@@ -20,7 +20,12 @@ export function StatusOf({ connection }: { connection: PartnerConnection }) {
   return <StatusBadge tone={status.tone}>{status.label}</StatusBadge>;
 }
 
-export const CONNECTION_COLUMNS: readonly DataGridColumn<PartnerConnection>[] = [
+type PartnerName = (settings: PartnerConnection["settings"]) => string;
+
+/** The connections' columns; the partner of incoming orders by its client's name (#4888). */
+export const connectionColumns = (
+  partnerName: PartnerName,
+): readonly DataGridColumn<PartnerConnection>[] => [
   {
     id: "name",
     header: "Name",
@@ -31,8 +36,8 @@ export const CONNECTION_COLUMNS: readonly DataGridColumn<PartnerConnection>[] = 
   {
     id: "partner",
     header: "Partner",
-    cell: (row) => row.settings.partner,
-    sortValue: (row) => row.settings.partner,
+    cell: (row) => partnerName(row.settings),
+    sortValue: (row) => partnerName(row.settings),
   },
   {
     id: "message",

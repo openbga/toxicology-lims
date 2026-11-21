@@ -54,6 +54,27 @@
               "notes": "`setup_status` also returns `laboratoryName`, the current laboratory profile's name or `null`, so the signed-out screens can show it before anyone signs in."
             },
             {
+              "id": "2026-11-20-incoming-order-outcomes",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "medium",
+              "title": "Clearer outcomes for incoming order messages",
+              "area": "Interfaces",
+              "link": "/interfaces/logs",
+              "summary": "In Interfaces › Logs a rejected order message names its reason, such as **Rejected – unknown test** or **Rejected – sender not accepted**, and shows a neutral **Resolved – rejected** once someone resolves it; resolved rejections no longer count under **Errors** on Connections. **Record** shows the placer order number for duplicates too, and opens the order that an **Order created** message made."
+            },
+            {
+              "id": "2026-11-20-reject-held-order-message",
+              "date": "2026-11-20",
+              "type": "fixed",
+              "impact": "medium",
+              "title": "Reject an incoming order held for review",
+              "area": "Interfaces",
+              "link": "/interfaces/logs",
+              "summary": "**Reject…** on an incoming order message that is **Held for review** in Interfaces › Logs now rejects it with the reason entered, as it does for one waiting for its patient. The row shows who rejected it and why, and no order is made from it.",
+              "notes": "Interfaces migration 0018 lets a held received message change state once, as a waiting one could. It adds no columns and changes no stored data."
+            },
+            {
               "id": "2026-11-20-installer-duplicate-installations",
               "date": "2026-11-20",
               "type": "changed",
@@ -276,6 +297,17 @@
               "impact": "low",
               "title": "Collapse all navigation areas with one button",
               "summary": "A Collapse all sections button beside … at the top of the navigation closes every open area at once, including the current page’s, which stays highlighted. It shows only while an area is open."
+            },
+            {
+              "id": "2026-11-20-connection-folders-and-clients",
+              "date": "2026-11-20",
+              "type": "fixed",
+              "impact": "low",
+              "title": "Plain folder paths and client names on connections",
+              "area": "Interfaces",
+              "link": "/interfaces/connections",
+              "summary": "On Windows, folder paths on Connections, a connection's page and Logs no longer start with `\\\\?\\`, also for folders chosen earlier. The **Partner** of an HL7 Orders connection shows the client's name instead of its code.",
+              "notes": "Stored folder paths are kept as they are, so destination checks stay valid; the prefix is removed where paths are shown."
             },
             {
               "id": "2026-11-20-user-menu-grouping",

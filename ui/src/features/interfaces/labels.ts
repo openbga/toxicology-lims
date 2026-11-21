@@ -302,7 +302,7 @@ export function transportOf(row: PartnerMessageRow): Labelled {
  * message became, or how an unrouted message was resolved.
  */
 export function applicationOf(row: PartnerMessageRow): Labelled | null {
-  if (row.received !== null) return receivedOutcome(row.received, row.errorCode);
+  if (row.received !== null) return receivedOutcome(row.received, row);
   if (row.resolution !== null) return { label: RESOLVED[row.resolution], tone: "neutral" };
   const ack = ackOutcome(row);
   if (ack) return ack;

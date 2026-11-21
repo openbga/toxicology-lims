@@ -32,6 +32,13 @@ pub fn without_verbatim_prefix(path: &str) -> String {
     }
 }
 
+/// A stored path as people see it (#4888): folders and file paths saved before the LIS kept
+/// the usual form still carry the prefix, and stay stored as they are, because destination
+/// checks are matched on the stored folder.
+pub(crate) fn shown_path(path: Option<String>) -> Option<String> {
+    path.map(|path| without_verbatim_prefix(&path))
+}
+
 fn is_drive(rest: &str) -> bool {
     let bytes = rest.as_bytes();
     bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\'
@@ -55,7 +62,7 @@ fn plain_part(part: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::without_verbatim_prefix as plain;
+    use super::{shown_path, without_verbatim_prefix as plain};
 
     #[test]
     fn drive_paths_lose_the_prefix() {
@@ -107,5 +114,15 @@ mod tests {
     #[test]
     fn names_that_only_look_like_devices_are_plain() {
         assert_eq!(plain(r"\\?\C:\console\com10\lpt"), r"C:\console\com10\lpt");
+    }
+
+    #[test]
+    fn a_stored_path_is_shown_in_its_usual_form() {
+        let stored = Some(r"\\?\C:\clinic\processed\2026\11\a.hl7".to_owned());
+        assert_eq!(
+            shown_path(stored).as_deref(),
+            Some(r"C:\clinic\processed\2026\11\a.hl7")
+        );
+        assert_eq!(shown_path(None), None);
     }
 }

@@ -16,6 +16,7 @@ use super::mllp::NO_ACK;
 use super::model::{PartnerConnectionId, PartnerMessageType};
 use super::received_queries::intake_counts;
 use super::repo::{self, ConnectionRow};
+use crate::folder_path::without_verbatim_prefix;
 use crate::model::ChangeStamp;
 
 /// Every connection by name (`manage_configuration`, checked by the engine).
@@ -160,13 +161,15 @@ fn connection_view(
     if verification.is_none() {
         allowed_actions.push("record_partner_destination_check".to_owned());
     }
+    // Shown in their usual form; stored as they are (#4888).
     let (processed_folder, failed_folder) = row.moved_to.map_or((None, None), |moved_to| {
-        (Some(moved_to.processed), Some(moved_to.failed))
+        let shown = |folder: &str| Some(without_verbatim_prefix(folder));
+        (shown(&moved_to.processed), shown(&moved_to.failed))
     });
     Ok(PartnerConnection {
         id: row.id,
         settings: row.settings,
-        folder: row.folder,
+        folder: without_verbatim_prefix(&row.folder),
         processed_folder,
         failed_folder,
         has_password: row.sealed_password.is_some(),

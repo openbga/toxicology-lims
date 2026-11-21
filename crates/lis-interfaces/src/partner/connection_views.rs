@@ -80,7 +80,8 @@ pub struct PartnerConnection {
     pub last_attempt: Option<LastAttempt>,
     /// Messages not written yet.
     pub waiting: u32,
-    /// Messages whose attempts failed, retrying or given up.
+    /// Messages whose attempts failed, retrying or given up; for an incoming connection, its
+    /// refused messages a person has not resolved yet (#4887).
     pub failing: u32,
     /// Messages sent over MLLP without an acknowledgement yet; they are sent again.
     pub awaiting_ack: u32,

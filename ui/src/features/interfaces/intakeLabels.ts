@@ -39,12 +39,46 @@ const OUTCOMES: Record<ReceivedState, { label: string; tone: Tone }> = {
   rejected: { label: "Rejected", tone: "danger" },
 };
 
-/** What a received message became, as the Application column shows it. */
-export function receivedOutcome(state: ReceivedState, reason: string | null) {
+/** Why a message was rejected, short enough for its badge: "Rejected – unknown test". */
+const REJECTED_AS: Record<string, string> = {
+  patient_unknown: "unknown patient",
+  not_accepted_sender: "sender not accepted",
+  unknown_test: "unknown test",
+  duplicate_test: "test ordered twice",
+  unknown_provider: "unknown provider",
+  no_provider: "no provider",
+  unknown_location: "unknown location",
+  unknown_client: "client not active",
+  diagnosis_system_missing: "no diagnosis system",
+  order_refused: "order rules",
+  not_text: "not text",
+  not_hl7: "not HL7",
+  unsupported_message: "not an order message",
+  no_control_id: "no control ID",
+  no_patient: "no patient ID",
+  no_order: "no order",
+  no_test: "no test code",
+  no_placer_order: "no order number",
+  unsupported_control: "not a new order",
+};
+
+/**
+ * What a received message became, as the Application column shows it. A rejection names its
+ * reason; once a person resolved it, or rejected it themselves, it is neutral, like a resolved
+ * unrouted message, and leaves the connection's Errors (#4887).
+ */
+export function receivedOutcome(
+  state: ReceivedState,
+  row: PartnerMessageRow,
+): { label: string; tone: Tone } {
   const outcome = OUTCOMES[state];
-  return state === "rejected" && reason === "unknown_test"
-    ? { ...outcome, label: "Rejected – unknown test" }
-    : outcome;
+  if (state !== "rejected") return outcome;
+  if (row.errorCode === "rejected_by_person") {
+    return { label: "Rejected – by a person", tone: "neutral" };
+  }
+  if (row.rejectionResolved !== null) return { label: "Resolved – rejected", tone: "neutral" };
+  const reason = row.errorCode === null ? undefined : REJECTED_AS[row.errorCode];
+  return reason === undefined ? outcome : { ...outcome, label: `Rejected – ${reason}` };
 }
 
 /** Why a received message stands where it does; `null` for a new order. An order made after
