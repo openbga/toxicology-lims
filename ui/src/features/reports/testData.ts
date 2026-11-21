@@ -26,6 +26,7 @@ export function sessionWith(capabilities: string[]): SessionInfo {
     username: "releaser",
     displayName: "Test Releaser",
     roles: [],
+    roleLabels: [],
     capabilities,
     idleTimeoutSeconds: 900,
     locked: false,

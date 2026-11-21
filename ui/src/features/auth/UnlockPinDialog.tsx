@@ -37,7 +37,7 @@ export function UnlockPinDialog({ onClose }: { onClose: () => void }) {
     );
   return (
     <Dialog
-      title="Unlock PIN"
+      title="Unlock PIN settings"
       isOpen
       onOpenChange={(open) => !open && onClose()}
       actions={<Button onPress={onClose}>Close</Button>}

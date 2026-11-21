@@ -45,6 +45,15 @@
           "impact": "medium",
           "entries": [
             {
+              "id": "2026-11-20-sign-in-screen-layout",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "medium",
+              "title": "A clearer sign-in screen with the laboratory name and an analyzers card",
+              "summary": "The sign-in screen names the laboratory under the product name and shows **Sign in** and **Use a security key** as full-width buttons with “or” between them. Under the form, on both the sign-in and lock screens, an **Analyzers** card sums the analyzers up in one line and opens one row per analyzer with its state and last activity, shown as “today 15:53”; whether the rows are open is remembered on this computer. The application version shows at the bottom of the screen.",
+              "notes": "`setup_status` also returns `laboratoryName`, the current laboratory profile's name or `null`, so the signed-out screens can show it before anyone signs in."
+            },
+            {
               "id": "2026-11-20-incoming-order-outcomes",
               "date": "2026-11-20",
               "type": "changed",
@@ -299,6 +308,23 @@
               "link": "/interfaces/connections",
               "summary": "On Windows, folder paths on Connections, a connection's page and Logs no longer start with `\\\\?\\`, also for folders chosen earlier. The **Partner** of an HL7 Orders connection shows the client's name instead of its code.",
               "notes": "Stored folder paths are kept as they are, so destination checks stay valid; the prefix is removed where paths are shown."
+            },
+            {
+              "id": "2026-11-20-user-menu-grouping",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "low",
+              "title": "The user menu groups account security and puts Lock now and Sign out last",
+              "summary": "In the menu that opens from your name, Change password, Security keys and **Unlock PIN settings**\n(formerly Unlock PIN) now sit under an **Account security** heading, each with its own icon.\nAppearance, About this app and the version follow, and **Lock now** and **Sign out** are at the\nbottom, after a line, with Sign out last."
+            },
+            {
+              "id": "2026-11-20-user-menu-signed-in",
+              "date": "2026-11-20",
+              "type": "added",
+              "impact": "low",
+              "title": "The user menu shows who is signed in and their roles",
+              "summary": "The menu that opens from your name at the top right now starts with your name and your roles,\nsuch as Accessioner, Analyst, or **All roles** when you hold every role. It is information only,\nso you can check which account is signed in before you work.",
+              "notes": "`current_session` (`SessionInfo`) adds `roleLabels`: the short names of `roles`, in the same order."
             },
             {
               "id": "2026-11-19-finish-receiving-layout",

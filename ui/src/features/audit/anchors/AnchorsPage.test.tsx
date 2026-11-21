@@ -17,6 +17,7 @@ function session(capabilities: string[]): SessionInfo {
     username: "auditor",
     displayName: "Test Auditor",
     roles: [],
+    roleLabels: [],
     capabilities,
     idleTimeoutSeconds: 900,
     locked: false,

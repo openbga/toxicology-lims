@@ -35,6 +35,14 @@ newest first. The application shows the same list under **What's new**.
 
 ### Medium impact
 
+- **Changed:** A clearer sign-in screen with the laboratory name and an analyzers card (2026-11-20)
+
+  The sign-in screen names the laboratory under the product name and shows **Sign in** and **Use a security key** as full-width buttons with “or” between them. Under the form, on both the sign-in and lock screens, an **Analyzers** card sums the analyzers up in one line and opens one row per analyzer with its state and last activity, shown as “today 15:53”; whether the rows are open is remembered on this computer. The application version shows at the bottom of the screen.
+
+  Technical notes:
+
+  `setup_status` also returns `laboratoryName`, the current laboratory profile's name or `null`, so the signed-out screens can show it before anyone signs in.
+
 - **Changed:** Clearer outcomes for incoming order messages (2026-11-20)
 
   In Interfaces › Logs a rejected order message names its reason, such as **Rejected – unknown test** or **Rejected – sender not accepted**, and shows a neutral **Resolved – rejected** once someone resolves it; resolved rejections no longer count under **Errors** on Connections. **Record** shows the placer order number for duplicates too, and opens the order that an **Order created** message made.
@@ -172,6 +180,23 @@ newest first. The application shows the same list under **What's new**.
   Technical notes:
 
   Stored folder paths are kept as they are, so destination checks stay valid; the prefix is removed where paths are shown.
+
+- **Changed:** The user menu groups account security and puts Lock now and Sign out last (2026-11-20)
+
+  In the menu that opens from your name, Change password, Security keys and **Unlock PIN settings**
+  (formerly Unlock PIN) now sit under an **Account security** heading, each with its own icon.
+  Appearance, About this app and the version follow, and **Lock now** and **Sign out** are at the
+  bottom, after a line, with Sign out last.
+
+- **Added:** The user menu shows who is signed in and their roles (2026-11-20)
+
+  The menu that opens from your name at the top right now starts with your name and your roles,
+  such as Accessioner, Analyst, or **All roles** when you hold every role. It is information only,
+  so you can check which account is signed in before you work.
+
+  Technical notes:
+
+  `current_session` (`SessionInfo`) adds `roleLabels`: the short names of `roles`, in the same order.
 
 - **Changed:** Finish receiving shows each specimen's next step in one box (2026-11-19)
 

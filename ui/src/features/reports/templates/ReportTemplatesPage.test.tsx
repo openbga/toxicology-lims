@@ -21,6 +21,7 @@ function session(capabilities: string[]): SessionInfo {
     username: "quality",
     displayName: "Test Quality Manager",
     roles: [],
+    roleLabels: [],
     capabilities,
     idleTimeoutSeconds: 900,
     locked: false,

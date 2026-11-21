@@ -71,6 +71,8 @@ pub struct SessionInfo {
     pub display_name: String,
     /// Current roles.
     pub roles: Vec<RoleCode>,
+    /// The short names of `roles`, in the same order, for the user menu (ticket #4869).
+    pub role_labels: Vec<String>,
     /// Capability codes the roles grant now.
     pub capabilities: Vec<String>,
     /// The engine's idle timeout.
@@ -87,6 +89,11 @@ impl SessionInfo {
             username: user.username.clone(),
             display_name: user.display_name.clone(),
             roles: user.roles.clone(),
+            role_labels: user
+                .roles
+                .iter()
+                .map(|role| role.label().to_owned())
+                .collect(),
             capabilities: user
                 .capabilities()
                 .into_iter()

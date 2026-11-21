@@ -2,14 +2,14 @@
   "id": "about",
   "title": "About this app",
   "summary": "Find the software versions to include when reporting an application problem.",
-  "reviewedOn": "2026-11-12",
+  "reviewedOn": "2026-11-20",
   "routes": ["/about"],
   "sections": [
     {
       "title": "How to use this page",
       "paragraphs": [
         "Read the app version, web engine version and platform shown on this page. Include these details when reporting a problem so support can identify the software involved. If the web engine version says Not reported by the operating system, include that wording rather than guessing a version.",
-        "The app version is also the last line of the user menu (your name, top right), such as Version 0.1.2-nightly.20261103.24, followed by a small copy icon in the same gray text. The icon darkens when you point at the line or move to it with the arrow keys. Choose anywhere on that line to copy the version to the clipboard; the menu stays open and, for about two seconds, the icon becomes a check mark followed by Copied. If the clipboard cannot be used, Not copied shows instead; read the version from the menu or this page. The line is missing while the version cannot be loaded."
+        "The app version is also in the user menu (your name, top right), on the line right after About this app, such as Version 0.1.2-nightly.20261103.24, followed by a small copy icon in the same gray text. The icon darkens when you point at the line or move to it with the arrow keys. Choose anywhere on that line to copy the version to the clipboard; the menu stays open and, for about two seconds, the icon becomes a check mark followed by Copied. If the clipboard cannot be used, Not copied shows instead; read the version from the menu or this page. The line is missing while the version cannot be loaded."
       ]
     },
     {
@@ -70,7 +70,7 @@
         "Use synthetic examples and omit patient data and credentials from support descriptions."
       ],
       "workflow": [
-        "Open About this app from the user menu. To paste only the app version, choose the Version line at the bottom of the user menu instead.",
+        "Open About this app from the user menu. To paste only the app version, choose the Version line under About this app in the user menu instead.",
         "Read all three values and retain any visible error/correlation ID.",
         "Use Versions and updates for update approval history or Host health for operational checks."
       ],

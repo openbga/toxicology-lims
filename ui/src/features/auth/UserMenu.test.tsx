@@ -62,6 +62,43 @@ describe("UserMenu", () => {
     await expectNoA11yViolations(container);
   });
 
+  it("names the person and their roles at the top of the menu, not as an item (#4869)", async () => {
+    mockCommands({
+      current_session: () => ({
+        ...TEST_SESSION,
+        roles: ["accessioner", "analyst"],
+        roleLabels: ["Accessioner", "Analyst"],
+      }),
+    });
+    const { user } = renderMenu();
+    await user.click(await screen.findByRole("button", { name: "Signed in as Test Analyst" }));
+    const menu = await screen.findByRole("menu", {
+      description: "Test Analyst Accessioner, Analyst",
+    });
+    expect(within(menu).queryByText("Accessioner, Analyst")).toBeNull();
+    expect(screen.getByText("Accessioner, Analyst")).toBeTruthy();
+    await expectNoA11yViolations(document.body);
+  });
+
+  it("says All roles when the person holds every role (#4869)", async () => {
+    const roles = [
+      "accessioner",
+      "analyst",
+      "technical_reviewer",
+      "releaser",
+      "quality_manager",
+      "billing",
+      "auditor",
+      "administrator",
+    ] as const;
+    mockCommands({
+      current_session: () => ({ ...TEST_SESSION, roles: [...roles], roleLabels: [...roles] }),
+    });
+    const { user } = renderMenu();
+    await user.click(await screen.findByRole("button", { name: "Signed in as Test Analyst" }));
+    expect(await screen.findByText("All roles")).toBeTruthy();
+  });
+
   it("offers the account actions and About this app in one menu, from the keyboard", async () => {
     mockCommands({ current_session: () => TEST_SESSION });
     const { user } = renderMenu();
@@ -78,11 +115,13 @@ describe("UserMenu", () => {
     ).toEqual([
       "Change password",
       "Security keys",
-      "Unlock PIN",
+      "Unlock PIN settings",
+      "About this app",
       "Lock now",
       "Sign out",
-      "About this app",
     ]);
+    const security = within(menu).getByRole("group", { name: "Account security" });
+    expect(within(security).getAllByRole("menuitem")).toHaveLength(3);
     await expectNoA11yViolations(document.body);
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
@@ -96,7 +135,7 @@ describe("UserMenu", () => {
     expect(await screen.findByText("Navigated to /about")).toBeTruthy();
   });
 
-  it("shows the running version last and copies it, staying open (#4584, #4745)", async () => {
+  it("shows the running version after About this app and copies it, staying open (#4584, #4745, #4868)", async () => {
     mockCommands({
       current_session: () => TEST_SESSION,
       app_info: () => ({ appVersion: "0.1.2-nightly.20261103.24" }),
@@ -106,7 +145,14 @@ describe("UserMenu", () => {
     const item = await screen.findByRole("menuitem", {
       name: "Copy version 0.1.2-nightly.20261103.24",
     });
-    expect(screen.getAllByRole("menuitem").at(-1)).toBe(item);
+    const items = screen.getAllByRole("menuitem");
+    expect(items.map((row) => row.textContent).slice(-4)).toEqual([
+      "About this app",
+      "Version 0.1.2-nightly.20261103.24",
+      "Lock now",
+      "Sign out",
+    ]);
+    expect(items.at(-3)).toBe(item);
     expect(item.textContent).toBe("Version 0.1.2-nightly.20261103.24");
     await expectNoA11yViolations(document.body);
     await user.click(item);
@@ -139,19 +185,19 @@ describe("UserMenu", () => {
       },
     });
     const { user } = renderMenu();
-    await choose(user, "Unlock PIN");
+    await choose(user, "Unlock PIN settings");
     await user.click(await screen.findByRole("button", { name: "Enable PIN" }));
     await user.type(screen.getByLabelText(/^New unlock PIN/), "042759");
     await user.type(screen.getByLabelText(/^Confirm unlock PIN/), "042759");
     await user.type(screen.getByLabelText(/^Your password/), "synthetic-password");
     await user.click(screen.getByRole("button", { name: "Enable PIN" }));
     await screen.findByText("Unlock PIN enabled");
-    await choose(user, "Unlock PIN");
+    await choose(user, "Unlock PIN settings");
     await user.click(await screen.findByRole("button", { name: "Disable PIN" }));
     await user.type(screen.getByLabelText(/^Your password/), "synthetic-password");
     await user.click(screen.getByRole("button", { name: "Disable PIN" }));
     await screen.findByText("Unlock PIN disabled");
-    await choose(user, "Unlock PIN");
+    await choose(user, "Unlock PIN settings");
     expect(await screen.findByRole("button", { name: "Enable PIN" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Disable PIN" })).toBeNull();
   });

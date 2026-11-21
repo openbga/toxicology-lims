@@ -60,11 +60,9 @@ export function RestartSummary() {
 
 export function ListenerList({
   listeners,
-  stacked,
   controls,
 }: {
   listeners: ListenersQuery;
-  stacked?: boolean;
   controls?: RowControls;
 }) {
   if (listeners.isPending) return <StatusBadge tone="neutral">Checking</StatusBadge>;
@@ -72,14 +70,10 @@ export function ListenerList({
   if (listeners.isError) return <StatusBadge tone="neutral">Status unavailable</StatusBadge>;
   if (listeners.data.length === 0) return <span>No instruments configured</span>;
   return (
-    <ul className={stacked ? styles.stacked : styles.list}>
-      {listeners.data.map((listener) =>
-        stacked ? (
-          <ListenerRow key={listener.instrumentId} listener={listener} controls={controls} />
-        ) : (
-          <ListenerItem key={listener.instrumentId} listener={listener} controls={controls} />
-        ),
-      )}
+    <ul className={styles.stacked}>
+      {listeners.data.map((listener) => (
+        <ListenerRow key={listener.instrumentId} listener={listener} controls={controls} />
+      ))}
     </ul>
   );
 }
@@ -112,32 +106,6 @@ function ListenerRow({
         )}
       </span>
       {controls && <span className={styles.action}>{controls.actionOf(listener)}</span>}
-    </li>
-  );
-}
-
-function ListenerItem({
-  listener,
-  controls,
-}: {
-  listener: ListenerStatusView;
-  controls?: RowControls;
-}) {
-  const state = LISTENER_STATES[listener.state];
-  const detail = listenerDetailText(listener);
-  return (
-    <li className={styles.listener}>
-      <span className={styles.name}>
-        {controls ? controls.nameOf(listener) : listener.instrumentName}
-      </span>
-      <StatusBadge tone={state.tone}>{state.label}</StatusBadge>
-      {listener.lastActivityAt && (
-        <span className={styles.detail}>
-          Last activity <Timestamp value={listener.lastActivityAt} />
-        </span>
-      )}
-      {detail && <span className={styles.detail}>{detail}</span>}
-      {controls?.actionOf(listener)}
     </li>
   );
 }

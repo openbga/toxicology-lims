@@ -1,34 +1,64 @@
-.listeners {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-text-muted);
+/* The sign-in and lock screens' card under the form (ticket #4885). */
+.card {
+  composes: section from "../../components/Section/Section.module.css";
+  align-items: flex-start;
 }
 
-.heading {
-  font-weight: var(--font-weight-semibold);
-}
-
-.list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-}
-
-.listener {
+/* The one summary line: the counts, then that results arrive without anyone signed in. */
+.summary {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  text-align: start;
+}
+
+.note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+/* One row per analyzer, its name, state and last activity in aligned columns. */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-2) var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table thead th {
+  border-top: none;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+}
+
+.table tbody th {
+  color: var(--color-text);
+  font-weight: var(--font-weight-regular);
+  overflow-wrap: anywhere;
+}
+
+.table td:last-child {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.reason {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
 }
 
 .name {
   color: var(--color-text);
-}
-
-.detail {
-  font-size: var(--font-size-sm);
 }
 
 /* The window's list: one row per analyzer, separated by a rule (ticket #4746). */
