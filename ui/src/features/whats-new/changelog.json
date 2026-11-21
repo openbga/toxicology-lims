@@ -269,6 +269,23 @@
               "summary": "A Collapse all sections button beside … at the top of the navigation closes every open area at once, including the current page’s, which stays highlighted. It shows only while an area is open."
             },
             {
+              "id": "2026-11-20-user-menu-grouping",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "low",
+              "title": "The user menu groups account security and puts Lock now and Sign out last",
+              "summary": "In the menu that opens from your name, Change password, Security keys and **Unlock PIN settings**\n(formerly Unlock PIN) now sit under an **Account security** heading, each with its own icon.\nAppearance, About this app and the version follow, and **Lock now** and **Sign out** are at the\nbottom, after a line, with Sign out last."
+            },
+            {
+              "id": "2026-11-20-user-menu-signed-in",
+              "date": "2026-11-20",
+              "type": "added",
+              "impact": "low",
+              "title": "The user menu shows who is signed in and their roles",
+              "summary": "The menu that opens from your name at the top right now starts with your name and your roles,\nsuch as Accessioner, Analyst, or **All roles** when you hold every role. It is information only,\nso you can check which account is signed in before you work.",
+              "notes": "`current_session` (`SessionInfo`) adds `roleLabels`: the short names of `roles`, in the same order."
+            },
+            {
               "id": "2026-11-19-finish-receiving-layout",
               "date": "2026-11-19",
               "type": "changed",

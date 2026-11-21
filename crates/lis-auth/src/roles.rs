@@ -84,6 +84,12 @@ impl RoleCode {
         }
     }
 
+    /// The role's short name, as screens show it.
+    #[must_use]
+    pub fn label(self) -> &'static str {
+        self.definition().label
+    }
+
     /// The capabilities this role grants.
     #[must_use]
     pub fn capabilities(self) -> &'static [Capability] {

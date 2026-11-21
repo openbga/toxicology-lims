@@ -2,7 +2,7 @@
   "id": "users",
   "title": "Users and access",
   "summary": "Manage individual accounts and roles, and maintain your own security keys, optional unlock PIN and appearance from the signed-in menu.",
-  "reviewedOn": "2026-11-17",
+  "reviewedOn": "2026-11-20",
   "routes": ["/users"],
   "sections": [
     {
@@ -31,8 +31,8 @@
         "The personal unlock PIN is optional and separate from a physical security key’s PIN. It is available to password and key accounts after normal sign-in. Follow the laboratory’s approved workstation and session policy; keep using your own account."
       ],
       "steps": [
-        "Open Signed in as … → Unlock PIN and choose Enable PIN or Change PIN.",
-        "Enter and confirm a personal six-digit PIN, then confirm with your password or registered security key. Read the success message and reopen Unlock PIN to verify Enabled.",
+        "Open Signed in as … → Unlock PIN settings, under Account security, and choose Enable PIN or Change PIN.",
+        "Enter and confirm a personal six-digit PIN, then confirm with your password or registered security key. Read the success message and reopen Unlock PIN settings to verify Enabled.",
         "When your session locks, enter the PIN or choose your normal unlock method. Choose Disable PIN in the settings dialog when you no longer want this option."
       ]
     },
@@ -65,7 +65,7 @@
       "title": "Users",
       "routes": ["/users"],
       "purpose": "Create individual accounts, assign authorized roles and manage sign-in access.",
-      "access": "Manage users administers accounts and nonclinical roles; Manage quality assigns clinical roles. Resetting a clinical account requires both. The engine checks each action even when a button is visible. Every signed-in person can manage their own keys from Signed in as … → Security keys; this does not grant access to another person’s credentials or to the Users directory. Every signed-in person can also manage their own optional personal PIN through Signed in as … → Unlock PIN; user-administration permission is not required.",
+      "access": "Manage users administers accounts and nonclinical roles; Manage quality assigns clinical roles. Resetting a clinical account requires both. The engine checks each action even when a button is visible. The menu that opens from your name at the top right shows, in order: your name and roles; Account security (Change password for password accounts, Security keys, Unlock PIN settings); Appearance; About this app and the version; then, after a line, Lock now and Sign out. Every signed-in person can manage their own keys from Signed in as … → Security keys; this does not grant access to another person’s credentials or to the Users directory. Every signed-in person can also manage their own optional personal PIN through Signed in as … → Unlock PIN settings; user-administration permission is not required.",
       "fields": [
         {
           "name": "Find users",
@@ -185,7 +185,13 @@
           "name": "Unlock PIN status",
           "meaning": "Whether your account has enabled the optional PIN for resuming its current locked session.",
           "values": "Enabled or Disabled; disabled by default.",
-          "rules": "Read-only in the Unlock PIN dialog. Changes require your password or registered security key. This setting is personal, not shared by the workstation."
+          "rules": "Read-only in the Unlock PIN settings dialog. Changes require your password or registered security key. This setting is personal, not shared by the workstation."
+        },
+        {
+          "name": "Signed in as … (name and roles)",
+          "meaning": "Who is signed in on this window, shown at the top of the menu that opens from your name at the top right.",
+          "values": "Your name, then your roles as short names separated by commas, such as Accessioner, Analyst. All roles appears when you hold every role, and No roles when you hold none.",
+          "rules": "Information only: it is not a menu item and cannot be chosen. It shows the roles of your current session. Roles describe software access, not laboratory qualifications."
         },
         {
           "name": "Appearance",
@@ -304,7 +310,7 @@
           "result": "Closing the inventory does not revoke keys. Cancelling before successful enrollment leaves the previous credentials usable."
         },
         {
-          "name": "Signed in as … / Unlock PIN",
+          "name": "Signed in as … / Unlock PIN settings",
           "does": "Opens the status and controls for your personal unlock PIN.",
           "availableWhen": "Any signed-in user with an unlocked session.",
           "result": "Shows Enabled or Disabled. This does not change your initial sign-in method or grant account-administration authority."
@@ -313,16 +319,16 @@
           "name": "Enable PIN / Change PIN",
           "does": "Opens the PIN form and then saves or replaces your personal unlock PIN when submitted.",
           "availableWhen": "Enable PIN when disabled; Change PIN when enabled. Supply New unlock PIN, matching Confirm unlock PIN and fresh password or security-key confirmation. No reason is requested.",
-          "result": "A success message confirms the change. Your current session stays open, other sessions end, and your current PIN attempt budget resets. Reopen Unlock PIN to verify Enabled."
+          "result": "A success message confirms the change. Your current session stays open, other sessions end, and your current PIN attempt budget resets. Reopen Unlock PIN settings to verify Enabled."
         },
         {
           "name": "Disable PIN",
           "does": "Opens a confirmation and removes your personal unlock PIN when confirmed.",
           "availableWhen": "PIN is enabled; fresh password or registered security-key confirmation required. The PIN itself cannot authorize removal.",
-          "result": "A success message confirms removal. Future unlocks require your normal password or key. Other sessions end; the current session stays open. Reopen Unlock PIN to verify Disabled."
+          "result": "A success message confirms removal. Future unlocks require your normal password or key. Other sessions end; the current session stays open. Reopen Unlock PIN settings to verify Disabled."
         },
         {
-          "name": "Close / Cancel (Unlock PIN)",
+          "name": "Close / Cancel (Unlock PIN settings)",
           "does": "Closes the status dialog or abandons an unsent PIN configuration form.",
           "availableWhen": "The dialog is open; form cancellation is unavailable while its command is pending.",
           "result": "An unsent form does not change the PIN. Submitted changes take effect only on success."
@@ -332,6 +338,12 @@
           "does": "Changes your appearance and remembers the choice for your account on this computer.",
           "availableWhen": "Any signed-in user. No password, reason or permission is needed.",
           "result": "The app and the window title bar change at once and the menu closes. It is a display preference, so nothing is added to the audit trail."
+        },
+        {
+          "name": "Signed in as … / Lock now",
+          "does": "Locks your session at once and shows the lock screen.",
+          "availableWhen": "Any signed-in user. It sits after the line near the bottom of the menu, just above Sign out.",
+          "result": "Cached screens are cleared and the workspace is hidden; the app and analyzer listeners keep running. Unlock with your password, security key or enabled unlock PIN. If the engine refuses, The session did not change appears."
         },
         {
           "name": "Signed in as … / Sign out",
@@ -346,7 +358,7 @@
           "result": "Cancel returns to the page with what you typed. Sign out without saving signs out; the typed input is lost and nothing about it is recorded."
         },
         {
-          "name": "Try again (Unlock PIN status)",
+          "name": "Try again (Unlock PIN settings)",
           "does": "Checks your PIN configuration again after a status error.",
           "availableWhen": "The status could not be read.",
           "result": "Enable, Change and Disable controls appear only after a successful status read."
@@ -408,11 +420,11 @@
         },
         {
           "problem": "You forgot your personal unlock PIN",
-          "recovery": "Use password or security key instead on the lock screen. After unlocking, open Unlock PIN to change or disable it using your normal credential; the old PIN is not required."
+          "recovery": "Use password or security key instead on the lock screen. After unlocking, open Unlock PIN settings to change or disable it using your normal credential; the old PIN is not required."
         },
         {
           "problem": "A PIN configuration change is cancelled or expires",
-          "recovery": "A session lock, sign-out, user change, expiry, timeout or clock change can invalidate confirmation. A cancelled change is not saved. Unlock or sign in again, reopen Unlock PIN, check its status and retry with a fresh confirmation."
+          "recovery": "A session lock, sign-out, user change, expiry, timeout or clock change can invalidate confirmation. A cancelled change is not saved. Unlock or sign in again, reopen Unlock PIN settings, check its status and retry with a fresh confirmation."
         },
         {
           "problem": "The unlock PIN disappeared after account recovery or credential reset",

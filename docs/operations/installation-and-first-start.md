@@ -248,9 +248,9 @@ whose people use security keys. See [Backups and recovery kit](backups-and-recov
 
 ## Optional personal unlock PIN
 
-After normal sign-in, any user can open **Signed in as … → Unlock PIN**. The personal PIN is
-disabled by default. It resumes only that person's existing locked session and is separate from
-a physical security key's PIN. Follow the laboratory's approved workstation and session policy.
+After normal sign-in, any user can open **Signed in as … → Unlock PIN settings** under
+**Account security**. The personal PIN is disabled by default. It resumes only that person's
+existing locked session and is separate from a physical security key's PIN. Follow the laboratory's approved workstation and session policy.
 
 1. Choose **Enable PIN** or, if already enabled, **Change PIN**.
 2. Enter **New unlock PIN** and **Confirm unlock PIN**. Both are required, masked and initially
@@ -259,8 +259,9 @@ a physical security key's PIN. Follow the laboratory's approved workstation and 
    three-digit blocks and common patterns (`112233`, `123321`, `159753`, `147258`, `258369`,
    `102030`) are rejected. Do not share your PIN.
 3. Confirm with **Your password** or your registered **Security key**, then submit. The previous
-   unlock PIN cannot confirm a change. A success message confirms saving; reopen **Unlock PIN**
-   to check **Enabled**. Saving ends your other sessions and keeps the current session open.
+   unlock PIN cannot confirm a change. A success message confirms saving; reopen
+   **Unlock PIN settings** to check **Enabled**. Saving ends your other sessions and keeps the
+   current session open.
 
 The lock screen offers **Unlock PIN** first when enabled. Enter it and choose **Unlock**. You can
 instead choose **Use password instead** or **Use security key instead**, and **Use unlock PIN**
@@ -274,7 +275,7 @@ different-user sign-in remain available.
 | Forgotten PIN | Use your normal unlock method, then change or disable the PIN using your password or key. The old PIN is not required and cannot be displayed. |
 | Restart, sign-out or 12-hour session limit | Normal sign-in is required. A PIN cannot start a new session or extend the absolute 12-hour session limit. |
 | Sensitive action | Confirm with the account's normal password or registered key. The personal unlock PIN cannot approve the action. |
-| Disable PIN | Open **Unlock PIN → Disable PIN**, then confirm with your password or key. A success message confirms removal. Other sessions end; the current one stays open. Future unlocks use the normal method. |
+| Disable PIN | Open **Unlock PIN settings → Disable PIN**, then confirm with your password or key. A success message confirms removal. Other sessions end; the current one stays open. Future unlocks use the normal method. |
 | Close / Cancel | Leaves the status dialog or abandons an unsent form. Form cancellation is unavailable while its command is pending. Unsubmitted changes are not saved. |
 | Status error / Try again | Checks the current setting again. Configuration controls appear only after a successful status read. |
 | Configuration cancelled or expired | A session lock, sign-out, user change, expiry, timeout or clock change can invalidate confirmation; a cancelled change is not saved. Unlock or sign in again, reopen the setting, check its status and retry with fresh confirmation. |

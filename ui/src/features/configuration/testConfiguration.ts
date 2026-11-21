@@ -15,6 +15,7 @@ export function sessionWith(capabilities: string[], userId = AUTHOR_ID): Session
     username: "config",
     displayName: "Test Configurer",
     roles: [],
+    roleLabels: [],
     capabilities,
     idleTimeoutSeconds: 900,
     locked: false,

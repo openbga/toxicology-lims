@@ -17,6 +17,7 @@ const sessionWith = (capabilities: string[]): SessionInfo => ({
   username: "synthetic.user",
   displayName: "Synthetic User",
   roles: [],
+  roleLabels: [],
   capabilities,
   idleTimeoutSeconds: 900,
   locked: false,

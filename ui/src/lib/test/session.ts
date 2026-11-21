@@ -7,6 +7,7 @@ export function session(capabilities: readonly string[]): SessionInfo {
     username: "reviewer",
     displayName: "Robin Reviewer",
     roles: ["administrator"],
+    roleLabels: ["Administrator"],
     capabilities: [...capabilities],
     idleTimeoutSeconds: 900,
     locked: false,

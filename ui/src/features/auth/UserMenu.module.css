@@ -53,3 +53,23 @@
 .item[data-focused] .copyIcon {
   color: var(--color-text);
 }
+
+/* Who is signed in, above the menu's items: information only, not an item (ticket #4869). */
+.signedIn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 20rem;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.signedInName {
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.signedInRoles {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
