@@ -75,22 +75,24 @@ fn quit_prompt(unsaved: &[String], in_progress: &[String]) -> Option<QuitPrompt>
          unfinished.",
         in_progress.join("\n• ")
     );
+    let title = "Quit OpenBGA Toxicology LIMS?";
+    let lost = format!("{unsaved_text} What you typed will be lost.");
     match (unsaved.is_empty(), in_progress.is_empty()) {
         (true, true) => None,
         (false, true) => Some(QuitPrompt {
-            title: "Leave without saving?",
-            text: format!("{unsaved_text} Leave without saving?"),
-            leave: "Leave",
+            title,
+            text: lost,
+            leave: "Quit without saving",
         }),
         (true, false) => Some(QuitPrompt {
-            title: "Quit OpenBGA Toxicology LIMS?",
+            title,
             text: in_progress_text,
             leave: "Quit anyway",
         }),
         (false, false) => Some(QuitPrompt {
-            title: "Quit OpenBGA Toxicology LIMS?",
-            text: format!("{unsaved_text} What you typed is lost.\n\n{in_progress_text}"),
-            leave: "Quit anyway",
+            title,
+            text: format!("{lost}\n\n{in_progress_text}"),
+            leave: "Quit without saving",
         }),
     }
 }
@@ -196,14 +198,15 @@ mod tests {
     }
 
     #[test]
-    fn unsaved_forms_alone_ask_to_leave_without_saving() {
+    fn unsaved_forms_alone_ask_to_quit_without_saving() {
         let prompt = quit_prompt(&names(&["New order", "Register patient"]), &[]).unwrap();
-        assert_eq!(prompt.title, "Leave without saving?");
+        assert_eq!(prompt.title, "Quit OpenBGA Toxicology LIMS?");
         assert_eq!(
             prompt.text,
-            "You have unsaved changes in New order, Register patient. Leave without saving?"
+            "You have unsaved changes in New order, Register patient. What you typed will be \
+             lost."
         );
-        assert_eq!(prompt.leave, "Leave");
+        assert_eq!(prompt.leave, "Quit without saving");
     }
 
     #[test]
@@ -228,10 +231,10 @@ mod tests {
         assert_eq!(prompt.title, "Quit OpenBGA Toxicology LIMS?");
         assert_eq!(
             prompt.text,
-            "You have unsaved changes in New order. What you typed is lost.\n\nThese are \
-             still in progress:\n\n• Analyzer A is listening\n• A backup is running\n\n\
+            "You have unsaved changes in New order. What you typed will be lost.\n\nThese \
+             are still in progress:\n\n• Analyzer A is listening\n• A backup is running\n\n\
              Quitting now may leave results or copies unfinished."
         );
-        assert_eq!(prompt.leave, "Quit anyway");
+        assert_eq!(prompt.leave, "Quit without saving");
     }
 }

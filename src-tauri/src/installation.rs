@@ -90,7 +90,7 @@ pub(crate) struct Folders {
 }
 
 /// `<parent>/<name><suffix>`: a sibling of `path`, never inside it.
-fn sibling(path: &Path, suffix: &str) -> Option<PathBuf> {
+pub(crate) fn sibling(path: &Path, suffix: &str) -> Option<PathBuf> {
     let name = path.file_name()?.to_str()?;
     Some(path.parent()?.join(format!("{name}{suffix}")))
 }

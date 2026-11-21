@@ -105,12 +105,13 @@ The application checks for work that closing could interrupt:
 It also names any full-page form with typed input that is not saved, such as New order or Register
 patient (page names only, never what was typed).
 
-If nothing is pending or unsaved, it closes. With only unsaved input, a native dialog says "You
-have unsaved changes in <page>. Leave without saving?" and offers **Cancel** or **Leave**. With work
-in progress, the dialog lists the PHI-free warnings, and any unsaved page, and offers **Cancel** or
-**Quit anyway**. **Cancel** is the default button, so Enter keeps the app open. Prefer **Cancel**,
-save the page or finish and reconcile the work, and then close. Choosing **Quit anyway** with work
-in progress records the stop and attributes it to the signed-in person or the sign-in screen;
+If nothing is pending or unsaved, it closes. Otherwise a native dialog titled "Quit OpenBGA
+Toxicology LIMS?" asks first. With unsaved input it says "You have unsaved changes in <page>. What
+you typed will be lost." and offers **Cancel** or **Quit without saving**; when work is also in
+progress, the same dialog lists the PHI-free warnings below that sentence. With work in progress
+and nothing unsaved, it lists the warnings and offers **Cancel** or **Quit anyway**. **Cancel** is
+the default button, so Enter keeps the app open. Prefer **Cancel**, save the page or finish and
+reconcile the work, and then close. Quitting with work in progress records the stop and attributes it to the signed-in person or the sign-in screen;
 leaving unsaved input alone is not recorded. **Sign out** in the signed-in menu asks the same
 "Leave without saving?" question in the app when a page form is unsaved; analyzers keep listening
 at the sign-in screen. During operating-system shutdown or sign-out, the warning is not allowed to prevent the
@@ -196,9 +197,9 @@ itself with true current time.
 
 ## What an unclean stop means
 
-An unclean stop means the previous application run had no recorded clean or **Quit anyway** stop.
-It can follow a power loss, process crash, forced termination, OS sign-out or reboot. It does not
-by itself prove database damage or lost results.
+An unclean stop means the previous application run had no recorded clean or confirmed quit
+(**Quit anyway** or **Quit without saving**). It can follow a power loss, process crash, forced
+termination, OS sign-out or reboot. It does not by itself prove database damage or lost results.
 
 At the next start, the application marks the prior run unclean, records the gap, marks interrupted
 operations jobs accordingly, reconciles receipts and starts listeners. Review **Health history**,
