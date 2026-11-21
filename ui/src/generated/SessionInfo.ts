@@ -22,6 +22,10 @@ displayName: string,
  */
 roles: Array<RoleCode>, 
 /**
+ * The short names of `roles`, in the same order, for the user menu (ticket #4869).
+ */
+roleLabels: Array<string>, 
+/**
  * Capability codes the roles grant now.
  */
 capabilities: Array<string>, 

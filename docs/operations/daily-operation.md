@@ -6,7 +6,9 @@ sign-in screen and actions taken later still require a person's account.
 
 ## Personal sessions and confirmations
 
-Use your individual LIS account even on a shared desktop. **Signed in as … → Lock now** hides the
+Use your individual LIS account even on a shared desktop. The menu that opens from your name at
+the top right starts with your name and roles (**All roles** when you hold every role), so you can
+check which account is signed in. **Signed in as … → Lock now** hides the
 workspace while the app and analyzer listeners continue running. Unlock with the same account's
 password, selected security key or, when enabled, the optional
 [personal unlock PIN](installation-and-first-start.md#optional-personal-unlock-pin). Restart,

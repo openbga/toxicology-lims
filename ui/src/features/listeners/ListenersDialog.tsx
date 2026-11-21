@@ -64,7 +64,7 @@ export function ListenersDialog({
     >
       <RestartSummary />
       {controls.notice}
-      <ListenerList listeners={listeners} stacked controls={controls.row} />
+      <ListenerList listeners={listeners} controls={controls.row} />
       {controls.confirmation}
     </Dialog>
   );

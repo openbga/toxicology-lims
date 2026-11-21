@@ -31,10 +31,16 @@ pub(super) fn session_of(principal: &Principal) -> Result<(UserId, SessionId), F
 }
 
 impl Engine {
-    /// `setup_status` (public).
+    /// `setup_status` (public). Also names the laboratory, so the sign-in and
+    /// lock screens show it before anyone is signed in (ticket #4885).
     pub async fn setup_status(&self) -> Result<SetupStatus, CommandError> {
         self.run(&SETUP_STATUS, |call| async move {
-            self.read(&call, lis_auth::setup_status).await
+            let mut status = self.read(&call, lis_auth::setup_status).await?;
+            status.laboratory_name = self
+                .read(&call, lis_identity::current_laboratory_profile)
+                .await?
+                .map(|profile| profile.name);
+            Ok(status)
         })
         .await
     }

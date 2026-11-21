@@ -29,6 +29,7 @@ export const ADMIN: SessionInfo = {
   username: "admin",
   displayName: "Test Admin",
   roles: [],
+  roleLabels: [],
   capabilities: ["manage_configuration"],
   idleTimeoutSeconds: 900,
   locked: false,

@@ -1,5 +1,5 @@
 import { screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ListenerStatusView } from "@/generated/ListenerStatusView";
 import { expectNoA11yViolations } from "@/lib/test/a11y";
 import { engineError, mockCommands } from "@/lib/test/ipc";
@@ -14,12 +14,18 @@ const ANALYZER: ListenerStatusView = {
   detail: null,
 };
 
-describe("ListenerStatus (REQ-OPS-013)", () => {
+const OPEN_KEY = "vibe-tox.sign-in-analyzers-open-v1";
+
+describe("ListenerStatus (REQ-OPS-013, #4885)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it("shows each listener's state and last activity", async () => {
+  it("sums the analyzers up in one line and opens one row per analyzer on request", async () => {
+    vi.useFakeTimers({ now: new Date("2026-10-12T20:00:00Z"), shouldAdvanceTime: true });
     mockCommands({
       list_listener_status: () => [
         ANALYZER,
@@ -33,13 +39,34 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
         },
       ],
     });
-    const { container } = renderWithProviders(<ListenerStatus />);
-    expect(await screen.findByText("Synthetic Analyzer 1")).toBeTruthy();
-    expect(screen.getByText("Receiving")).toBeTruthy();
-    expect(screen.getByText("2026-10-12 14:03 UTC")).toBeTruthy();
-    expect(screen.getByText("Error")).toBeTruthy();
-    expect(screen.getByText("Could not open the connection")).toBeTruthy();
+    const { user, container } = renderWithProviders(<ListenerStatus />);
+    const summary = await screen.findByRole("button", {
+      name: /^2 analyzers: 1 error, 1 receiving.*Results are received while nobody is signed in\.$/,
+    });
+    expect(summary.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("table")).toBeNull();
+    await user.click(summary);
+    const table = screen.getByRole("table");
+    expect(within(table).getByRole("rowheader", { name: "Synthetic Analyzer 1" })).toBeTruthy();
+    expect(within(table).getByText("Receiving")).toBeTruthy();
+    expect(within(table).getByText("today 14:03").getAttribute("title")).toBe(
+      "2026-10-12 14:03 UTC",
+    );
+    expect(within(table).getByText("Could not open the connection")).toBeTruthy();
+    expect(within(table).getByText("None yet")).toBeTruthy();
+    expect(localStorage.getItem(OPEN_KEY)).toBe("true");
     await expectNoA11yViolations(container);
+    await user.click(summary);
+    expect(screen.queryByRole("table")).toBeNull();
+    expect(localStorage.getItem(OPEN_KEY)).toBe("false");
+  });
+
+  it("opens as it was last left on this computer", async () => {
+    localStorage.setItem(OPEN_KEY, "true");
+    mockCommands({ list_listener_status: () => [ANALYZER] });
+    renderWithProviders(<ListenerStatus />);
+    expect(await screen.findByRole("table")).toBeTruthy();
+    expect(screen.getByText("2026-10-12 14:03")).toBeTruthy();
   });
 
   it("after an update, says how many analyzers listen again and why others did not", async () => {
@@ -56,7 +83,8 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
     await expectNoA11yViolations(container);
   });
 
-  it("says when a watched folder cannot be read or has files waiting (result files §6)", async () => {
+  it("says when a folder cannot be read, has files waiting or too large (result files §6)", async () => {
+    localStorage.setItem(OPEN_KEY, "true");
     mockCommands({
       list_listener_status: () => [
         { ...ANALYZER, state: "error", detail: "folder_unavailable", filesWaiting: 0 },
@@ -68,21 +96,9 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
           detail: "files_waiting",
           filesWaiting: 1,
         },
-      ],
-    });
-    renderWithProviders(<ListenerStatus />);
-    expect(await screen.findByText("The watched folder cannot be read")).toBeTruthy();
-    expect(screen.getByText("1 file waiting to be read for more than 5 minutes")).toBeTruthy();
-  });
-
-  it("says when an instrument is loaded by hand only, or a file was too large to read", async () => {
-    mockCommands({
-      list_listener_status: () => [
-        { ...ANALYZER, state: "manual_only", lastActivityAt: null },
         {
           ...ANALYZER,
-          instrumentId: "00000000-0000-7000-8000-0000000000a2",
-          instrumentName: "Synthetic LC-MS/MS 2",
+          instrumentId: "00000000-0000-7000-8000-0000000000a3",
           state: "listening",
           detail: "file_too_large",
           filesTooLarge: 2,
@@ -90,7 +106,8 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
       ],
     });
     renderWithProviders(<ListenerStatus />);
-    expect(await screen.findByText("Manual loading only")).toBeTruthy();
+    expect(await screen.findByText("The watched folder cannot be read")).toBeTruthy();
+    expect(screen.getByText("1 file waiting to be read for more than 5 minutes")).toBeTruthy();
     expect(
       screen.getByText(
         "2 files in the folder are larger than the 20 MiB the LIS reads and were not read",
@@ -98,18 +115,21 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
     ).toBeTruthy();
   });
 
-  it("says when no instruments are configured", async () => {
+  it("says when no instruments are configured, without a list to open", async () => {
     mockCommands({ list_listener_status: () => [] });
     renderWithProviders(<ListenerStatus />);
     expect(await screen.findByText("No instruments configured")).toBeTruthy();
+    expect(screen.queryByRole("button")).toBeNull();
   });
 
   it("shows a neutral unavailable state when the status cannot be read", async () => {
+    localStorage.setItem(OPEN_KEY, "true");
     mockCommands({
       list_listener_status: () => Promise.reject(engineError("internal", "Not available.")),
     });
     renderWithProviders(<ListenerStatus />);
-    expect(await screen.findByText("Status unavailable")).toBeTruthy();
+    expect(await screen.findByText("Analyzers: status unavailable")).toBeTruthy();
+    expect(screen.queryByRole("table")).toBeNull();
   });
 
   it("asks for the status again every 10 seconds", async () => {
@@ -120,9 +140,9 @@ describe("ListenerStatus (REQ-OPS-013)", () => {
       .mockReturnValue([ANALYZER]);
     mockCommands({ list_listener_status: list });
     renderWithProviders(<ListenerStatus />);
-    expect(await screen.findByText("Listening")).toBeTruthy();
+    expect(await screen.findByText("1 analyzer: 1 listening")).toBeTruthy();
     await vi.advanceTimersByTimeAsync(10_000);
-    expect(await screen.findByText("Receiving")).toBeTruthy();
+    expect(await screen.findByText("1 analyzer: 1 receiving")).toBeTruthy();
     expect(list).toHaveBeenCalledTimes(2);
   });
 });
@@ -155,6 +175,7 @@ describe("ListenerSummary (REQ-OPS-013)", () => {
   });
 
   it("colors each state: Connected green, Listening blue, Disabled grey, Error red (#4792)", async () => {
+    localStorage.setItem(OPEN_KEY, "true");
     mockCommands({
       list_listener_status: () => [
         { ...ANALYZER, state: "listening" },

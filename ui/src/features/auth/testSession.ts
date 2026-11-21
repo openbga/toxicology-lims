@@ -6,6 +6,7 @@ export const TEST_SESSION: SessionInfo = {
   username: "analyst",
   displayName: "Test Analyst",
   roles: ["analyst"],
+  roleLabels: ["Analyst"],
   capabilities: ["perform_analysis"],
   idleTimeoutSeconds: 900,
   locked: false,

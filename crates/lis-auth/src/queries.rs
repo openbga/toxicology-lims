@@ -11,8 +11,9 @@ use crate::error::AuthError;
 use crate::repo::{self, UserStatus};
 use crate::roles::{RoleCode, capabilities_of};
 
-/// Whether first-run setup still has to create an administrator.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, TS)]
+/// Whether first-run setup still has to create an administrator, and the
+/// laboratory's name for the signed-out screens.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct SetupStatus {
@@ -20,6 +21,9 @@ pub struct SetupStatus {
     pub needs_administrator: bool,
     /// The first account requested demo preparation and it has not completed yet.
     pub demo_setup_pending: bool,
+    /// The current laboratory profile's name, or `None` before one is set.
+    /// Laboratory configuration, not patient data; filled in by the engine.
+    pub laboratory_name: Option<String>,
 }
 
 /// The first-run state.
@@ -27,6 +31,7 @@ pub fn setup_status(conn: &Connection) -> Result<SetupStatus, AuthError> {
     Ok(SetupStatus {
         needs_administrator: !repo::any_user(conn)?,
         demo_setup_pending: repo::pending_demo_setup_user(conn)?.is_some(),
+        laboratory_name: None,
     })
 }
 

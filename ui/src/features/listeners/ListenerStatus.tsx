@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { useId, useState } from "react";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
 import type { Tone } from "@/components/tones";
 import type { ListenerState } from "@/generated/ListenerState";
 import { LISTENER_STATES } from "@/lib/listenerDetail";
-import { ListenerList, type ListenersQuery, RestartSummary, useListeners } from "./ListenerList";
+import { type ListenersQuery, RestartSummary, useListeners } from "./ListenerList";
 import { ListenersDialog } from "./ListenersDialog";
+import { ListenerTable } from "./ListenerTable";
 import styles from "./listeners.module.css";
 
-/** The order states are counted in the top-bar summary: the ones needing attention first. */
+/** The order states are counted in the summaries: the ones needing attention first. */
 const SUMMARY_ORDER: readonly ListenerState[] = [
   "error",
   "receiving",
@@ -18,17 +20,63 @@ const SUMMARY_ORDER: readonly ListenerState[] = [
   "disabled",
 ];
 
+/** Whether the card shows one row per analyzer, remembered on this computer (ticket #4885). */
+const OPEN_KEY = "vibe-tox.sign-in-analyzers-open-v1";
+
+function readOpen(): boolean {
+  try {
+    return localStorage.getItem(OPEN_KEY) === "true";
+  } catch {
+    // An unavailable store means the card starts closed.
+    return false;
+  }
+}
+
+function saveOpen(open: boolean) {
+  try {
+    localStorage.setItem(OPEN_KEY, String(open));
+  } catch {
+    // Continue with the in-memory choice when this webview cannot persist it.
+  }
+}
+
 /**
- * Each analyzer listener's state and last activity, on the sign-in screen (REQ-OPS-013). The
- * engine keeps listening whoever is signed in.
+ * The analyzers on the sign-in and lock screens, as a card under the form (REQ-OPS-013,
+ * ticket #4885): one line counting them by state, which opens one row per analyzer with its
+ * state and last activity. The engine keeps listening whoever is signed in.
  */
 export function ListenerStatus() {
   const listeners = useListeners();
+  const [isOpen, setOpen] = useState(readOpen);
+  const listId = useId();
+  const { tone, text } = summarize(listeners);
+  const all = listeners.isSuccess ? listeners.data : [];
+  const summary = <StatusBadge tone={tone}>{text}</StatusBadge>;
+  const toggle = () => {
+    setOpen(!isOpen);
+    saveOpen(!isOpen);
+  };
+  const Chevron = isOpen ? ChevronDown : ChevronRight;
   return (
-    <section aria-label="Analyzer listeners" className={styles.listeners}>
-      <span className={styles.heading}>Analyzer listeners</span>
+    <section aria-label="Analyzers" className={styles.card}>
       <RestartSummary />
-      <ListenerList listeners={listeners} />
+      {all.length === 0 ? (
+        <span className={styles.summary}>{summary}</span>
+      ) : (
+        <Button
+          variant="quiet"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? listId : undefined}
+          onPress={toggle}
+        >
+          <span className={styles.summary}>
+            <Chevron aria-hidden="true" />
+            {summary}
+            <span className={styles.note}>Results are received while nobody is signed in.</span>
+          </span>
+        </Button>
+      )}
+      {isOpen && all.length > 0 && <ListenerTable id={listId} listeners={all} />}
     </section>
   );
 }
