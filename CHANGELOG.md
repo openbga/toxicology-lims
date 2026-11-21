@@ -43,6 +43,18 @@ newest first. The application shows the same list under **What's new**.
 
   `setup_status` also returns `laboratoryName`, the current laboratory profile's name or `null`, so the signed-out screens can show it before anyone signs in.
 
+- **Changed:** Clearer outcomes for incoming order messages (2026-11-20)
+
+  In Interfaces › Logs a rejected order message names its reason, such as **Rejected – unknown test** or **Rejected – sender not accepted**, and shows a neutral **Resolved – rejected** once someone resolves it; resolved rejections no longer count under **Errors** on Connections. **Record** shows the placer order number for duplicates too, and opens the order that an **Order created** message made.
+
+- **Fixed:** Reject an incoming order held for review (2026-11-20)
+
+  **Reject…** on an incoming order message that is **Held for review** in Interfaces › Logs now rejects it with the reason entered, as it does for one waiting for its patient. The row shows who rejected it and why, and no order is made from it.
+
+  Technical notes:
+
+  Interfaces migration 0018 lets a held received message change state once, as a waiting one could. It adds no columns and changes no stored data.
+
 - **Changed:** The app window opens as you left it (2026-11-20)
 
   The application opens maximized the first time. After that it opens as you closed it: maximized,
@@ -177,6 +189,14 @@ newest first. The application shows the same list under **What's new**.
   Closing the app while a page has unsaved input now always asks **Quit OpenBGA Toxicology LIMS?**,
   says what you typed will be lost and offers **Quit without saving**, whether or not analyzers are
   listening. Work still in progress is listed below, as before.
+
+- **Fixed:** Plain folder paths and client names on connections (2026-11-20)
+
+  On Windows, folder paths on Connections, a connection's page and Logs no longer start with `\\?\`, also for folders chosen earlier. The **Partner** of an HL7 Orders connection shows the client's name instead of its code.
+
+  Technical notes:
+
+  Stored folder paths are kept as they are, so destination checks stay valid; the prefix is removed where paths are shown.
 
 - **Changed:** The user menu groups account security and puts Lock now and Sign out last (2026-11-20)
 

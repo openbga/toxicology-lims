@@ -17,3 +17,5 @@ const segment = encodeURIComponent;
 export const reportPath = (reportId: string) => `/reports/${segment(reportId)}`;
 export const revisionPath = (revisionId: string) => `/reports/revisions/${segment(revisionId)}`;
 export const handoffPath = (handoffId: string) => `/billing/handoffs/${segment(handoffId)}`;
+/** The order a received order message made (#4887). */
+export const orderPath = (orderId: string) => `/orders/${segment(orderId)}`;

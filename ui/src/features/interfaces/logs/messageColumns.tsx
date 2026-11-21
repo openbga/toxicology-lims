@@ -5,7 +5,7 @@ import { Timestamp } from "@/components/Timestamp";
 import type { PartnerMessageRow } from "@/generated/PartnerMessageRow";
 import type { WaitReason } from "@/generated/WaitReason";
 import { applicationOf, detailText, MESSAGE_TYPES, recordText, transportOf } from "../labels";
-import { contractPath, handoffPath, reportPath, revisionPath } from "../paths";
+import { contractPath, handoffPath, orderPath, reportPath, revisionPath } from "../paths";
 
 type FormatTime = (at: string) => string;
 type PersonText = (userId: string, display?: string) => string;
@@ -52,7 +52,7 @@ export function MessageDetails({
   );
 }
 
-/** The page of the record a message was made from; none for a test message or an order. */
+/** The page of the record a message was made from, or of the order a received one made. */
 function recordPath({ source, sourceId }: PartnerMessageRow): string | null {
   if (sourceId === null) return null;
   switch (source) {
@@ -62,14 +62,17 @@ function recordPath({ source, sourceId }: PartnerMessageRow): string | null {
       return reportPath(sourceId);
     case "billing_handoff":
       return handoffPath(sourceId);
+    case "order":
+      return orderPath(sourceId);
     default:
       return null;
   }
 }
 
 /**
- * The record, linked to the report revision sent, the withdrawn report or the handoff; a
- * synthetic test message shows as a Test badge, so it stands apart from real messages.
+ * The record, linked to the report revision sent, the withdrawn report, the handoff or the order
+ * a received message made (#4887); a synthetic test message shows as a Test badge, so it
+ * stands apart from real messages.
  */
 function Record({ row }: { row: PartnerMessageRow }) {
   if (row.source === "test") return <StatusBadge tone="info">Test</StatusBadge>;

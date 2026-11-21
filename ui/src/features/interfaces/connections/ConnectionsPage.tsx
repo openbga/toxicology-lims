@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { Button } from "@/components/Button";
 import { DataGrid } from "@/components/DataGrid";
@@ -16,7 +16,8 @@ import { awaitsAck } from "../mllpLabels";
 import { CONNECTIONS_PATH, connectionPath } from "../paths";
 import { ConnectionDialog } from "./ConnectionDialog";
 import styles from "./ConnectionsPage.module.css";
-import { CONNECTION_COLUMNS } from "./connectionColumns";
+import { connectionColumns } from "./connectionColumns";
+import { usePartnerName } from "./usePartnerName";
 
 /** The tabs of the mockup, each with the message types it lists; All lists every connection. */
 const TYPE_TABS: readonly { id: string; label: string; types: readonly PartnerMessageType[] }[] = [
@@ -42,6 +43,8 @@ export function ConnectionsPage() {
   const selected = TYPE_TABS.find((tab) => tab.id === params.get("type")) ?? TYPE_TABS[0];
   const connections = useCommandQuery<PartnerConnection[]>(LIST_CONNECTIONS);
   const unrouted = useCommandQuery<UnroutedMessage[]>(LIST_UNROUTED);
+  const partnerName = usePartnerName();
+  const columns = useMemo(() => connectionColumns(partnerName), [partnerName]);
   const all = connections.data ?? NO_CONNECTIONS;
   const of = (tab: (typeof TYPE_TABS)[number]) =>
     tab.id === "all" ? all : all.filter((row) => tab.types.includes(row.settings.messageType));
@@ -108,7 +111,7 @@ export function ConnectionsPage() {
           {() => (
             <DataGrid
               label="Connections"
-              columns={CONNECTION_COLUMNS}
+              columns={columns}
               rows={rows}
               getRowId={(row) => row.id}
               onRowAction={(row) => navigate(connectionPath(row.id))}

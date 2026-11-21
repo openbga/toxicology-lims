@@ -107,6 +107,7 @@ describe("Logs (ticket #4555; REQ-INT-002, REQ-RPT-011)", () => {
       ...WRITTEN,
       messageType: "hl7_orders" as const,
       source: "order" as const,
+      sourceId: "01a1a000-0000-7000-8000-000000000124",
       sourceNumber: null,
       sourceLabel: "ORD-000124",
       transport: "received" as const,
@@ -122,20 +123,43 @@ describe("Logs (ticket #4555; REQ-INT-002, REQ-RPT-011)", () => {
       sourceLabel: "ORD-000125",
       errorCode: "unknown_test",
       writtenPath: "/srv/clinic-a/failed/2026/11/clinicA_000125.hl7",
+      sourceId: null,
       received: "rejected" as const,
     };
-    renderPage(() => ({ rows: [received, rejected], more: false }));
+    // #4887: every rejection names its reason; a resolved one is neutral and leaves Rejected.
+    const sender = {
+      ...rejected,
+      messageId: "01a1a000-0000-7000-8000-000000000021",
+      sourceLabel: "ORD-000126",
+      errorCode: "not_accepted_sender",
+    };
+    const resolved = {
+      ...sender,
+      messageId: "01a1a000-0000-7000-8000-000000000022",
+      sourceLabel: "ORD-000127",
+      rejectionResolved: {
+        note: "The clinic sent it again from its registered facility",
+        resolved: { by: ADMIN.userId, at: "2026-11-03T11:00:00.000000000Z" },
+      },
+    };
+    renderPage(() => ({ rows: [received, rejected, sender, resolved], more: false }));
     expect(await screen.findByRole("gridcell", { name: "ORD-000124" })).toBeTruthy();
-    expect(screen.getAllByRole("gridcell", { name: "In" })).toHaveLength(2);
-    expect(screen.getAllByRole("gridcell", { name: "Received" })).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "ORD-000124" }).getAttribute("href")).toBe(
+      `/orders/${received.sourceId}`,
+    );
+    expect(screen.queryByRole("link", { name: "ORD-000125" })).toBeNull();
+    expect(screen.getAllByRole("gridcell", { name: "In" })).toHaveLength(4);
+    expect(screen.getAllByRole("gridcell", { name: "Received" })).toHaveLength(4);
     expect(screen.getByRole("gridcell", { name: "Order created" })).toBeTruthy();
     expect(screen.getByRole("gridcell", { name: "Rejected – unknown test" })).toBeTruthy();
+    expect(screen.getByRole("gridcell", { name: "Rejected – sender not accepted" })).toBeTruthy();
+    expect(screen.getByRole("gridcell", { name: "Resolved – rejected" })).toBeTruthy();
     expect(
       screen.getByRole("gridcell", {
         name: "Waited until the patient was registered · Moved to /srv/clinic-a/processed/2026/11/clinicA_000124.hl7",
       }),
     ).toBeTruthy();
-    expect(screen.getByRole("tab", { name: /Rejected \(1\)/ })).toBeTruthy();
+    expect(screen.getByRole("tab", { name: /Rejected \(2\)/ })).toBeTruthy();
   });
 
   it("sends a failed message again from its row", async () => {
@@ -185,6 +209,7 @@ describe("Logs (ticket #4555; REQ-INT-002, REQ-RPT-011)", () => {
       reject_received_message: reject,
     });
     expect(await screen.findByRole("tab", { name: "Rejected (0)" })).toBeTruthy();
+    expect(screen.getByRole("gridcell", { name: "Rejected – by a person" })).toBeTruthy();
     expect(
       screen.getByRole("gridcell", { name: /^Rejected by .+: The clinic cancelled it by phone$/ }),
     ).toBeTruthy();

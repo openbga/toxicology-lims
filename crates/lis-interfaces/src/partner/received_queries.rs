@@ -10,8 +10,11 @@ use super::message_queries::{ConnectionRef, PartnerMessageRow, TransportOutcome,
 use super::model::{MessageSource, PartnerConnectionId, PartnerMessageType};
 use super::received::{PartnerReceivedId, ReceivedState};
 use super::rejections::{RESOLUTION_COLUMNS, resolution_at};
+use crate::folder_path::shown_path;
 
-/// Received messages, newest first, from `since`, of one connection or all.
+/// Received messages, newest first, from `since`, of one connection or all. The record is
+/// the placer order number of every message read, a duplicate's from the one it repeats
+/// (#4887); the file name only when nothing could be read.
 pub(crate) fn received_rows(
     conn: &Connection,
     since: Option<UtcTimestamp>,
@@ -20,10 +23,11 @@ pub(crate) fn received_rows(
 ) -> Result<Vec<PartnerMessageRow>, PartnerError> {
     conn.prepare_cached(&format!(
         "SELECT r.id, r.received_at, r.order_id, \
-         COALESCE(r.placer_order, NULLIF(r.file_name, '')), \
+         COALESCE(r.placer_order, o.placer_order, NULLIF(r.file_name, '')), \
          c.id, c.name, c.protocol, r.state, r.reason_code, r.moved_to, r.ack_code, r.peer, \
          {RESOLUTION_COLUMNS} \
          FROM ifc_partner_received r JOIN ifc_partner_connections c ON c.id = r.connection_id \
+         LEFT JOIN ifc_partner_received o ON o.id = r.duplicate_of \
          LEFT JOIN ifc_partner_rejection_resolutions x ON x.received_id = r.id \
          WHERE (?1 IS NULL OR r.received_at >= ?1) AND (?2 IS NULL OR c.id = ?2) \
          ORDER BY r.received_at DESC LIMIT ?3"
@@ -65,7 +69,7 @@ pub(crate) fn received_rows(
             superseded: false,
             next_attempt_at: None,
             error_code: row.get(8)?,
-            written_path: row.get(9)?,
+            written_path: shown_path(row.get(9)?),
             ack_code: row.get(10)?,
             ack_text: None,
             awaiting_ack: false,
@@ -82,7 +86,7 @@ pub(crate) fn received_rows(
 }
 
 /// An incoming connection's last message read, its messages waiting for a patient or a
-/// person, and its refused ones.
+/// person, and its refused ones not yet resolved (#4887).
 pub(crate) fn intake_counts(
     conn: &Connection,
     connection_id: PartnerConnectionId,
@@ -102,8 +106,11 @@ pub(crate) fn intake_counts(
         })
         .optional()?;
     let (waiting, refused) = conn.query_row(
-        "SELECT COALESCE(SUM(state IN (?2, ?3)), 0), COALESCE(SUM(state = ?4), 0) \
-         FROM ifc_partner_received WHERE connection_id = ?1",
+        "SELECT COALESCE(SUM(r.state IN (?2, ?3)), 0), \
+         COALESCE(SUM(r.state = ?4 AND x.received_id IS NULL), 0) \
+         FROM ifc_partner_received r \
+         LEFT JOIN ifc_partner_rejection_resolutions x ON x.received_id = r.id \
+         WHERE r.connection_id = ?1",
         params![
             connection_id,
             ReceivedState::WaitingPatient,

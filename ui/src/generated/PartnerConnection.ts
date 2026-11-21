@@ -34,7 +34,8 @@ verification: PartnerVerification | null, lastAttempt: LastAttempt | null,
  */
 waiting: number, 
 /**
- * Messages whose attempts failed, retrying or given up.
+ * Messages whose attempts failed, retrying or given up; for an incoming connection, its
+ * refused messages a person has not resolved yet (#4887).
  */
 failing: number, 
 /**

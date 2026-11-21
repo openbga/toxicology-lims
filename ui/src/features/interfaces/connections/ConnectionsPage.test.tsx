@@ -25,6 +25,29 @@ function renderPage(handlers: Record<string, (args: unknown) => unknown>, path: 
   return renderRoutes(ROUTES, path);
 }
 
+/** An HL7 Orders connection reading a folder, for its client CLINIC-A. */
+const ORDERS = {
+  ...CONNECTION,
+  // The engine offers no test message to a connection that only reads.
+  allowedActions: CONNECTION.allowedActions.filter(
+    (action) => action !== "send_partner_test_message",
+  ),
+  processedFolder: "/srv/clinic-a/processed",
+  failedFolder: "/srv/clinic-a/failed",
+  settings: {
+    ...CONNECTION.settings,
+    partner: "CLINIC-A",
+    messageType: "hl7_orders" as const,
+    rules: [],
+    fileNamePattern: "",
+    intake: { checkEverySeconds: 30, acceptFrom: "CLINIC-A", unknownPatient: "hold" as const },
+  },
+};
+
+const CLIENTS = [
+  { id: "c1", code: "CLINIC-A", name: "Clinic A", active: true, revision: 1, locations: [] },
+];
+
 describe("Connections (ticket #4555; REQ-RPT-012)", () => {
   beforeEach(mockGridLayout);
 
@@ -129,25 +152,11 @@ describe("Connections (ticket #4555; REQ-RPT-012)", () => {
   });
 
   it("shows an incoming connection's folders and what it accepts", async () => {
-    const orders = {
-      ...CONNECTION,
-      // The engine offers no test message to a connection that only reads.
-      allowedActions: CONNECTION.allowedActions.filter(
-        (action) => action !== "send_partner_test_message",
-      ),
-      processedFolder: "/srv/clinic-a/processed",
-      failedFolder: "/srv/clinic-a/failed",
-      settings: {
-        ...CONNECTION.settings,
-        partner: "CLINIC-A",
-        messageType: "hl7_orders" as const,
-        rules: [],
-        fileNamePattern: "",
-        intake: { checkEverySeconds: 30, acceptFrom: "CLINIC-A", unknownPatient: "hold" as const },
-      },
-    };
     renderPage(
-      { get_partner_connection: () => ({ ...DETAIL, connection: orders }) },
+      {
+        get_partner_connection: () => ({ ...DETAIL, connection: ORDERS }),
+        list_clients: () => CLIENTS,
+      },
       `/interfaces/connections/${CONNECTION_ID}`,
     );
     expect(
@@ -155,7 +164,20 @@ describe("Connections (ticket #4555; REQ-RPT-012)", () => {
     ).toBeTruthy();
     expect(screen.getByText("/srv/clinic-a/processed")).toBeTruthy();
     expect(screen.getByText("MSH-4 = CLINIC-A")).toBeTruthy();
+    // The connection keeps its client by code; people read its name (#4888).
+    expect(await screen.findByText("Clinic A")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Send test message" })).toBeNull();
+  });
+
+  it("names an incoming connection's client in Partner, and a sending one's partner as entered", async () => {
+    const orders = { ...ORDERS, id: "01a1a000-0000-7000-8000-000000000009" };
+    renderPage(
+      { list_partner_connections: () => [CONNECTION, orders], list_clients: () => CLIENTS },
+      "/interfaces/connections",
+    );
+    expect(await screen.findByRole("gridcell", { name: "Clinic A" })).toBeTruthy();
+    expect(screen.getByRole("gridcell", { name: "Synthetic billing company" })).toBeTruthy();
+    expect(screen.queryByRole("gridcell", { name: "CLINIC-A" })).toBeNull();
   });
 
   it("offers the SFTP server fields of mockup 6 and tests the server as entered", async () => {

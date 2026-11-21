@@ -170,6 +170,11 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "report_file_name_placeholder",
         sql: include_str!("../migrations/0017_report_file_name_placeholder.sql"),
     },
+    Migration {
+        version: 18,
+        name: "reject_held_received",
+        sql: include_str!("../migrations/0018_reject_held_received.sql"),
+    },
 ];
 
 /// Schema descriptor for tables owned by this crate.

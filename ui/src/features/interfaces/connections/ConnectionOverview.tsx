@@ -19,6 +19,7 @@ import styles from "./ConnectionPage.module.css";
 import { ContractLine } from "./contract/ContractLine";
 import { partnersText } from "./listenerForm";
 import { CodeMappingsSection } from "./mappings/CodeMappingsSection";
+import { usePartnerName } from "./usePartnerName";
 
 /** A titled card of label–value pairs. */
 function Card({ title, items }: { title: string; items: [string, ReactNode][] }) {
@@ -145,6 +146,7 @@ const rulesText = (connection: PartnerConnection) =>
 export function ConnectionOverview({ detail }: { detail: PartnerConnectionDetail }) {
   const formatTime = useFormatTime();
   const person = usePersonText();
+  const partnerName = usePartnerName();
   const { connection } = detail;
   const lastReason = detail.history[0]?.reason ?? null;
   const { settings, verification, lastAttempt, lastChange } = connection;
@@ -154,7 +156,7 @@ export function ConnectionOverview({ detail }: { detail: PartnerConnectionDetail
       <Card
         title="Connection"
         items={[
-          ["Partner", settings.partner],
+          ["Partner", partnerName(settings)],
           ["Message", messageText(type)],
           ...destinationItems(connection, formatTime),
           ...workingItems(connection),
