@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatBirthDate, formatTimestamp, isCalendarDate, labDayStart } from "./format";
+import {
+  formatBirthDate,
+  formatRecentTime,
+  formatTimestamp,
+  isCalendarDate,
+  labDayStart,
+} from "./format";
 
 describe("formatTimestamp", () => {
   it("formats in the laboratory zone and names it, across daylight saving", () => {
@@ -24,6 +30,27 @@ describe("formatTimestamp", () => {
     const today = new Date("2026-10-13T04:30:00Z");
     expect(formatTimestamp("2026-10-12T14:03:05Z", "America/Chicago", { today })).toBe("09:03 CDT");
     expect(formatTimestamp("2026-10-12T14:03:05Z", null, { today })).toBe("2026-10-12 14:03 UTC");
+  });
+});
+
+describe("formatRecentTime (#4885)", () => {
+  it("says today or yesterday by the laboratory's calendar, and the date before that", () => {
+    // 04:30 UTC on 13 October is still 12 October in Chicago.
+    const now = new Date("2026-10-13T04:30:00Z");
+    expect(formatRecentTime("2026-10-12T14:03:05Z", "America/Chicago", now)).toBe("today 09:03");
+    expect(formatRecentTime("2026-10-11T14:03:05Z", "America/Chicago", now)).toBe(
+      "yesterday 09:03",
+    );
+    expect(formatRecentTime("2026-10-10T14:03:05Z", "America/Chicago", now)).toBe(
+      "2026-10-10 09:03",
+    );
+    expect(formatRecentTime("2026-10-12T14:03:05Z", null, now)).toBe("yesterday 14:03");
+  });
+
+  it("counts yesterday across a month end and shows a value that does not parse as received", () => {
+    const now = new Date("2026-11-01T12:00:00Z");
+    expect(formatRecentTime("2026-10-31T08:00:00Z", "Not/AZone", now)).toBe("yesterday 08:00");
+    expect(formatRecentTime("unknown", null, now)).toBe("unknown");
   });
 });
 

@@ -2,7 +2,7 @@
   "id": "instruments",
   "title": "Instruments",
   "summary": "Configure analyzer connections and result-file intake for registered instruments.",
-  "reviewedOn": "2026-11-17",
+  "reviewedOn": "2026-11-20",
   "routes": ["/configuration/instruments"],
   "sections": [
     {
@@ -18,7 +18,7 @@
       "paragraphs": [
         "Use the laboratory’s approved connection details. Confirm instrument identity and the intended source before enabling intake. Keep one instrument’s exports in its dedicated folder and preserve the files as produced.",
         "Connection setup is separate from service readiness and result-source approval in Bench setup. The application must remain open for listeners and folder intake to operate, including when nobody is signed in.",
-        "The sign-in and lock screens list every analyzer's listener state under the card, wrapping onto more lines in a narrow window. Their times are in the laboratory's time zone as last read on this computer, or in UTC, labelled so, until someone has signed in on it."
+        "The sign-in and lock screens show an Analyzers card under the form: one line counting the analyzers by state, which opens one row per analyzer with its state and last activity (today 15:53, yesterday 15:53 or the date). Whether the rows are open is remembered on this computer. Their times are in the laboratory's time zone as last read on this computer, or in UTC until someone has signed in on it; pointing at a time shows it in full with the zone."
       ]
     },
     {
@@ -462,6 +462,7 @@
     "ui/src/lib/instrumentEnabling.tsx",
     "ui/src/features/listeners/ListenersDialog.tsx",
     "ui/src/features/listeners/ListenerList.tsx",
-    "ui/src/features/listeners/ListenerStatus.tsx"
+    "ui/src/features/listeners/ListenerStatus.tsx",
+    "ui/src/features/listeners/ListenerTable.tsx"
   ]
 }

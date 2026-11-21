@@ -139,7 +139,8 @@ describe("App frame", () => {
       <RouterProvider router={createMemoryRouter(routes, { initialEntries: ["/orders"] })} />,
     );
     expect(await screen.findByRole("heading", { level: 1, name: "Sign in" })).toBeTruthy();
-    expect(await screen.findByText("Synthetic Analyzer 1")).toBeTruthy();
+    const analyzers = await screen.findByRole("region", { name: "Analyzers" });
+    expect(await within(analyzers).findByText("1 analyzer: 1 receiving")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "Main" })).toBeNull();
   });
 

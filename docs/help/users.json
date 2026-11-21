@@ -58,6 +58,21 @@
         "Open Signed in as … and choose Sign out, or close the window. If the warning names a page, choose Cancel to go back to it.",
         "Choose Sign out without saving, Leave or Quit anyway only when the typed input may be lost. Quitting while work is in progress is recorded as Quit despite warnings in the application runs on Health history; unsaved input is not recorded, because it never reached the laboratory record."
       ]
+    },
+    {
+      "title": "Sign in or unlock, and check the analyzers",
+      "paragraphs": [
+        "The sign-in screen shows the product name with the laboratory's name under it, from the current laboratory profile. Before a profile is saved, or when the name cannot be read, only the product name shows. The laboratory name is configuration, not patient data.",
+        "Sign in, the primary button, and Use a security key (or Use password and authenticator app, once you switched) span the card with “or” between them. Recover with a saved code appears under them while the security-key method is chosen.",
+        "Under the card, on both the sign-in and lock screens, the Analyzers card sums the analyzers up in one line, for example 3 analyzers: 1 error, 2 listening, followed by Results are received while nobody is signed in. The line takes the color of the state it counts first. It reads Analyzers: checking while the state is being read, Analyzers: status unavailable when it cannot be read (no earlier state is shown as current), and No instruments configured when there are none. The state is read again every 10 seconds.",
+        "Select the summary line to open one row per analyzer with three columns: Analyzer (its name), State (the colored badge, with the reason under it when there is one, such as Could not open the connection) and Last activity. Last activity reads today 15:53 or yesterday 15:53 by the laboratory's calendar, and the date for anything older, such as 2026-11-18 15:53; None yet means no activity since the listener started. Point at a time to see it in full with its time zone. Times use the laboratory time zone as last read on this computer, or UTC until someone has signed in on it. Select the line again to close the rows. Whether the rows are open is remembered on this computer for the next sign-in or lock, for everyone who uses it.",
+        "After the first start of a new version the card also says how many analyzers listen again and names any that did not start, with the reason. The application version shows in small text at the bottom of the screen."
+      ],
+      "steps": [
+        "Enter your username and password and choose Sign in, or choose Use a security key and then Find my keys.",
+        "To check the analyzers before signing in, select the Analyzers line and read each analyzer's state and last activity.",
+        "On the lock screen, unlock with your PIN, password or security key, or choose Sign in as a different user; the Analyzers card works the same way there."
+      ]
     }
   ],
   "pages": [
@@ -489,6 +504,15 @@
     "ui/src/features/auth/PinUnlockForm.test.tsx",
     "ui/src/features/auth/UserMenu.test.tsx",
     "crates/lis-auth/src/unlock_pin.rs",
-    "crates/lis-engine/src/commands/unlock_pin.rs"
+    "crates/lis-engine/src/commands/unlock_pin.rs",
+    "ui/src/features/auth/AuthLayout.tsx",
+    "ui/src/features/auth/SignInScreen.tsx",
+    "ui/src/features/auth/CredentialsForm.tsx",
+    "ui/src/features/auth/KeySignInForm.tsx",
+    "ui/src/features/auth/AuthGate.tsx",
+    "ui/src/features/listeners/ListenerStatus.tsx",
+    "ui/src/features/listeners/ListenerTable.tsx",
+    "ui/src/lib/format.ts",
+    "crates/lis-engine/src/commands/sign_in.rs"
   ]
 }

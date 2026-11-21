@@ -48,7 +48,13 @@ function AuthGateContent({ children, aside }: AuthGateProps) {
       </>
     );
   }
-  return <AuthLayout aside={aside}>{signedOutView(session)}</AuthLayout>;
+  // The laboratory is named once the session is known, so a signed-in person's setup check
+  // stays the only one (demo preparation).
+  return (
+    <AuthLayout aside={aside} showLaboratory={!session.isPending}>
+      {signedOutView(session)}
+    </AuthLayout>
+  );
 }
 
 function demoSetupView(

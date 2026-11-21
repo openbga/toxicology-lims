@@ -43,6 +43,7 @@ function zonedParts(date: Date, timeZone: string, seconds: boolean) {
   const time = [part("hour"), part("minute"), ...(seconds ? [part("second")] : [])].join(":");
   return {
     day: `${part("year")}-${part("month")}-${part("day")}`,
+    time,
     timeAndZone: `${time} ${part("timeZoneName")}`,
   };
 }
@@ -70,6 +71,34 @@ export function formatTimestamp(
   } catch {
     return zonedText(date, "UTC", options);
   }
+}
+
+/**
+ * A recent engine timestamp in `timeZone` as `today 15:53` or `yesterday 15:53`, otherwise
+ * `2026-11-18 15:53`, without the zone (ticket #4885). For short status lines whose full time,
+ * with the zone, is available beside them; a value that does not parse is shown as received.
+ */
+export function formatRecentTime(timestamp: string, timeZone: string | null, now: Date): string {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return timestamp;
+  const recentIn = (zone: string) => {
+    const { day, time } = zonedParts(date, zone, false);
+    const today = zonedParts(now, zone, false).day;
+    if (day === today) return `today ${time}`;
+    return day === dayBefore(today) ? `yesterday ${time}` : `${day} ${time}`;
+  };
+  try {
+    return recentIn(timeZone ?? "UTC");
+  } catch {
+    return recentIn("UTC");
+  }
+}
+
+/** The `YYYY-MM-DD` day before `day`, counted on the calendar, not in hours. */
+function dayBefore(day: string): string | null {
+  const date = parseCalendarDate(day);
+  if (date === null) return null;
+  return new Date(Date.UTC(date.year, date.month - 1, date.day - 1)).toISOString().slice(0, 10);
 }
 
 /** Formats engine timestamps in the laboratory time zone (UTC until a profile exists). */

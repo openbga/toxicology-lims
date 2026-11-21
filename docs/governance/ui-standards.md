@@ -333,7 +333,7 @@ These come from health-IT safety guidance for clinical software. They apply to e
 
 - Plain language, sentence case, and laboratory terms rather than developer terms. Status labels are adjectives or past participles ("Held", "Approved"), not verbs (ENG-187).
 - **Decimals** display exactly as the engine string, with units always shown. Comparators appear as received, for example `<0.50 ng/mL`.
-- **Times** display in the laboratory time zone, formatted `2026-10-12 14:03`, with the zone where it could be ambiguous. Unknown or estimated times display as such, never as a guess.
+- **Times** display in the laboratory time zone, formatted `2026-10-12 14:03`, with the zone where it could be ambiguous. A short status line, such as an analyzer's last activity on the sign-in and lock screens, may read `today 15:53` or `yesterday 15:53` by the laboratory's calendar (`formatRecentTime`), with the full time and zone on hover (ticket #4885). Unknown or estimated times display as such, never as a guess.
 - **Dates of birth** display with the month as text and the age, for example `Nov 9, 1961 (64 y)`. People read them aloud and compare them with a requisition or an ID card, where a numeric month and day are easy to swap (ENG-179).
 - **Delivery status** always names the channel and evidence level, never a bare "Delivered" (REQ-RPT-011).
 - **Payload text** (analyzer, HL7 or imported) renders as plain text.

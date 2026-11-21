@@ -35,6 +35,14 @@ newest first. The application shows the same list under **What's new**.
 
 ### Medium impact
 
+- **Changed:** A clearer sign-in screen with the laboratory name and an analyzers card (2026-11-20)
+
+  The sign-in screen names the laboratory under the product name and shows **Sign in** and **Use a security key** as full-width buttons with “or” between them. Under the form, on both the sign-in and lock screens, an **Analyzers** card sums the analyzers up in one line and opens one row per analyzer with its state and last activity, shown as “today 15:53”; whether the rows are open is remembered on this computer. The application version shows at the bottom of the screen.
+
+  Technical notes:
+
+  `setup_status` also returns `laboratoryName`, the current laboratory profile's name or `null`, so the signed-out screens can show it before anyone signs in.
+
 - **Changed:** The Windows installer lists duplicate earlier installations (2026-11-20)
 
   When a Windows computer has more than one installation under an earlier product name (Vibe Tox LIS, OpenBGA Tox or Steady State LIMS) in different folders, the installer still stops, but its message now lists each installation with its version and folder, names the one to keep and tells you to remove the others in Windows Settings › Apps › Installed apps. Leave **Delete the application data** unchecked when uninstalling; the laboratory data is then not removed. The installer does not uninstall anything itself.

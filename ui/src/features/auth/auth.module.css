@@ -19,13 +19,25 @@
   background: var(--color-surface);
 }
 
+/* The product, with the laboratory's name under it (ticket #4885). */
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.labName {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
 .card:has([data-first-run]) {
   width: min(68rem, 100%);
   padding: var(--space-8);
   gap: var(--space-6);
 }
 
-.card:has([data-first-run]) .appName {
+.card:has([data-first-run]) .identity {
   padding-bottom: var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
@@ -41,17 +53,47 @@
   }
 }
 
-/* Below the card, within the window: a long line, such as the analyzers, wraps. */
+/* Below the card and as wide as it: the analyzer card (ticket #4885). */
 .aside {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-2);
-  max-width: 100%;
+  width: min(26rem, 100%);
 }
 
-.aside > * {
-  max-width: 100%;
+.version {
+  width: min(26rem, 100%);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The sign-in methods: the form's main action and the other method span the card, "or"
+   between them (ticket #4885). */
+.methods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.methods > button,
+.methods form button[type="submit"] {
+  width: 100%;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--color-border);
 }
 
 .flow {

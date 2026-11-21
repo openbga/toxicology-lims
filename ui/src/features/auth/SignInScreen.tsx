@@ -55,10 +55,13 @@ export function SignInScreen({ notice }: { notice?: ReactNode }) {
               This sign-in step expired or was already used. Enter your username and password again.
             </Alert>
           )}
-          {keyMode ? <KeySignInForm /> : <CredentialsForm onStep={advance} />}
-          <Button onPress={() => setKeyMode(!keyMode)}>
-            {keyMode ? "Use password and authenticator app" : "Use a security key"}
-          </Button>
+          <div className={styles.methods}>
+            {keyMode ? <KeySignInForm /> : <CredentialsForm onStep={advance} />}
+            <p className={styles.or}>or</p>
+            <Button onPress={() => setKeyMode(!keyMode)}>
+              {keyMode ? "Use password and authenticator app" : "Use a security key"}
+            </Button>
+          </div>
           {keyMode && (
             <Button variant="quiet" onPress={() => setRecovering(true)}>
               Recover with a saved code
