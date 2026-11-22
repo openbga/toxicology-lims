@@ -37,6 +37,15 @@ to start when it detects a network data folder; on an unusual drive that it cann
 also refuse rather than risk opening SQLite on unsafe storage. Network shares are allowed only as
 backup targets. This rule is defined in the [host-health and lifecycle contract](../architecture/operations-contract.md#host-health-and-application-lifecycle).
 
+## The application window
+
+The window opens maximized on the first start. Later starts open it as it was closed: maximized, or
+with the same size and position. A position on a monitor that is no longer connected opens centred
+on the primary monitor, no larger than that monitor. The window state is saved per computer in a
+small `<identifier>.window.json` file beside the data folder; it holds only window geometry, no
+patient information, and is not part of backups or exports. Deleting it makes the next start open
+maximized again.
+
 ## Choose a demo or an empty laboratory
 
 On **Set up this laboratory**, **Explore the demo laboratory** opens an evaluation workspace

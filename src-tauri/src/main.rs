@@ -23,6 +23,8 @@
 //!   progress or the UI reports an unsaved page form; Cancel is the default and quitting
 //!   with work in progress is recorded (REQ-OPS-013, §6.3, [`quit`]). A second close or
 //!   quit request while the dialog is open, such as an OS shutdown, is never blocked.
+//! - The main window opens maximized on the first start and as it was closed afterwards
+//!   ([`window_state`]).
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod commands;
@@ -33,6 +35,7 @@ mod report_window;
 mod security_key_operations;
 mod startup;
 mod updater;
+mod window_state;
 
 use std::path::Path;
 use std::sync::Arc;
@@ -83,6 +86,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 installation = choice.kind().as_str(),
                 "app started"
             );
+            window_state::open_main(app.handle());
             if let Some(Err(error)) = chosen {
                 tracing::warn!(%error, "opening the laboratory installation");
             }
@@ -104,18 +108,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         })
         .on_window_event(|window, event| match event {
-            WindowEvent::CloseRequested { api, .. }
-                if window.label() == MAIN_WINDOW && !may_exit(window.app_handle()) =>
-            {
-                api.prevent_close();
+            WindowEvent::CloseRequested { api, .. } if window.label() == MAIN_WINDOW => {
+                window_state::save(window.app_handle());
+                if !may_exit(window.app_handle()) {
+                    api.prevent_close();
+                }
             }
             WindowEvent::Destroyed => report_window::forget(window),
             _ => {}
         })
         .invoke_handler(commands::handler())
         .build(context)?;
-    app.run(|app, event| match event {
-        RunEvent::ExitRequested { api, .. } if !may_exit(app) => api.prevent_exit(),
+    app.run(on_run_event);
+    Ok(())
+}
+
+/// Saves the window state and asks before an exit, then shuts the engine down on exit.
+fn on_run_event(app: &AppHandle, event: RunEvent) {
+    match event {
+        RunEvent::ExitRequested { api, .. } => {
+            window_state::save(app);
+            if !may_exit(app) {
+                api.prevent_exit();
+            }
+        }
         RunEvent::Exit => {
             if let Some(operations) =
                 app.try_state::<security_key_operations::SecurityKeyOperations>()
@@ -128,8 +144,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing::info!("app stopped");
         }
         _ => {}
-    });
-    Ok(())
+    }
 }
 
 /// The shell's plugins. The updater is registered only in builds CI configured for updates

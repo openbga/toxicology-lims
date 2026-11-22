@@ -75,6 +75,15 @@
               "notes": "Interfaces migration 0018 lets a held received message change state once, as a waiting one could. It adds no columns and changes no stored data."
             },
             {
+              "id": "2026-11-20-window-size-remembered",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "medium",
+              "title": "The app window opens as you left it",
+              "summary": "The application opens maximized the first time. After that it opens as you closed it: maximized,\nor with the same size and position. If that position is on a monitor that is no longer\nconnected, the window opens on the main monitor instead.",
+              "notes": "The window state is kept per computer in `<identifier>.window.json` beside the data folder,\noutside the data folder, backups and exports. It holds only window geometry."
+            },
+            {
               "id": "2026-11-20-installer-duplicate-installations",
               "date": "2026-11-20",
               "type": "changed",
@@ -297,6 +306,15 @@
               "impact": "low",
               "title": "Collapse all navigation areas with one button",
               "summary": "A Collapse all sections button beside … at the top of the navigation closes every open area at once, including the current page’s, which stays highlighted. It shows only while an area is open."
+            },
+            {
+              "id": "2026-11-20-quit-warning-wording",
+              "date": "2026-11-20",
+              "type": "changed",
+              "impact": "low",
+              "title": "One clear quit warning for unsaved input",
+              "area": "System",
+              "summary": "Closing the app while a page has unsaved input now always asks **Quit OpenBGA Toxicology LIMS?**,\nsays what you typed will be lost and offers **Quit without saving**, whether or not analyzers are\nlistening. Work still in progress is listed below, as before."
             },
             {
               "id": "2026-11-20-connection-folders-and-clients",
