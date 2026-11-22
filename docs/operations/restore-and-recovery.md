@@ -93,7 +93,7 @@ attested and supported by the laboratory's records.
 | This computer is the production computer | The replacement is authorized to resume production. Never attest this on a test copy. |
 | Lost interval listed | Record the time from the backup set through the incident or cutover. Work in this period is not in the restored database. |
 | Number floors checked | Confirm the floors are higher than every accession and container number on a physical label. Raise them if needed. |
-| Analyzer results resent | Use analyzer retention and the **Results expected** queue to identify and resend missing results. |
+| Analyzer results resent | Use analyzer retention and the **Results expected from analyzers** queue to identify and resend missing results. |
 | Reports reconciled | Compare released and delivered reports from the lost interval. Never resend an older revision over a correction. |
 | Orders and work re-entered | Re-enter orders, decisions, QC and reviews that are absent from the restored copy. |
 | Billing handoffs reconciled | Compare handoffs and outcomes so nothing is omitted or duplicated. |

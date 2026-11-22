@@ -106,7 +106,7 @@
           "name": "Open row",
           "does": "Opens the connection's page.",
           "availableWhen": "A listed connection.",
-          "result": "Overview, Rules, Logs and History of that connection."
+          "result": "Overview, Rules, Code mappings, Logs and History of that connection."
         }
       ],
       "restrictions": [

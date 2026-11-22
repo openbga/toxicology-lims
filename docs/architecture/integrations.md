@@ -6,7 +6,7 @@ The laboratory's host computer is the system of record. Integrations terminate e
 
 ## Proposed topology
 
-This diagram specifies future partner and hosted-service boundaries. The current application implements local ASTM/AU and result-file intake; it has no HL7 listener, portal, cloud connector or hosted delivery service.
+This diagram specifies future partner and hosted-service boundaries. The current application implements local ASTM/AU and result-file intake, and partner HL7 orders and results over a folder, SFTP or MLLP; it has no portal, cloud connector or hosted delivery service.
 
 ```mermaid
 flowchart LR
@@ -256,7 +256,7 @@ Driver types (REQ-INT-009, P0):
 
 - **ASTM LIS1-A (framing) and LIS2-A2 (records)** over serial and TCP. In-house code, because no maintained open-source driver exists ([ENG-82](../research/sources-engineering.md#single-computer-technology-sources)). The driver sends the low-level ACK for a frame or message only after the received content is durably committed. It has a conformance corpus with synthetic sessions, including checksum errors, timeouts, contention, interrupted transfers and duplicate retransmission. AU400/AU640 sessions follow the [AU contract](au-protocol.md).
 - **Watched-folder import** for delimited vendor quantitation exports; XML and other unsupported shapes are not parsed. The folder may be local or a lab-LAN share on a vendor workstation; the database never is. Placing any software on an instrument control workstation requires vendor/support review. Contract: [result-file intake](../planning/result-files-design-brief.md), with manual loading by the same path.
-- **HL7 from instrument software** (for example MassLynx), proposed: through the host's lab-LAN listener, under the same contract rules as partner HL7. No HL7 listener is implemented.
+- **HL7 from instrument software** (for example MassLynx), proposed: through the host's lab-LAN listener, under the same contract rules as partner HL7. No HL7 listener for instrument results is implemented.
 
 Official documentation demonstrates several routes: SCIEX describes a MultiQuant template producing CSV, Waters documents a MassLynx interface sending HL7 using configured assays/templates, and MassLynx 4.2 documents text/XML export. These are product/version-specific routes requiring installed-license and laboratory validation checks. The SCIEX article is explicitly research-use-only. [DOM-020](https://sciex.com/support/knowledge-base-articles/how-to-interface-multiquant-with-lims-system-via-lims-report-template_en_us), [DOM-021](https://help.waters.com/content/dam/waters/ko/support/usermanuals/2024/715008798/715008798.pdf), [DOM-022](https://help.waters.com/content/dam/waters/en/support/usermanuals/2006/71500123505/71500123505v01.pdf)
 

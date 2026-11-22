@@ -79,7 +79,7 @@ The [domain model](../architecture/domain-model.md) also proposes records that a
 - **Cutoffs.** Supply researched clinical starting values, including values published by clinical laboratories, for the matching analyte, specimen and analytical technique. Compare independent laboratories where possible, record disagreements, and retain free/total-drug and collection-device qualifications. A published laboratory value is evidence of that laboratory's practice, not proof of the nationally most common cutoff. Federal workplace values are not the clinical default. Leave a value blank only when suitable evidence is missing or the field cannot express the needed rule (for example a specimen-validity range). Each populated cutoff cites its source and still requires laboratory review. See the [content notes](../../crates/lis-catalog/standard/content-notes.md).
 - **Analytes are specific to one specimen type.** A LOINC code names an observation in one specimen by one method, and analyte rows cannot be edited once created. The catalog therefore carries `UR-MORPH` and `OF-MORPH` as separate analytes, each with its own LOINC code.
 - **Other limits** stay blank: limit of detection, limit of quantitation, reportable range and display scale. They belong to each laboratory's validated assay.
-- **Required fields with a starter value.** The schema requires a threshold rule and a threshold rounding. Drafts get `at_or_above` and `before_rounding`, and the report marks both as "starter value, confirm".
+- **Required fields with a starter value.** The schema requires a threshold rule and a threshold rounding. Drafts get `at_or_above` and `before_rounding`, and the report marks both as "Starter value: confirm".
 - **No panels sized to billing tiers**, and no default bundling of presumptive and definitive testing. Panels follow clinical drug classes. This follows INV-13 and the OIG and DOJ findings on comprehensive panels (DOM-038, DOM-039, SR-049).
 - **Disclaimer.** The load dialog, the Catalog Preview header and every catalog screen show this while loaded starter drafts remain unapproved: "Starter content: check every value before use. It is not validated for your laboratory and not ready for patient testing." The app-wide starter catalog notice has a close button. Dismissal lasts across navigation until the signed-in shell unmounts (lock, sign-out or app restart); it does not approve drafts or change catalog review status.
 
@@ -173,7 +173,7 @@ The shipped demo dataset contains no staff, analyzers, lots, orders or results.
 | Phone and fax | Real area code with a line number from 555-0100 to 555-0199, reserved for fictitious use. Other 555 numbers are not safe. | DOM-108 |
 | Email and web addresses | Under `example.com`, `.example` or `.test` | DOM-109 |
 | NPI | Valid check digit with the `80840` prefix (`lis-identity` refuses others). No reserved test range was found. Each one was checked as absent from the NPPES registry when the file was written, and the check is recorded in the demo README. | DOM-103, DOM-132 |
-| CLIA ID | Format: two digits, `D`, seven digits. Use `00D0000000`. State code 00 is assumed unassigned; that assumption remains unverified in the demo content notes. | DOM-114 |
+| CLIA ID | Format: two digits, `D`, seven digits. Use `00D0000000`. State code 00 is assumed unassigned; that assumption remains unverified in the [demo README](../../crates/lis-engine/demo/README.md). | DOM-114 |
 | SSN | None | — |
 | Patient names | Realistic given names with coined surnames, for example "Marisol Fennimoor" or "Darnell Quillbrook". Every surname was checked against the US Census 2010 surname list when the file was written; the check is recorded in `crates/lis-engine/demo/README.md`. | DOM-110, DOM-131 |
 | Street addresses | Fictitious streets such as "Example Way" in a real state and ZIP code (assumption) | — |
@@ -196,7 +196,7 @@ Tests check that:
 
 | Name | Kind and capability | Does |
 | --- | --- | --- |
-| `catalog.preview_standard_catalog` | Query, `manage_configuration` | Both trees, with each item's state: new, already present, or code in use |
+| `catalog.standard_catalog_tree` | Query, `manage_configuration` | Both trees, with each item's state: new, already present, or code in use |
 | `catalog.load_standard_catalog` | Command, `manage_configuration` | Creates the chosen items and the items they need, using the existing create and draft functions in one transaction. One summary audit event holds the file version and digest. Running it again is safe. |
 | `catalog.generate_catalog_preview` | Command, `manage_configuration` or `approve_configuration` | Renders the report, stores the artifact and records the report |
 | `catalog.approve_reviewed_catalog` | Command, `approve_configuration`, with re-authentication | Approve reviewed catalog, as described above |

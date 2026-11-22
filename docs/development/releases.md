@@ -137,8 +137,6 @@ Renaming the repository does not strand installations:
   name, and its `nightly-*` release carries `latest-<owner>-<name>.json`, a copy of
   `latest.json` whose package addresses use that name. GitHub redirects them, and the
   Minisign signatures do not depend on addresses.
-- `0.1.2-nightly.20261113.31` was listed only under the new name, so builds made under a
-  former name do not see it; they see the next nightly published with these copies.
 
 The bundle identifier and persistent names are unchanged; installer upgrade continuity is
 still subject to the [real-host checks](packaging.md#product-name-and-compatibility).

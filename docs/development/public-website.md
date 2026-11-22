@@ -28,12 +28,6 @@ Pages with an OIDC token. A website change on `develop` goes live when it reache
 review it in the local preview first. This guide does not attest to a current
 remote-state check.
 
-The 2026-11-16 repository rename moved Pages to the URL above. The new URL
-returned HTTP 200 and the former `/steady-state-lims/` Pages path returned 404;
-GitHub repository redirects do not preserve the old Pages path. The hosted content
-keeps its previously deployed branding until reviewed changes reach `main` and the
-Pages workflow succeeds. No redirect site is deployed at the old Pages path.
-
 ## Content and design
 
 The canonical product copy is [the overview](../overview.md), checked against the

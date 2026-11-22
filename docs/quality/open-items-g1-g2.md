@@ -14,7 +14,7 @@ approval.
 | Q-01–Q-42 | Stable decisions in [open questions](../planning/open-questions.md) |
 | M2-R1–R14 | Laboratory inputs in [order-to-result policy inputs](laboratory-policy-inputs.md#order-to-result) |
 | M3-L1–L16 | Laboratory inputs in [reporting policy inputs](laboratory-policy-inputs.md#reporting-and-handoff) |
-| M4-L1–L13 | Laboratory inputs in [operations policy inputs](laboratory-policy-inputs.md#operations) |
+| M4-L1–L14 | Laboratory inputs in [operations policy inputs](laboratory-policy-inputs.md#operations) |
 
 “Verify” means obtain reviewed evidence for the applicable release and environment.
 It does not mean no related automated test exists. “Decide” requires the named

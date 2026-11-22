@@ -73,7 +73,7 @@ Versioned record pages show the version in effect and any open draft in the head
 | Delivery obligation | Reports › Delivery → panel | Attempts and their channel/evidence level belong to the exact obligation |
 | Billing evidence | Billing › Billing follow-up or order billing context | Financial evidence does not authorize clinical work |
 | Billing derivation and handoff | Billing work → derivation or handoff page; Billing handoffs → handoff page | Bulk handoff selection is explicit; individual outcomes belong to the handoff item. A handoff whose items are all acknowledged leaves Billing work and is found in Billing handoffs |
-| Interface connection | Interfaces › Connections → page with Overview, Rules, Logs and History tabs | Edit, Start/Stop with a reason, destination check, folder test and synthetic test message; analyzers stay under Laboratory setup › Instruments |
+| Interface connection | Interfaces › Connections → page with Overview, Rules, Code mappings, Logs and History tabs | Edit, Start/Stop with a reason, destination check, folder test and synthetic test message; analyzers stay under Laboratory setup › Instruments |
 | Interface message | Interfaces › Logs → tab by outcome; an outgoing message opens in a side panel (control ID, message as sent, ACK, attempts; audited), an unrouted one Unrouted messages, a received one its connection | Transport and application outcomes are separate; never a bare "Delivered"; Send again only after every attempt failed |
 | Unrouted message | Interfaces › Unrouted messages → panel | Send once, Retry routing, Deliver another way or Dismiss with reason; Add a rule opens the closest connection |
 
