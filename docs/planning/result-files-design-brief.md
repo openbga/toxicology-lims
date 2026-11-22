@@ -47,7 +47,7 @@ A receipt is durable before parsing. Every attempt accounts for imported, duplic
 
 An unplaced nonpatient batch row is visible as **batch row not placed**. Unusable outside-order rows retain reasons such as incompatible unit, malformed value, dilution mismatch or unsupported dilution. Usable unordered measurements can be selected only for an accepted component on the correct order/accession/matrix; the engine rechecks specimen/order gates and expected result revision. It creates result lines only for analytes with retained evidence.
 
-Partial imports do not reconcile absent analytes. **Results expected** follows frozen execution scope, including closed runs; failed executions defer to explicitly linked repeats. Retained receipts provide the exact retry route. A missing placeholder does not count as completed analytical work.
+Partial imports do not reconcile absent analytes. **Results expected from analyzers** follows frozen execution scope, including closed runs; failed executions defer to explicitly linked repeats. Retained receipts provide the exact retry route. A missing placeholder does not count as completed analytical work.
 
 ## 6. Manual load and watched folder
 

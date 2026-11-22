@@ -187,8 +187,8 @@ the current account may simply lack that queue's authority.
 The host clock supplies audit times. The application compares wall-clock movement with monotonic
 elapsed time and with the newest stored audit time. A backward jump or a clock behind existing
 records raises an alert for 24 hours. A forward discrepancy above the current 60-second default
-records a clock-change audit event; it does not by itself create an item in the **Listening gaps**
-queue. Time synchronization that is off or cannot be read is a warning. These defaults come from
+records a clock-change audit event; it does not by itself create an item in the **Listening gaps to
+acknowledge** queue. Time synchronization that is off or cannot be read is a warning. These defaults come from
 [host-health and lifecycle contract](../architecture/operations-contract.md#host-health-and-application-lifecycle).
 
 If the clock is wrong, preserve the displayed evidence, correct the operating-system time source,
