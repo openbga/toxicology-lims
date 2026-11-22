@@ -63,7 +63,7 @@ These expected outcomes are the acceptance basis for release-versus-change tests
 | Concurrent change | Change commits first | Release commits first |
 | --- | --- | --- |
 | QC rejection/supersession | Release refuses stale candidate/review (`qc_rejected` or corresponding dependency reason). | Issued bytes remain unchanged; impact review opens for the changed QC dependency. |
-| Applicable deviation | Release refuses stale candidate/review (`deviation_opened`). | Impact review opens for that deviation. |
+| Applicable deviation | Release refuses stale candidate/review (`deviation_open`). | Impact review opens for that deviation. |
 | Identity hold | Release refuses `identity_hold_open`. | Impact review opens for the hold, even if it is later cleared. |
 | Accepted cancellation | Release refuses stale candidate/component cancellation. | Impact review opens for the cancelled reported component. |
 | Result supersession | Release refuses stale candidate/review (`revision_superseded`). | Impact review opens for the superseded revision. |

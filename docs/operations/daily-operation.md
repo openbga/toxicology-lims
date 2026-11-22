@@ -128,8 +128,8 @@ that a result is missing; it marks a period the laboratory must check. The defau
 
 For each unacknowledged gap:
 
-1. Open **Work queues → Listening gaps** or **Health history → App runs**.
-2. Check analyzer retention, interrupted imports, the **Results expected** queue and the relevant
+1. Open **Work queues → Listening gaps to acknowledge** or **Health history → Application runs**.
+2. Check analyzer retention, interrupted imports, the **Results expected from analyzers** queue and the relevant
    worksheets or other approved source records.
 3. Ask the analyzer to resend the applicable results through the supported interface. Do not
    transcribe or infer a result merely to clear the gap.
@@ -173,11 +173,11 @@ queues currently include:
 
 | Queue | Owner | Meaning |
 | --- | --- | --- |
-| Operations alerts | The capability assigned to each health check | A health check is in warning or alert |
-| Listening gaps | Analyst | A period without listening needs review and acknowledgement |
-| Recovery reconciliation | Quality manager | A restored installation is waiting for the recovery checklist |
-| Version acceptance | Administrator | The running version is waiting for recorded application acceptance; laboratory validation evidence may be maintained externally |
-| Results expected | Analyst | An open run position has no measurement and may need analyzer resend or investigation |
+| Health checks needing attention | The capability assigned to each health check | A health check is in warning or alert |
+| Listening gaps to acknowledge | Analyst | A period without listening needs review and acknowledgement |
+| Recovery reconciliation after a restore | Quality manager | A restored installation is waiting for the recovery checklist |
+| Version awaiting acceptance | Administrator | The running version is waiting for recorded application acceptance; laboratory validation evidence may be maintained externally |
+| Results expected from analyzers | Analyst | An open run position has no measurement and may need analyzer resend or investigation |
 
 Counts and ages come from the engine. An empty queue is not evidence that another role has no work;
 the current account may simply lack that queue's authority.

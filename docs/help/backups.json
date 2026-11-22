@@ -144,7 +144,7 @@
         {
           "name": "Audit anchor comparison (restore test)",
           "meaning": "Evidence comparisons made while checking a retained set.",
-          "values": "Compared, Matched, Lost interval, Unverified restore boundary, Mismatched, Local events missing, Conflicts, Gaps and Not yet anchored counts.",
+          "values": "Anchors compared, Matched, Lost interval (expected after a restore), Explained by a restore not yet anchored, Mismatched, Local events missing, Conflicting anchors, Gaps and Not yet anchored counts.",
           "rules": "Read-only; an expected lost interval is different from mismatched or missing evidence."
         }
       ],
