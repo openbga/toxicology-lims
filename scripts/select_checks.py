@@ -129,8 +129,6 @@ def classify(path, before=None, after=None):
         return {"website", "docs"}, "standalone presentation changed"
     if path.startswith(".github/ISSUE_TEMPLATE/"):
         return {"docs"}, "issue template changed"
-    if path == "ui/src/features/whats-new/changelog.json":
-        return {"ui", "docs"}, "What's new list generated from changelog.d changed"
     if path.startswith("ui/src/generated/"):
         return {"rust", "ui", "help"}, "generated IPC contract changed"
     if path.startswith(("crates/", "src-tauri/", "fixtures/")):
