@@ -4,9 +4,26 @@ import type { RoleInfo } from "@/generated/RoleInfo";
 import type { UserSummary } from "@/generated/UserSummary";
 
 /** A user's roles as the engine's role labels, such as "Analyst, Auditor". */
-export function roleNamesOf(roles: readonly RoleInfo[]): (user: UserSummary) => string {
+export function roleListOf(roles: readonly RoleInfo[]): (user: UserSummary) => string {
   const labels = new Map<string, string>(roles.map((role) => [role.code, role.label]));
   return (user) => user.roles.map((code) => labels.get(code) ?? code).join(", ") || "No roles";
+}
+
+/** Like `roleListOf`, but "All roles" for a user who holds every role the catalog has. */
+export function roleNamesOf(roles: readonly RoleInfo[]): (user: UserSummary) => string {
+  const list = roleListOf(roles);
+  return (user) =>
+    roles.length > 0 && roles.every((role) => user.roles.includes(role.code))
+      ? "All roles"
+      : list(user);
+}
+
+export function StatusTag({ user }: { user: UserSummary }) {
+  return (
+    <StatusBadge tone={user.status === "active" ? "success" : "neutral"}>
+      {statusLabel(user)}
+    </StatusBadge>
+  );
 }
 
 export const statusLabel = (user: UserSummary) =>
@@ -17,7 +34,7 @@ export const authenticationLabel = (user: UserSummary) =>
 
 export function Authenticator({ user }: { user: UserSummary }) {
   return user.mfaEnrolled ? (
-    <StatusBadge tone="neutral">Set up</StatusBadge>
+    <StatusBadge tone="success">Set up</StatusBadge>
   ) : (
     <StatusBadge tone="warning">Not set up</StatusBadge>
   );
@@ -28,9 +45,14 @@ export function Lockout({ user }: { user: UserSummary }) {
 }
 
 /** The user grid's columns; role codes show as the engine's role labels. */
-export function userColumns(roles: readonly RoleInfo[]): DataGridColumn<UserSummary>[] {
+export function userColumns(
+  roles: readonly RoleInfo[],
+  /** Beside the side panel the list keeps only the columns that identify a user. */
+  compact = false,
+): DataGridColumn<UserSummary>[] {
   const roleNames = roleNamesOf(roles);
-  return [
+  const roleList = roleListOf(roles);
+  const all: DataGridColumn<UserSummary>[] = [
     {
       id: "username",
       header: "Username",
@@ -45,7 +67,12 @@ export function userColumns(roles: readonly RoleInfo[]): DataGridColumn<UserSumm
       cell: (user) => user.displayName,
       sortValue: (user) => user.displayName,
     },
-    { id: "roles", header: "Roles", cell: roleNames, sortValue: roleNames },
+    {
+      id: "roles",
+      header: "Roles",
+      cell: (user) => <span title={roleList(user)}>{roleNames(user)}</span>,
+      sortValue: roleNames,
+    },
     {
       id: "authentication",
       header: "Sign-in method",
@@ -62,7 +89,7 @@ export function userColumns(roles: readonly RoleInfo[]): DataGridColumn<UserSumm
     {
       id: "status",
       header: "Status",
-      cell: (user) => <StatusBadge tone="neutral">{statusLabel(user)}</StatusBadge>,
+      cell: (user) => <StatusTag user={user} />,
       sortValue: (user) => user.status,
       width: 130,
     },
@@ -74,4 +101,7 @@ export function userColumns(roles: readonly RoleInfo[]): DataGridColumn<UserSumm
       width: 150,
     },
   ];
+  return compact ? all.filter((column) => COMPACT_COLUMNS.includes(column.id)) : all;
 }
+
+const COMPACT_COLUMNS = ["username", "displayName", "status"];

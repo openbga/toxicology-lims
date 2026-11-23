@@ -234,7 +234,11 @@ describe("UsersPage (REQ-IDN-004)", { timeout: WALKTHROUGH_TIMEOUT_MS }, () => {
     const disable = vi.fn(() =>
       Promise.reject(engineError("conflict", "At least one active administrator must remain.")),
     );
-    const { user } = renderPage({ disable_user: disable });
+    // Another administrator is listed, as when the list is stale: the engine still refuses.
+    const { user } = renderPage({
+      disable_user: disable,
+      list_users: () => [ADMIN, { ...ANALYST, roles: ["administrator"] }],
+    });
     const panel = await openUser(user, ADMIN);
     await user.click(within(panel).getByRole("button", { name: "Disable user" }));
     const dialog = await screen.findByRole("alertdialog", { name: "Disable Test Administrator?" });
@@ -325,9 +329,58 @@ describe("UsersPage (REQ-IDN-004)", { timeout: WALKTHROUGH_TIMEOUT_MS }, () => {
     ).toBeTruthy();
     expect(panel.queryByRole("button", { name: "Edit roles" })).toBeNull();
     expect(panel.queryByRole("button", { name: "Reset sign-in" })).toBeNull();
-    expect(panel.getByRole("button", { name: "Disable user" })).toBeTruthy();
+    // The only active administrator cannot be disabled: the engine would refuse.
+    expect(panel.queryByRole("button", { name: "Disable user" })).toBeNull();
+  });
+
+  it("offers Disable user on one's own account while another administrator is active", async () => {
+    const { user } = renderPage({
+      list_users: () => [ADMIN, { ...ANALYST, roles: ["administrator"] }],
+    });
+    await waitForUser("admin");
     const menu = within(await openRowActions(user, "admin"));
     expect(menu.getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Disable user"]);
+  });
+
+  it("colors Active and Set up green, and keeps Not set up in warning", async () => {
+    const { user } = renderPage();
+    await waitForUser("analyst");
+    const toneOf = (text: string, scope: HTMLElement) =>
+      within(scope).getByText(text).closest("[data-tone]")?.getAttribute("data-tone");
+    expect(toneOf("Active", rowOf("admin"))).toBe("success");
+    expect(toneOf("Set up", rowOf("admin"))).toBe("success");
+    expect(toneOf("Not set up", rowOf("analyst"))).toBe("warning");
+    expect(toneOf("Disabled", rowOf("former"))).toBe("neutral");
+    const panel = await openUser(user, ADMIN);
+    expect(toneOf("Active", panel)).toBe("success");
+    expect(toneOf("Set up", panel)).toBe("success");
+  });
+
+  it("shows All roles for a user with every role, with the full list on hover", async () => {
+    const everyRole = TEST_ROLES.map((role) => role.code);
+    renderPage({
+      list_users: () => [
+        { ...ADMIN, roles: everyRole },
+        { ...ANALYST, roles: ["analyst", "auditor"] },
+      ],
+    });
+    await waitForUser("analyst");
+    const all = within(rowOf("admin")).getByText("All roles");
+    expect(all.getAttribute("title")).toContain("Analyst");
+    expect(within(rowOf("analyst")).getByText("Analyst, Auditor").getAttribute("title")).toBe(
+      "Analyst, Auditor",
+    );
+  });
+
+  it("keeps only Username, Display name and Status while a user's panel is open", async () => {
+    const { user } = renderPage();
+    await waitForUser("analyst");
+    expect(screen.getByRole("columnheader", { name: /Roles/ })).toBeTruthy();
+    await openUser(user, ADMIN);
+    expect(screen.queryByRole("columnheader", { name: /Roles/ })).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: /Authenticator/ })).toBeNull();
+    expect(screen.getByRole("columnheader", { name: /Status/ })).toBeTruthy();
+    expect(screen.getByRole("columnheader", { name: /Display name/ })).toBeTruthy();
   });
 
   it("offers a quality manager role changes only", async () => {
@@ -435,6 +488,26 @@ describe("UsersPage (REQ-IDN-004)", { timeout: WALKTHROUGH_TIMEOUT_MS }, () => {
     });
     await waitFor(() => expect(session.mock.calls.length).toBeGreaterThan(reads.session));
     await waitFor(() => expect(list.mock.calls.length).toBeGreaterThan(reads.users));
+  });
+
+  it("shows One-person laboratory instead of the action once it is set up", async () => {
+    const policy = {
+      version: 2,
+      values: {
+        selfApproveConfiguration: true,
+        selfReleaseReports: true,
+        selfVerifyDestinations: true,
+      },
+      reason: "Alone",
+      setBy: null,
+      setAt: null,
+    };
+    renderPage({
+      list_users: () => [{ ...ADMIN, roles: TEST_ROLES.map((role) => role.code) }],
+      get_separation_policy: () => policy,
+    });
+    expect(await screen.findByText("One-person laboratory")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Set up for one person" })).toBeNull();
   });
 
   it("shows the engine's refusal while another account is active", async () => {

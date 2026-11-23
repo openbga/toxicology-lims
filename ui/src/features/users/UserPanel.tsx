@@ -1,10 +1,10 @@
 import { DetailPanel } from "@/components/DetailPanel";
 import { Facts } from "@/components/Facts";
 import { type ActionItem, RecordActions } from "@/components/RowActions";
-import { StatusBadge } from "@/components/StatusBadge";
 import type { UserSummary } from "@/generated/UserSummary";
 import type { OpenRecord } from "@/lib/openRecord";
-import { Authenticator, authenticationLabel, Lockout, statusLabel } from "./userColumns";
+import { Authenticator, authenticationLabel, Lockout, StatusTag } from "./userColumns";
+import styles from "./users.module.css";
 
 interface UserPanelProps {
   user: UserSummary;
@@ -21,13 +21,17 @@ export function UserPanel({ user, roleNames, actions, own, record }: UserPanelPr
   return (
     <DetailPanel
       identifier={user.displayName}
-      status={<StatusBadge tone="neutral">{statusLabel(user)}</StatusBadge>}
+      status={<StatusTag user={user} />}
       actions={actions.length > 0 && <RecordActions items={actions} />}
       onClose={record.close}
       onPrevious={record.previous}
       onNext={record.next}
     >
-      {own && <p>Ask someone else to change your own roles or reset your sign-in.</p>}
+      {own && (
+        <p className={styles.panelNote}>
+          Ask someone else to change your own roles or reset your sign-in.
+        </p>
+      )}
       <Facts
         items={[
           { label: "Username", value: user.username },

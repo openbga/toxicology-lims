@@ -57,7 +57,7 @@ export function UserAdministration({ users, roles, record, onReload }: UserAdmin
   const userRows = users.data ?? NO_USERS;
   const roleRows = roles.data ?? NO_ROLES;
   const roleNames = useMemo(() => roleNamesOf(roleRows), [roleRows]);
-  const actionsOf = useUserActions(setPending);
+  const actionsOf = useUserActions(setPending, userRows);
   return (
     <DetailLayout
       // Looked up in the latest list, so a dialog always sends the current revision.
@@ -108,7 +108,8 @@ function UserList({ users, roles, record, rowActions }: UserListProps) {
   const [status, setStatus] = useStatusFilter();
   const userRows = users.data ?? NO_USERS;
   const roleRows = roles.data ?? NO_ROLES;
-  const columns = useMemo(() => userColumns(roleRows), [roleRows]);
+  const compact = record.openId !== null;
+  const columns = useMemo(() => userColumns(roleRows, compact), [roleRows, compact]);
   const shown = useMemo(
     () =>
       findRows(
@@ -223,6 +224,23 @@ function useStatusFilter(): [StatusFilter, (next: StatusFilter) => void] {
   ];
 }
 
+const KEPT_ROLES = ["administrator", "quality_manager"] as const;
+
+/**
+ * Whether the user is the only active holder of a role that must stay held, so the engine
+ * would refuse to disable the account ("At least one active administrator must remain").
+ */
+function isLastHolder(user: UserSummary, users: readonly UserSummary[]): boolean {
+  return KEPT_ROLES.some(
+    (role) =>
+      user.roles.includes(role) &&
+      !users.some(
+        (other) =>
+          other.userId !== user.userId && other.status === "active" && other.roles.includes(role),
+      ),
+  );
+}
+
 /**
  * The account actions offered on one user, as before this screen had a panel: Edit roles
  * to anyone but the person themselves (a quality manager assigns clinical roles), and
@@ -234,7 +252,7 @@ function useStatusFilter(): [StatusFilter, (next: StatusFilter) => void] {
  * is shown anyway and the engine's refusal is displayed. Engine request: `allowedActions`
  * on `UserSummary` (edit roles, enable, disable, reset sign-in), computed for the caller.
  */
-function useUserActions(setPending: (pending: Pending) => void) {
+function useUserActions(setPending: (pending: Pending) => void, users: readonly UserSummary[]) {
   const session = useCommandQuery<SessionInfo | null>(CURRENT_SESSION).data;
   const managesAccounts = session?.capabilities.includes("manage_users") ?? false;
   const isOwn = (user: UserSummary) => user.userId === session?.userId;
@@ -245,11 +263,16 @@ function useUserActions(setPending: (pending: Pending) => void) {
     const items: ActionItem[] = [];
     if (!own) items.push({ id: "roles", label: "Edit roles", onAction: ask("roles") });
     if (managesAccounts) {
-      items.push(
-        user.status === "disabled"
-          ? { id: "status", label: "Enable user", onAction: ask("status") }
-          : { id: "status", label: "Disable user", variant: "danger", onAction: ask("status") },
-      );
+      if (user.status === "disabled") {
+        items.push({ id: "status", label: "Enable user", onAction: ask("status") });
+      } else if (!isLastHolder(user, users)) {
+        items.push({
+          id: "status",
+          label: "Disable user",
+          variant: "danger",
+          onAction: ask("status"),
+        });
+      }
       if (!own && user.authenticationMethod !== "security_key")
         items.push({ id: "reset", label: "Reset sign-in", onAction: ask("reset") });
     }
