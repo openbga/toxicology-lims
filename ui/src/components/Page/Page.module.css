@@ -126,3 +126,12 @@
 .page[data-layout="collection"] > .header {
   margin-bottom: var(--space-1);
 }
+
+/* The header's own buttons; locked and dimmed while the previous record still shows (#4791). */
+.pageActions {
+  display: contents;
+}
+
+.stale > * {
+  opacity: 0.6;
+}

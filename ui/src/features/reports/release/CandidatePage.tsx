@@ -8,6 +8,7 @@ import { QueryContent } from "@/components/QueryContent";
 import { RefreshControl } from "@/components/RefreshControl";
 import { Section } from "@/components/Section";
 import { useCommandQuery } from "@/lib/commands";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import styles from "@/styles/layout.module.css";
 import { Dispositions, ReleaseBlocked } from "../content/Dispositions";
@@ -33,7 +34,7 @@ import { ReleaseDialog } from "./ReleaseDialog";
  */
 export function CandidatePage() {
   const { specimenId = "", candidateId = "" } = useParams();
-  const candidate = useCommandQuery<CandidateView>(GET_REPORT_CANDIDATE, {
+  const candidate = useRecordQuery<CandidateView>(GET_REPORT_CANDIDATE, {
     input: { candidateId },
   });
   // Engine request: `subject` and `accessionNumber` on `CandidateView`, so this second
