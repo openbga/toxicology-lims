@@ -53,13 +53,12 @@ describe("ListenerStatus (REQ-OPS-013, #4885)", () => {
     expect(within(table).getByText("today 14:03").getAttribute("title")).toBe(
       "2026-10-12 14:03 UTC",
     );
-    // The reason is its own line under the row, across the columns.
+    // The reason sits under the analyzer's name, in its row.
     expect(
-      within(table)
-        .getByText("Could not open the connection")
-        .closest("td")
-        ?.getAttribute("colspan"),
-    ).toBe("3");
+      within(table).getByRole("rowheader", {
+        name: /Synthetic Analyzer 2.*Could not open the connection/,
+      }),
+    ).toBeTruthy();
     expect(within(table).getByText("None yet")).toBeTruthy();
     expect(localStorage.getItem(OPEN_KEY)).toBe("true");
     await expectNoA11yViolations(container);

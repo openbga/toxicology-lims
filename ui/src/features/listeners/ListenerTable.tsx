@@ -1,4 +1,4 @@
-import { Fragment, useContext } from "react";
+import { useContext } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import type { ListenerStatusView } from "@/generated/ListenerStatusView";
 import { formatRecentTime, LabTimeZoneContext, useFormatTime } from "@/lib/format";
@@ -28,29 +28,23 @@ export function ListenerTable({ id, listeners }: { id: string; listeners: Listen
   );
 }
 
-/** One line per analyzer; a reason shows in a second line under it, across the columns. */
+/** One row per analyzer; a reason shows under its name, the state and time centred on the row. */
 function ListenerTableRow({ listener }: { listener: ListenerStatusView }) {
   const state = LISTENER_STATES[listener.state];
   const detail = listenerDetailText(listener);
   return (
-    <Fragment>
-      <tr>
-        <th scope="row">{listener.instrumentName}</th>
-        <td>
-          <StatusBadge tone={state.tone}>{state.label}</StatusBadge>
-        </td>
-        <td>
-          {listener.lastActivityAt ? <RecentTime value={listener.lastActivityAt} /> : "None yet"}
-        </td>
-      </tr>
-      {detail && (
-        <tr className={styles.detailRow}>
-          <td colSpan={3} className={styles.reason}>
-            {detail}
-          </td>
-        </tr>
-      )}
-    </Fragment>
+    <tr>
+      <th scope="row">
+        {listener.instrumentName}
+        {detail && <span className={styles.reason}>{detail}</span>}
+      </th>
+      <td>
+        <StatusBadge tone={state.tone}>{state.label}</StatusBadge>
+      </td>
+      <td>
+        {listener.lastActivityAt ? <RecentTime value={listener.lastActivityAt} /> : "None yet"}
+      </td>
+    </tr>
   );
 }
 

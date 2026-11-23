@@ -47,7 +47,7 @@
   white-space: nowrap;
   border-top: 1px solid var(--color-border);
   text-align: start;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .table thead th {
@@ -65,14 +65,9 @@
   color: var(--color-text-muted);
 }
 
-/* A reason sits under its row without a rule or a column of its own. */
-.table .detailRow td {
-  border-top: none;
-  padding-top: 0;
-  white-space: normal;
-}
-
+/* A reason sits under the name, in the same row. */
 .reason {
+  display: block;
   color: var(--color-text-muted);
 }
 
