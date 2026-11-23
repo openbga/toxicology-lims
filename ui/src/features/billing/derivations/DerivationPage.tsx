@@ -10,8 +10,8 @@ import { StatusBadge } from "@/components/StatusBadge";
 import type { DerivationView } from "@/generated/DerivationView";
 import { CommandConfirmDialog } from "@/lib/CommandConfirmDialog";
 import { labelOf } from "@/lib/choices";
-import { useCommandQuery } from "@/lib/commands";
 import { IdentityBanner } from "@/lib/IdentityBanner";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import styles from "@/styles/layout.module.css";
 import { DERIVATION_QUERIES, GET_SERVICE_DERIVATION } from "../contract";
@@ -32,7 +32,7 @@ const HOME = { label: "Billing work", href: "/billing/work" };
  */
 export function DerivationPage() {
   const { derivationId = "" } = useParams();
-  const derivation = useCommandQuery<DerivationView>(GET_SERVICE_DERIVATION, {
+  const derivation = useRecordQuery<DerivationView>(GET_SERVICE_DERIVATION, {
     input: { derivationId },
   });
   const { list, sequence } = useRecordSequence(derivationId, HOME, derivationPath);

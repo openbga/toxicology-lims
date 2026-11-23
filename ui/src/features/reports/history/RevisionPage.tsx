@@ -9,6 +9,7 @@ import { Section } from "@/components/Section";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Timestamp } from "@/components/Timestamp";
 import { useCommandQuery } from "@/lib/commands";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import styles from "@/styles/layout.module.css";
 import { ReportContent } from "../content/ReportContent";
@@ -35,7 +36,7 @@ const HOME = { label: "Reports", href: "/reports" };
  */
 export function RevisionPage() {
   const { revisionId = "" } = useParams();
-  const revision = useCommandQuery<RevisionDetail>(GET_REPORT_REVISION, {
+  const revision = useRecordQuery<RevisionDetail>(GET_REPORT_REVISION, {
     input: { revisionId },
   });
   const data = revision.data;

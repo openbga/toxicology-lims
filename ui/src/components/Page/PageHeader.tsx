@@ -1,6 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Breadcrumb, Breadcrumbs, Link } from "react-aria-components";
+import { useRecordSwitching } from "@/lib/recordQuery";
 import styles from "./Page.module.css";
 import { type SequenceLinks, SequenceNav } from "./SequenceNav";
 
@@ -36,6 +37,7 @@ export function PageHeader({
   chips,
   sequence,
 }: PageHeaderProps) {
+  const switching = useRecordSwitching();
   const hasEnd = Boolean(actions) || Boolean(sequence);
   return (
     <header className={styles.header}>
@@ -69,7 +71,14 @@ export function PageHeader({
         {hasEnd && (
           <div className={styles.actions}>
             {sequence && <SequenceNav sequence={sequence} />}
-            {actions}
+            {actions && (
+              <div
+                className={switching ? `${styles.pageActions} ${styles.stale}` : styles.pageActions}
+                inert={switching}
+              >
+                {actions}
+              </div>
+            )}
           </div>
         )}
       </div>

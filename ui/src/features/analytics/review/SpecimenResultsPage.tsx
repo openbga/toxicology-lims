@@ -6,8 +6,8 @@ import { RefreshControl } from "@/components/RefreshControl";
 import { Section } from "@/components/Section";
 import type { SpecimenResults } from "@/generated/SpecimenResults";
 import { labelOf } from "@/lib/choices";
-import { useCommandQuery } from "@/lib/commands";
 import { IdentityBanner } from "@/lib/IdentityBanner";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import { GET_SPECIMEN_RESULTS } from "../contract";
 import { REVIEW_LIST, specimenResultsPath } from "../paths";
@@ -29,7 +29,7 @@ import { ValiditySection } from "./ValiditySection";
  */
 export function SpecimenResultsPage() {
   const { specimenId = "" } = useParams();
-  const results = useCommandQuery<SpecimenResults>(GET_SPECIMEN_RESULTS, {
+  const results = useRecordQuery<SpecimenResults>(GET_SPECIMEN_RESULTS, {
     input: { specimenId },
   });
   const { list, sequence } = useRecordSequence(specimenId, REVIEW_LIST, specimenResultsPath);

@@ -7,7 +7,7 @@ What changed in OpenBGA Toxicology LIMS, newest release first. Changes not yet i
 release are listed under Unreleased. Within a release, changes are ordered by impact, then
 newest first. The application shows the same list under **What's new**.
 
-## Unreleased (2026-11-12 to 2026-11-20)
+## Unreleased (2026-11-12 to 2026-11-23)
 
 ### High impact
 
@@ -171,6 +171,16 @@ newest first. The application shows the same list under **What's new**.
   The reason is computed when read and never stored, so there is no migration.
 
 ### Low impact
+
+- **Fixed:** Readable order links, and Previous and Next without flicker (2026-11-23)
+
+  On **Receive specimens** and **Finish receiving**, the link to the order now reads as the clinic's order number, or **Order · patient name · received date** when none was supplied. The internal order ID is no longer shown, and the breadcrumb on Finish receiving names the order.
+
+  On pages with **Previous** and **Next**, the record you are leaving stays on screen, dimmed, until the next one is loaded. The title, status, buttons and **Updated** no longer disappear, so the buttons stay where they are.
+
+  Technical notes:
+
+  New `useRecordQuery` keeps the previous record as placeholder data and marks the screen as switching; `QueryContent` and `PageHeader` make the stale record's content and actions inert meanwhile. No engine change.
 
 - **Changed:** Choose Compact, Default or Wide navigation width (2026-11-20)
 
