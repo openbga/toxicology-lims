@@ -26,8 +26,7 @@ export function StatusTag({ user }: { user: UserSummary }) {
   );
 }
 
-const statusLabel = (user: UserSummary) =>
-  user.status === "active" ? "Active" : "Disabled";
+const statusLabel = (user: UserSummary) => (user.status === "active" ? "Active" : "Disabled");
 
 export const authenticationLabel = (user: UserSummary) =>
   user.authenticationMethod === "security_key" ? "Security key" : "Password + authenticator app";
