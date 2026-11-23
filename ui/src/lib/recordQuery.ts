@@ -1,5 +1,5 @@
-import { useEffect, useSyncExternalStore } from "react";
 import type { InvokeArgs } from "@tauri-apps/api/core";
+import { useEffect, useSyncExternalStore } from "react";
 import type { CommandName } from "@/generated/CommandName";
 import { useCommandQuery } from "./commands";
 
