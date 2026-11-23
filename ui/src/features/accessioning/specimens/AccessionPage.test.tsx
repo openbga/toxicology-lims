@@ -109,8 +109,13 @@ describe("AccessionPage (REQ-SPC-001 to REQ-SPC-003)", { timeout: WALKTHROUGH_TI
     expect(screen.getByText("Waiting for a receipt decision")).toBeTruthy();
     expect(screen.getByText("30.0 mL, estimated")).toBeTruthy();
     expect(screen.getByText("No label requested")).toBeTruthy();
-    // The breadcrumb and the strip both open the order, named by the accession number.
-    for (const link of screen.getAllByRole("link", { name: "A26000001" })) {
+    // The breadcrumb and the strip both open the order, never named by an internal ID (#4890).
+    for (const link of [
+      within(screen.getByRole("navigation", { name: "Breadcrumb" })).getByRole("link", {
+        name: "Order",
+      }),
+      await screen.findByRole("link", { name: "PO-0001" }),
+    ]) {
       expect(link).toHaveProperty("href", expect.stringContaining(`/orders/${ORDER_ID}`));
     }
     expect(screen.getByText("0 of 1 recorded")).toBeTruthy();
@@ -118,7 +123,7 @@ describe("AccessionPage (REQ-SPC-001 to REQ-SPC-003)", { timeout: WALKTHROUGH_TI
     expect(await screen.findByRole("link", { name: "Patient, Test" })).toBeTruthy();
     const banner = screen.getByRole("region", { name: "Patient identity" });
     expect(within(banner).getByText("MRN-00001")).toBeTruthy();
-    expect(within(banner).getByRole("link", { name: "A26000001" })).toBeTruthy();
+    expect(within(banner).getByRole("link", { name: "PO-0001" })).toBeTruthy();
     expect(await within(banner).findByText("Synthetic Clinic")).toBeTruthy();
     expect(within(banner).getByText(/SYN-SCR Synthetic drug screen/)).toBeTruthy();
     // Two identifiers on every container row: the label and the accession.
