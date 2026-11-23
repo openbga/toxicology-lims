@@ -7,7 +7,7 @@ What changed in OpenBGA Toxicology LIMS, newest release first. Changes not yet i
 release are listed under Unreleased. Within a release, changes are ordered by impact, then
 newest first. The application shows the same list under **What's new**.
 
-## Unreleased (2026-11-12 to 2026-11-20)
+## Unreleased (2026-11-12 to 2026-11-23)
 
 ### High impact
 
@@ -171,6 +171,10 @@ newest first. The application shows the same list under **What's new**.
   The reason is computed when read and never stored, so there is no migration.
 
 ### Low impact
+
+- **Changed:** Clearer Users list and fewer impossible actions (2026-11-23)
+
+  On Users, Active and Set up now show in green (Disabled is gray, Not set up stays yellow). A user with every role shows "All roles", other users show their roles with the full list on hover, and with an account open beside the list only Username, Display name and Status are shown, so the list no longer scrolls sideways. "Set up for one person" is replaced by "One-person laboratory" once the laboratory is set up that way, and "Disable user" is no longer offered on the only active administrator or quality manager.
 
 - **Changed:** Choose Compact, Default or Wide navigation width (2026-11-20)
 
