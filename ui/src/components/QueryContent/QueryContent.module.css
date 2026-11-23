@@ -1,0 +1,9 @@
+/* Wraps the loaded content without a box of its own, so layouts do not change (#4791). */
+.content {
+  display: contents;
+}
+
+/* The previous record, kept until the next one is loaded. */
+.stale > * {
+  opacity: 0.6;
+}

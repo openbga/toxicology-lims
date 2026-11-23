@@ -8,6 +8,7 @@ import { Tabs } from "@/components/Tabs";
 import { Timestamp } from "@/components/Timestamp";
 import { useCommandQuery } from "@/lib/commands";
 import { IdentityBanner } from "@/lib/IdentityBanner";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import { useRouteTabs } from "@/lib/routeTabs";
 import styles from "@/styles/layout.module.css";
@@ -44,7 +45,7 @@ const HOME = { label: "Reports", href: "/reports" };
  */
 export function ReportPage() {
   const { reportId = "" } = useParams();
-  const report = useCommandQuery<ReportDetail>(GET_REPORT, { input: { reportId } });
+  const report = useRecordQuery<ReportDetail>(GET_REPORT, { input: { reportId } });
   const { list, sequence } = useRecordSequence(reportId, HOME, reportPath);
   const data = report.data;
   // One header in every state, so Previous and Next keep focus while the next report loads.

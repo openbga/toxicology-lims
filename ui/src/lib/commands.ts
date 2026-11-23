@@ -77,7 +77,8 @@ export function createQueryClient(): QueryClient {
  * does not run, and stays pending: for a read the session may not make (a refused read is
  * audited), or one that waits for a choice.
  * `keepPrevious` keeps a directory's last page visible during a new query. Callers must
- * label it as updating and disable pagination while fetching. Never use it for record views.
+ * label it as updating and disable pagination while fetching. Record views use it only through
+ * `useRecordQuery`, which blocks actions on the stale record.
  */
 export function useCommandQuery<T>(
   command: CommandName,

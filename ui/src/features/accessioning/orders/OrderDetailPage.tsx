@@ -5,8 +5,8 @@ import { QueryContent } from "@/components/QueryContent";
 import { RefreshControl } from "@/components/RefreshControl";
 import { StatusBadge } from "@/components/StatusBadge";
 import type { OrderDetail } from "@/generated/OrderDetail";
-import { useCommandQuery } from "@/lib/commands";
 import { IdentityBanner } from "@/lib/IdentityBanner";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import { OrderBillingSection } from "../billing/OrderBillingSection";
 import { IntakeSteps } from "../IntakeSteps";
@@ -36,7 +36,7 @@ export function OrderDetailPage() {
   const [params] = useSearchParams();
   const receiveNext = params.get("next") === "receive";
   const openBilling = params.get("billing") === "open";
-  const order = useCommandQuery<OrderDetail>(GET_ORDER, { input: { orderId } });
+  const order = useRecordQuery<OrderDetail>(GET_ORDER, { input: { orderId } });
   const accessionContext = useOrderAccessionContext(orderId);
   const { list, sequence } = useRecordSequence(orderId, ORDERS, orderPath);
   const { references } = useOrderReferences();
