@@ -70,24 +70,6 @@ describe("DataGrid", () => {
     await expectNoA11yViolations(container);
   });
 
-  it("marks a centred column's header and cells with data-align", () => {
-    const centred: readonly DataGridColumn<Item>[] = [
-      COLUMNS[0] as DataGridColumn<Item>,
-      { id: "status", header: "Status", cell: (item) => item.status, align: "center" },
-    ];
-    renderWithProviders(
-      <DataGrid label="Centred" columns={centred} rows={items(2)} getRowId={getRowId} />,
-    );
-    expect(screen.getByRole("columnheader", { name: "Status" }).getAttribute("data-align")).toBe(
-      "center",
-    );
-    const cell = screen.getAllByRole("gridcell", { name: /Received|On hold/ })[0];
-    expect(cell?.getAttribute("data-align")).toBe("center");
-    expect(
-      screen.getByRole("columnheader", { name: "Accession" }).getAttribute("data-align"),
-    ).toBeNull();
-  });
-
   it("sorts by a sortable column on click and on Enter", async () => {
     const { user } = renderWithProviders(<Harness rows={items(3)} />);
     const header = screen.getByRole("columnheader", { name: "Accession" });

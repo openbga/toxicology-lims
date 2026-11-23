@@ -69,8 +69,8 @@ export interface DataGridColumn<Row extends RowData> {
    * does not fit ends in "…" and shows in full on hover.
    */
   wrap?: boolean;
-  /** `end` for numbers and counts, so their digits line up; `center` for a middle column. */
-  align?: "end" | "center";
+  /** `end` for numbers and counts, so their digits line up. */
+  align?: "end";
   /**
    * The identifier people use, such as a code or accession number, styled as a link so it
    * is visible that rows open. Not a link itself: a click on the row or Enter opens it.

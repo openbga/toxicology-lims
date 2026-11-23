@@ -46,7 +46,7 @@ interface GridCellProps extends CellBehavior {
   children: ReactNode;
   "aria-sort"?: "ascending" | "descending" | "none" | undefined;
   "data-sortable"?: true | undefined;
-  "data-align"?: "end" | "center" | undefined;
+  "data-align"?: "end" | undefined;
   "data-wrap"?: true | undefined;
   "data-zero"?: true | undefined;
   "data-identifier"?: true | undefined;

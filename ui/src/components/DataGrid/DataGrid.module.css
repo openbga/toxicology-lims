@@ -84,10 +84,6 @@
   justify-content: flex-end;
 }
 
-.headerCell[data-align="center"] {
-  justify-content: center;
-}
-
 /* `text-overflow` needs a block box, so data cells are blocks, centred by line height. In a
    row another cell's wrapped text made taller, every other cell sits in its middle. */
 .cell {
@@ -115,10 +111,6 @@
 
 .cell[data-align="end"] {
   text-align: end;
-}
-
-.cell[data-align="center"] {
-  text-align: center;
 }
 
 /* The first line sits where a one-line cell's text does; further lines grow the row. */
