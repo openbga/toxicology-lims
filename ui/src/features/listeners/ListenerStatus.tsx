@@ -63,18 +63,21 @@ export function ListenerStatus() {
       {all.length === 0 ? (
         <span className={styles.summary}>{summary}</span>
       ) : (
-        <Button
-          variant="quiet"
-          aria-expanded={isOpen}
-          aria-controls={isOpen ? listId : undefined}
-          onPress={toggle}
-        >
-          <span className={styles.summary}>
-            <Chevron aria-hidden="true" />
-            {summary}
-            <span className={styles.note}>Results are received while nobody is signed in.</span>
-          </span>
-        </Button>
+        <>
+          <Button
+            variant="quiet"
+            aria-expanded={isOpen}
+            aria-controls={isOpen ? listId : undefined}
+            onPress={toggle}
+          >
+            <span className={styles.summary}>
+              <span className={styles.heading}>Analyzers</span>
+              {summary}
+              <Chevron aria-hidden="true" className={styles.chevron} />
+            </span>
+          </Button>
+          <p className={styles.note}>Results are received while nobody is signed in.</p>
+        </>
       )}
       {isOpen && all.length > 0 && <ListenerTable id={listId} listeners={all} />}
     </section>

@@ -41,8 +41,9 @@ describe("ListenerStatus (REQ-OPS-013, #4885)", () => {
     });
     const { user, container } = renderWithProviders(<ListenerStatus />);
     const summary = await screen.findByRole("button", {
-      name: /^2 analyzers: 1 error, 1 receiving.*Results are received while nobody is signed in\.$/,
+      name: /^Analyzers\s*2 analyzers: 1 error, 1 receiving/,
     });
+    expect(screen.getByText("Results are received while nobody is signed in.")).toBeTruthy();
     expect(summary.getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("table")).toBeNull();
     await user.click(summary);
@@ -52,7 +53,13 @@ describe("ListenerStatus (REQ-OPS-013, #4885)", () => {
     expect(within(table).getByText("today 14:03").getAttribute("title")).toBe(
       "2026-10-12 14:03 UTC",
     );
-    expect(within(table).getByText("Could not open the connection")).toBeTruthy();
+    // The reason is its own line under the row, across the columns.
+    expect(
+      within(table)
+        .getByText("Could not open the connection")
+        .closest("td")
+        ?.getAttribute("colspan"),
+    ).toBe("3");
     expect(within(table).getByText("None yet")).toBeTruthy();
     expect(localStorage.getItem(OPEN_KEY)).toBe("true");
     await expectNoA11yViolations(container);

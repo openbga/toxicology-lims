@@ -7,7 +7,7 @@ What changed in OpenBGA Toxicology LIMS, newest release first. Changes not yet i
 release are listed under Unreleased. Within a release, changes are ordered by impact, then
 newest first. The application shows the same list under **What's new**.
 
-## Unreleased (2026-11-12 to 2026-11-20)
+## Unreleased (2026-11-12 to 2026-11-23)
 
 ### High impact
 
@@ -171,6 +171,10 @@ newest first. The application shows the same list under **What's new**.
   The reason is computed when read and never stored, so there is no migration.
 
 ### Low impact
+
+- **Changed:** The analyzers card on the sign-in screen is wider and more compact (2026-11-23)
+
+  The Analyzers card under the sign-in form is wider than the form. Its header reads Analyzers with the summary and the expand arrow on one line, and the update message uses the full card width. In the open list each analyzer fits one line (name, state, last activity) with any error shown under it, so six analyzers fit without scrolling. The version is centred under the cards.
 
 - **Changed:** Choose Compact, Default or Wide navigation width (2026-11-20)
 
