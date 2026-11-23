@@ -4,7 +4,7 @@ import type { RoleInfo } from "@/generated/RoleInfo";
 import type { UserSummary } from "@/generated/UserSummary";
 
 /** A user's roles as the engine's role labels, such as "Analyst, Auditor". */
-export function roleListOf(roles: readonly RoleInfo[]): (user: UserSummary) => string {
+function roleListOf(roles: readonly RoleInfo[]): (user: UserSummary) => string {
   const labels = new Map<string, string>(roles.map((role) => [role.code, role.label]));
   return (user) => user.roles.map((code) => labels.get(code) ?? code).join(", ") || "No roles";
 }
@@ -26,7 +26,7 @@ export function StatusTag({ user }: { user: UserSummary }) {
   );
 }
 
-export const statusLabel = (user: UserSummary) =>
+const statusLabel = (user: UserSummary) =>
   user.status === "active" ? "Active" : "Disabled";
 
 export const authenticationLabel = (user: UserSummary) =>
