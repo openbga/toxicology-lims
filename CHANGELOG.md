@@ -7,7 +7,7 @@ What changed in OpenBGA Toxicology LIMS, newest release first. Changes not yet i
 release are listed under Unreleased. Within a release, changes are ordered by impact, then
 newest first. The application shows the same list under **What's new**.
 
-## Unreleased (2026-11-12 to 2026-11-20)
+## Unreleased (2026-11-12 to 2026-11-23)
 
 ### High impact
 
@@ -171,6 +171,14 @@ newest first. The application shows the same list under **What's new**.
   The reason is computed when read and never stored, so there is no migration.
 
 ### Low impact
+
+- **Fixed:** New order patient search shows its full hint and the exact search fields directly (2026-11-23)
+
+  On the Patient step of New order, the hint in the search box is no longer cut off. Exact search now shows the Find by identifier and Find by name fields directly, and patients are listed only after you run a search, instead of opening the whole patient list.
+
+  Technical notes:
+
+  Exact search reuses the Patients page identifier and name search forms and the audited `search_subjects` page; nothing is read until a search runs. No engine change.
 
 - **Changed:** Choose Compact, Default or Wide navigation width (2026-11-20)
 
