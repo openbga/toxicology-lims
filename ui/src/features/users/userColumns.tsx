@@ -102,10 +102,10 @@ export function userColumns(
     },
   ];
   if (!compact) return all;
-  // Fixed widths keep the three columns together instead of stretching across the list.
+  // Without a fixed width the three columns share the list's width in equal parts.
   return all
-    .filter((column) => column.id in COMPACT_WIDTHS)
-    .map((column) => ({ ...column, width: COMPACT_WIDTHS[column.id] }));
+    .filter((column) => COMPACT_COLUMNS.includes(column.id))
+    .map((column) => ({ ...column, width: undefined }));
 }
 
-const COMPACT_WIDTHS: Record<string, number> = { username: 160, displayName: 240, status: 130 };
+const COMPACT_COLUMNS = ["username", "displayName", "status"];

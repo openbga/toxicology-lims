@@ -383,6 +383,9 @@ describe("UsersPage (REQ-IDN-004)", { timeout: WALKTHROUGH_TIMEOUT_MS }, () => {
     expect(screen.getByRole("columnheader", { name: /Display name/ })).toBeTruthy();
     // No empty actions column beside the panel: the panel carries the actions.
     expect(screen.getAllByRole("columnheader")).toHaveLength(3);
+    // No fixed pixel width on any column: they share the width in equal parts.
+    const template = screen.getAllByRole("row")[0]?.style.gridTemplateColumns ?? "";
+    expect(template).toMatch(/^(minmax\([^)]*, 1fr\) ?){3}$/);
   });
 
   it("offers a quality manager role changes only", async () => {
