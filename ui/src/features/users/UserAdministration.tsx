@@ -178,7 +178,8 @@ function UserList({ users, roles, record, rowActions }: UserListProps) {
                   openRowId={record.openId}
                   onOrderChange={record.followOrder}
                   onRowAction={(user, order) => record.open(user.userId, order)}
-                  rowActions={rowActions}
+                  // The panel carries the actions, so beside it the list drops the actions column.
+                  rowActions={compact ? undefined : rowActions}
                   fill
                 />
               )

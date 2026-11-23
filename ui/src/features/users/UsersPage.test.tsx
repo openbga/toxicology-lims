@@ -381,6 +381,8 @@ describe("UsersPage (REQ-IDN-004)", { timeout: WALKTHROUGH_TIMEOUT_MS }, () => {
     expect(screen.queryByRole("columnheader", { name: /Authenticator/ })).toBeNull();
     expect(screen.getByRole("columnheader", { name: /Status/ })).toBeTruthy();
     expect(screen.getByRole("columnheader", { name: /Display name/ })).toBeTruthy();
+    // No empty actions column beside the panel: the panel carries the actions.
+    expect(screen.getAllByRole("columnheader")).toHaveLength(3);
   });
 
   it("offers a quality manager role changes only", async () => {

@@ -101,7 +101,11 @@ export function userColumns(
       width: 150,
     },
   ];
-  return compact ? all.filter((column) => COMPACT_COLUMNS.includes(column.id)) : all;
+  if (!compact) return all;
+  // Fixed widths keep the three columns together instead of stretching across the list.
+  return all
+    .filter((column) => column.id in COMPACT_WIDTHS)
+    .map((column) => ({ ...column, width: COMPACT_WIDTHS[column.id] }));
 }
 
-const COMPACT_COLUMNS = ["username", "displayName", "status"];
+const COMPACT_WIDTHS: Record<string, number> = { username: 160, displayName: 240, status: 130 };
