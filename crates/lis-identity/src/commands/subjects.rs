@@ -1,7 +1,7 @@
 //! Subject registration, demographic assertions and identifiers (REQ-IDN-001).
 
 use lis_audit::{AuditDetail, AuditEvent, Outcome, Stream};
-use lis_core::Capability;
+use lis_core::{Capability, Phi};
 use lis_store::CommandContext;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -31,6 +31,10 @@ pub struct RegisterSubject {
     /// The name and birth date candidates the user reviewed; must equal the current set.
     #[serde(default)]
     pub acknowledged_candidates: Vec<SubjectId>,
+    /// The portal email, the patient's consent to portal delivery; absent or blank for none.
+    #[serde(default)]
+    #[ts(optional = nullable)]
+    pub email: Option<Phi<String>>,
 }
 
 /// Result of [`register_subject`].
@@ -74,6 +78,8 @@ pub fn register_subject(
     repo::insert_subject(ctx.tx(), subject_id, ctx.now())?;
     let actor = ActorRef::of(ctx.principal());
     add_assertion(ctx, subject_id, &demographics, &source, None, &actor)?;
+    let has_email =
+        crate::email::record_at_registration(ctx, subject_id, input.email.as_ref(), &actor)?;
     for identifier in &identifiers {
         repo::insert_identifier(
             ctx.tx(),
@@ -91,7 +97,8 @@ pub fn register_subject(
         )
         .record("subject", subject_id)
         .new_revision(1)
-        .detail("identifier_count", AuditDetail::count(identifiers.len())),
+        .detail("identifier_count", AuditDetail::count(identifiers.len()))
+        .detail("has_email", AuditDetail::boolean(has_email)),
     )?;
     let identity_hold_id = if candidates.is_empty() {
         None

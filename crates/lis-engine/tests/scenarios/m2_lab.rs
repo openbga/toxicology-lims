@@ -331,6 +331,7 @@ async fn register_parties(desk: &Desk) -> Parties {
             source: "requisition".to_owned(),
             identifiers: Vec::new(),
             acknowledged_candidates: Vec::new(),
+            email: None,
         })
         .await
         .unwrap()

@@ -74,6 +74,7 @@ async fn find_offers_records_by_readable_values_and_patients_only_to_who_may_rea
             source: "requisition".to_owned(),
             identifiers: vec![],
             acknowledged_candidates: vec![],
+            email: None,
         })
         .await
         .unwrap()

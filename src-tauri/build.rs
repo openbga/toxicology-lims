@@ -77,6 +77,7 @@ const APP_COMMANDS: &[&str] = &[
     "get_subject",
     "assert_demographics",
     "add_subject_identifier",
+    "set_subject_email",
     "deactivate_subject_identifier",
     "list_identity_holds",
     "resolve_identity_hold",

@@ -271,6 +271,7 @@ async fn namesake(bench: &Bench) -> RegisterSubject {
         source: "requisition".to_owned(),
         identifiers: Vec::new(),
         acknowledged_candidates: vec![subject],
+        email: None,
     }
 }
 

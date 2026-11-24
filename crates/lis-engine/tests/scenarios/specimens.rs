@@ -591,6 +591,7 @@ async fn accepted_order(
             source: "requisition".to_owned(),
             identifiers: Vec::new(),
             acknowledged_candidates: Vec::new(),
+            email: None,
         })
         .await
         .unwrap()

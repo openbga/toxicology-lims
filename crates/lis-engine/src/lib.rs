@@ -57,9 +57,9 @@ pub use lis_identity::{
     AddClientLocation, AddSubjectIdentifier, AssertDemographics, ClientId, ClientLocationId,
     ClientView, ConfirmDistinctSubjects, CreateClient, DeactivateSubjectIdentifier,
     IdentifierAdded, IdentityHoldResolved, IdentityHoldView, LaboratoryProfileView, PractitionerId,
-    PractitionerView, RegisterPractitioner, RegisterSubject, SetLaboratoryProfile,
-    SubjectCandidates, SubjectMatchQuery, SubjectRegistered, SubjectRevision, SubjectSearch,
-    SubjectSummary, SubjectView,
+    PractitionerView, RegisterPractitioner, RegisterSubject, SetLaboratoryProfile, SetSubjectEmail,
+    SubjectCandidates, SubjectEmailSet, SubjectMatchQuery, SubjectRegistered, SubjectRevision,
+    SubjectSearch, SubjectSummary, SubjectView,
 };
 // identity: end
 // catalog: begin

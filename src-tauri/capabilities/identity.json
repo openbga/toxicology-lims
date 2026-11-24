@@ -10,6 +10,7 @@
     "allow-get-subject",
     "allow-assert-demographics",
     "allow-add-subject-identifier",
+    "allow-set-subject-email",
     "allow-deactivate-subject-identifier",
     "allow-list-identity-holds",
     "allow-resolve-identity-hold",

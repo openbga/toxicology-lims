@@ -21,4 +21,8 @@ identifiers: Array<IdentifierInput>,
 /**
  * The name and birth date candidates the user reviewed; must equal the current set.
  */
-acknowledgedCandidates: Array<string>, };
+acknowledgedCandidates: Array<string>, 
+/**
+ * The portal email, the patient's consent to portal delivery; absent or blank for none.
+ */
+email?: string | null, };

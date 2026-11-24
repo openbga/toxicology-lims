@@ -108,6 +108,7 @@ fn registration() -> RegisterSubject {
             value: Phi::new("SYN-QUALITY-1".into()),
         }],
         acknowledged_candidates: vec![],
+        email: None,
     }
 }
 

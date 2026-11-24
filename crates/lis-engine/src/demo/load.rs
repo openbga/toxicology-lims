@@ -209,6 +209,7 @@ fn load_patients(
                 source: patient.source.clone(),
                 identifiers: patient.identifiers.clone(),
                 acknowledged_candidates,
+                email: None,
             },
         )?;
         loaded.patients += 1;

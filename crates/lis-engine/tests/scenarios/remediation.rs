@@ -164,6 +164,7 @@ async fn register_source_verified_subject(t: &TestEngine) -> lis_identity::Subje
             source: "Corrected synthetic requisition R-2 supplied exact DOB".into(),
             identifiers: vec![],
             acknowledged_candidates: vec![],
+            email: None,
         })
         .await
         .unwrap()

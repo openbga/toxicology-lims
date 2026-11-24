@@ -332,6 +332,7 @@ fn profile_selection_cannot_cross_patient_identity_or_select_duplicate_coverages
                     source: "synthetic".into(),
                     identifiers: vec![],
                     acknowledged_candidates: vec![],
+                    email: None,
                 },
             )
         })

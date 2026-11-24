@@ -31,6 +31,7 @@ pub(crate) fn registration() -> RegisterSubject {
             value: Phi::new("MRN-00000".to_owned()),
         }],
         acknowledged_candidates: vec![],
+        email: None,
     }
 }
 

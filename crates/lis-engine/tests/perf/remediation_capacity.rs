@@ -24,6 +24,7 @@ pub(super) async fn register_patient(engine: &Engine) -> SubjectId {
             source: "Synthetic capacity measurement".to_owned(),
             identifiers: Vec::new(),
             acknowledged_candidates: Vec::new(),
+            email: None,
         })
         .await
         .unwrap()

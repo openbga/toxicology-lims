@@ -30,6 +30,8 @@ pub struct SubjectView {
     pub open_holds: Vec<IdentityHoldView>,
     /// Incomplete identity intake resolved with this subject, oldest resolution first.
     pub resolved_intakes: Vec<IntakeDeferralView>,
+    /// The portal email; absent when none was given or it was removed.
+    pub email: Option<crate::email::SubjectEmailView>,
 }
 
 /// One demographic assertion as provided.

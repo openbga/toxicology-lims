@@ -206,6 +206,7 @@ pub fn get_subject(conn: &Connection, subject_id: SubjectId) -> Result<SubjectVi
         identifiers: subjects::identifiers(conn, subject_id)?,
         open_holds: list_open_identity_holds(conn, subject_id)?,
         resolved_intakes: crate::intake::resolved_intakes(conn, subject_id)?,
+        email: crate::repo::emails::current_view(conn, subject_id)?,
     })
 }
 
