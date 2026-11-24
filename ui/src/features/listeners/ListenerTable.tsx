@@ -28,15 +28,18 @@ export function ListenerTable({ id, listeners }: { id: string; listeners: Listen
   );
 }
 
+/** One row per analyzer; a reason shows under its name, the state and time centred on the row. */
 function ListenerTableRow({ listener }: { listener: ListenerStatusView }) {
   const state = LISTENER_STATES[listener.state];
   const detail = listenerDetailText(listener);
   return (
     <tr>
-      <th scope="row">{listener.instrumentName}</th>
+      <th scope="row">
+        {listener.instrumentName}
+        {detail && <span className={styles.reason}>{detail}</span>}
+      </th>
       <td>
         <StatusBadge tone={state.tone}>{state.label}</StatusBadge>
-        {detail && <span className={styles.reason}>{detail}</span>}
       </td>
       <td>
         {listener.lastActivityAt ? <RecentTime value={listener.lastActivityAt} /> : "None yet"}
