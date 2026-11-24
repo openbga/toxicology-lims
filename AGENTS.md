@@ -37,6 +37,21 @@ retained `nightly-*` releases. Every installation, nightly included, keeps the r
 approval and verified pre-update backup (NFR-24). It does not authorize OS code signing,
 supported releases or clinical use (Q-19, Q-34).
 
+**LIMSiq Patient Portal integration — user instruction, 2026-11-24.** Released report
+revisions, corrections and withdrawals are sent to the LIMSiq Patient Portal through its lab
+ingest API (HL7 v2.5.1 ORU^R01 over HTTPS) as an outbound partner interface: an Interfaces
+connection, not an OpenBGA cloud service under
+[ADR 0010](docs/architecture/decisions/0010-optional-cloud-services.md). The laboratory's
+computer stays the system of record; the portal holds copies, and its accounts, identity
+proofing and proxy access are LIMSiq's (Q-35 stays open for any OpenBGA patient portal).
+This authorizes, in separate reviewed changes: an optional patient email, where a filled
+email is the patient's consent to portal delivery and an empty one sends nothing; a required
+phone on the ordering practitioner; the portal's ORU profile; and an HTTPS connection with
+an HTTP client dependency reviewed under the library policy. LIMSiq operates the portal
+under its existing business-associate process. Development and tests use synthetic data and
+a local or development portal only. It does not authorize production delivery, real patient
+data, signing or clinical use (Q-19, Q-34).
+
 **License — project owner decision, 2026-11-11.** The whole project is licensed under
 AGPL-3.0-only ([ADR 0021](docs/architecture/decisions/0021-agplv3-license.md)), replacing
 the 2026-10-20 instruction to retain GPL-3.0-only; builds published earlier stay under
