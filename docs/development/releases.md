@@ -48,11 +48,15 @@ Each change that users, deployers or integrators can observe has one entry file 
 `changelog.d/` ([changelog-entry skill](../../.ai/skills/changelog-entry/SKILL.md)).
 [`scripts/changelog.py`](../../scripts/changelog.py) generates
 [CHANGELOG.md](../../CHANGELOG.md) and the list the application bundles at build time and
-shows under **What's new**; CI fails when either is out of date.
+shows under **What's new**. Only the entries are edited in a pull request. The list is not
+tracked: `npm run changelog` writes it before dev, build, typecheck, test and knip.
+CHANGELOG.md is tracked but regenerated only when a release is cut, so two pull requests
+never change the same generated file; CI checks the entries, and a pull request into `main`
+also checks that CHANGELOG.md is current.
 
 An entry learns its release when the release is cut: `python3 scripts/changelog.py --release
-X.Y.Z` adds `release: X.Y.Z` to every entry that has no release yet, then regenerates both
-outputs. Entries without a release are listed under Unreleased, which is what nightly builds
+X.Y.Z` adds `release: X.Y.Z` to every entry that has no release yet, then regenerates
+CHANGELOG.md and the list. Entries without a release are listed under Unreleased, which is what nightly builds
 show. A pull request into `main` fails the `changelog` workflow while any entry lacks a
 release. Because the list ships inside each build, the application shows the changes of the
 version that is installed, including right after an in-app update.

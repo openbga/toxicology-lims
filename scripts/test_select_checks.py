@@ -31,7 +31,6 @@ class ClassificationTests(unittest.TestCase):
             "ui/src/content.md": {"ui", "docs"},
             "crates/example/template.md": {"rust", "help", "docs"},
             "ui/src/generated/Order.ts": {"rust", "ui", "help"},
-            "ui/src/features/whats-new/changelog.json": {"ui", "docs"},
             "changelog.d/2026-11-17-a-change.md": {"docs"},
             "CHANGELOG.md": {"docs"},
             "scripts/changelog.py": {"tooling"},

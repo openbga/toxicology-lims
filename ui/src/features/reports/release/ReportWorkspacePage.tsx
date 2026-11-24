@@ -8,8 +8,9 @@ import { QueryContent } from "@/components/QueryContent";
 import { RefreshControl } from "@/components/RefreshControl";
 import { Section } from "@/components/Section";
 import { StatusBadge } from "@/components/StatusBadge";
-import { useCommandQuery, useHasCapability } from "@/lib/commands";
+import { useHasCapability } from "@/lib/commands";
 import { IdentityBanner } from "@/lib/IdentityBanner";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import styles from "@/styles/layout.module.css";
 import { Dispositions, ReleaseBlocked } from "../content/Dispositions";
@@ -37,7 +38,7 @@ const HOME = { label: "Release queue", href: "/reports/release" };
  */
 export function ReportWorkspacePage() {
   const { specimenId = "" } = useParams();
-  const workspace = useCommandQuery<ReportWorkspace>(GET_REPORT_WORKSPACE, {
+  const workspace = useRecordQuery<ReportWorkspace>(GET_REPORT_WORKSPACE, {
     input: { specimenId },
   });
   const { list, sequence } = useRecordSequence(specimenId, HOME, workspacePath);

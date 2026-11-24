@@ -206,7 +206,7 @@ jobs:
             python3 scripts/check_repository_metadata.py --full
           fi
       # Entries are Markdown, so they select these checks; see .ai/skills/changelog-entry/SKILL.md.
-      - name: CHANGELOG.md and What's new match changelog.d
+      - name: Changelog entries are valid
         run: python3 scripts/changelog.py --check
       - name: Check selection and metadata regression tests
         if: needs.select.outputs.tooling == 'true'
