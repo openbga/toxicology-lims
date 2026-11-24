@@ -7,9 +7,13 @@ plain summary and an optional `## Technical notes` section. See
 .ai/skills/changelog-entry/SKILL.md for when and how to write one.
 
   (no option)         Write CHANGELOG.md and the application's bundled list.
-  --check             Exit 1 when an entry is invalid or either output is out of date.
+  --bundle            Write only the bundled list; npm runs this before dev, build, typecheck,
+                      test and knip. The list is not tracked, so branches never conflict on it.
+  --check             Exit 1 when an entry is invalid.
   --release X.Y.Z     Stamp `release: X.Y.Z` on every entry without a release, then write.
-  --require-release   With --check: every entry must carry a release (pull requests into main).
+  --require-release   With --check: every entry must carry a release and CHANGELOG.md must be
+                      current (pull requests into main). CHANGELOG.md is tracked and changes
+                      only when a release is cut, so branches do not conflict on it either.
 
 Entries without a release form the Unreleased group on top; releases follow, newest first
 (docs/development/releases.md#cut-a-release).
@@ -217,6 +221,7 @@ def main(argv=None, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true")
+    mode.add_argument("--bundle", action="store_true")
     mode.add_argument("--release", metavar="X.Y.Z")
     parser.add_argument("--require-release", action="store_true")
     args = parser.parse_args(argv)
@@ -238,15 +243,18 @@ def main(argv=None, root=ROOT):
         print(error, file=sys.stderr)
         return 1
     if args.check:
-        stale = [name for name, text in files.items() if not (root / name).is_file()
-                 or (root / name).read_text(encoding="utf-8") != text]
-        if stale:
+        document = root / DOCUMENT
+        if args.require_release and (
+            not document.is_file() or document.read_text(encoding="utf-8") != files[DOCUMENT]
+        ):
             print(
-                f"Out of date: {', '.join(stale)}. Run `python3 scripts/changelog.py` and commit the result.",
+                f"{DOCUMENT} is out of date. Run `python3 scripts/changelog.py` and commit the result.",
                 file=sys.stderr,
             )
             return 1
         return 0
+    if args.bundle:
+        files = {BUNDLE: files[BUNDLE]}
     for name, text in files.items():
         path = root / name
         path.parent.mkdir(parents=True, exist_ok=True)

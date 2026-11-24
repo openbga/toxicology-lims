@@ -8,6 +8,9 @@ node_modules/
 *.tsbuildinfo
 coverage/
 
+# What's new list, generated from changelog.d/ by `npm run changelog`
+/ui/src/features/whats-new/changelog.json
+
 # Python verification tools
 __pycache__/
 

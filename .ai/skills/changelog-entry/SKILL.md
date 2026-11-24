@@ -1,6 +1,6 @@
 ---
 name: changelog-entry
-description: Record a change that users, deployers or integrators can observe as one entry file in changelog.d/, rate its impact, word it for laboratory staff and regenerate CHANGELOG.md and the in-app What's new list. Use in every change that alters what the application does, shows, stores, sends or needs to install, and when a branch still edits CHANGELOG.md by hand.
+description: Record a change that users, deployers or integrators can observe as one entry file in changelog.d/, rate its impact, word it for laboratory staff and check it. CHANGELOG.md and the in-app What's new list are generated, never committed in a feature branch. Use in every change that alters what the application does, shows, stores, sends or needs to install, and when a branch still edits CHANGELOG.md by hand.
 ---
 
 # Changelog entry
@@ -8,7 +8,10 @@ description: Record a change that users, deployers or integrators can observe as
 `changelog.d/` is the only source of the change history. `python3 scripts/changelog.py`
 generates [CHANGELOG.md](../../../CHANGELOG.md) and the list the application shows under
 **What's new** (`ui/src/features/whats-new/changelog.json`) from it. Never edit either
-output by hand. Each change adds its own file, so parallel branches do not conflict.
+output by hand, and never commit them in a feature pull request: the list is not tracked
+(`npm run changelog` writes it before dev, build, typecheck, test and knip), and
+CHANGELOG.md changes only when a release is cut. Each change adds its own file, so parallel
+branches do not conflict.
 
 ## 1. Decide whether an entry is needed
 
@@ -90,18 +93,20 @@ levels, ask whether someone would want to be told before their next shift.
 ## 5. Regenerate and check
 
 ```bash
-python3 scripts/changelog.py           # write CHANGELOG.md and the What's new list
-python3 scripts/changelog.py --check   # exit 1 when an entry is invalid or an output is stale
+python3 scripts/changelog.py --check   # exit 1 when an entry is invalid
+npm run changelog                      # write the What's new list (done before build and tests)
 ```
 
 An invalid entry stops both with a message naming the file and the key. Commit the entry
-and both outputs together. CI runs the check, and the `changelog` workflow fails a pull
-request that changes application source without adding an entry.
+only. CI runs the check, and the `changelog` workflow fails a pull request that changes
+application source without adding an entry.
 
 ## 6. Hand edits to CHANGELOG.md
 
 A branch that still edits CHANGELOG.md directly, for example one started before the
 generator existed, loses those edits at the next regeneration. Move each bullet into its own
 entry file: keep its date, choose the type and impact, and put any technical detail under
-`## Technical notes` so nothing is lost. Then regenerate; on a merge conflict in
-CHANGELOG.md, take either side and regenerate.
+`## Technical notes` so nothing is lost. On a merge conflict in CHANGELOG.md, take the
+`develop` side. A branch started before the What's new list stopped being tracked can
+still show it as a conflict or as a deletion: take the deletion, since `npm run changelog`
+writes it.

@@ -72,7 +72,7 @@ For UI work, use `npx biome check <changed-files>`, `npm run typecheck` and
 `npx vitest run <relevant-test-files>`. Use `npm run build` for changed bundled
 output. `npm run knip`, `npm run dup` and `npm run lines` check relevant source
 structure; they are not prerequisites for prose or license-only handoffs.
-When `changelog.d/`, CHANGELOG.md or the What's new list change, run
+When `changelog.d/` changes, run
 `python3 scripts/changelog.py --check` ([changelog-entry skill](../changelog-entry/SKILL.md)).
 The duplication limit remains 8 lines / 60 tokens in non-test code. Resolve clones
 by reuse/extraction, not by reshuffling code to defeat detection.
