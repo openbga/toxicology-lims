@@ -85,8 +85,21 @@ describe("PatientStep (REQ-ORD-001, REQ-IDN-001)", () => {
     await screen.findByRole("searchbox");
     expect(screen.queryByRole("grid", { name: "Patients" })).toBeNull();
     await user.click(screen.getByText("Exact search"));
-    expect(
-      await screen.findByRole("searchbox", { name: "Find by name, birth date or identifier" }),
-    ).toBeTruthy();
+    expect(await screen.findByRole("form", { name: "Find by identifier" })).toBeTruthy();
+    expect(screen.getByRole("form", { name: "Find by name" })).toBeTruthy();
+    expect(screen.queryByRole("grid", { name: "Patients" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "More filters" })).toBeNull();
+  });
+
+  it("lists patients from Exact search only after a search, and chooses one", async () => {
+    const { user, choose } = renderStep();
+    await screen.findByRole("searchbox");
+    await user.click(screen.getByText("Exact search"));
+    const byName = await screen.findByRole("form", { name: "Find by name" });
+    await user.type(within(byName).getByRole("textbox", { name: /Family name/ }), "Patient");
+    await user.click(within(byName).getByRole("button", { name: "Find by name" }));
+    expect(await screen.findByText("1 matching patient")).toBeTruthy();
+    await openRow(user, "MRN-00001 (SYN-CLINIC MR)");
+    expect(choose).toHaveBeenCalledWith(SUBJECT_ID);
   });
 });

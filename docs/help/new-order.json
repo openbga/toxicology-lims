@@ -2,13 +2,13 @@
   "id": "new-order",
   "title": "Entering a new order",
   "summary": "Choose the patient and capture the ordering source’s request before acceptance and receipt.",
-  "reviewedOn": "2026-11-20",
+  "reviewedOn": "2026-11-23",
   "routes": ["/orders/new"],
   "sections": [
     {
       "title": "How to use this page",
       "paragraphs": [
-        "New order begins with the Patient step: Who is the order for? Type part of the name, the birth date or an identifier in the one search box, which has the focus when the page opens; the matching patients are listed as you type. Click a row, or move to it with the arrow keys and press Enter, to go on to Order details. Patients you entered orders for recently are offered under the box for one click. If nobody matches, Register patient sits right under the results, and you come back to New order with the new patient chosen. The exact searches by identifier or by name and birth date stay available under Exact search. Once a patient is chosen, the patient box (the identity banner) stays visible above the order form, with a Change patient link at its right end.",
+        "New order begins with the Patient step: Who is the order for? Type part of the name, the birth date or an identifier in the one search box, which has the focus when the page opens; the matching patients are listed as you type. Click a row, or move to it with the arrow keys and press Enter, to go on to Order details. Patients you entered orders for recently are offered under the box for one click. If nobody matches, Register patient sits right under the results, and you come back to New order with the new patient chosen. The exact searches by identifier or by name and birth date stay available under Exact search, which shows their fields directly and lists patients only after you search. Once a patient is chosen, the patient box (the identity banner) stays visible above the order form, with a Change patient link at its right end.",
         "Order details follow the paper requisition in two steps. Step 1 of 2, Requisition, holds the top of the form (Ordering source: who sent it and who pays) and the bottom (Authority to test); Next: Tests checks the step and moves on. Step 2 of 2, Tests, holds the tests and panels with their sequence role and reflex testing, then the details only some requisitions have, behind small buttons with their counts. Back: Requisition keeps everything entered. The trail at the top shows Patient › Order details › Receive specimens › Finish receipt as rounded pills: a finished step is green with a check, the current step is filled blue with white text and a dot, and later steps are outlined. The choices with a few options (Received as, Billing responsibility, Template use, As supplied, Sequence role, Reflex testing) are rows of buttons where the chosen one is filled blue; a ? beside a label explains the field. Under each section title, one line says which part of the requisition it covers, and the section you last clicked or focused, anywhere inside it, keeps a blue border until you click or move into another one. On a typical desktop window the whole of step 1 fits without scrolling: Client, Client location and Ordering practitioner on one row, Received as, Billing responsibility and Template use on the next, and As supplied beside Document reference. Next to Next: Tests, a tip recalls that Enter or Next checks the step. The Order summary on the right ticks off Patient, Ordering source, Authority to test and Tests. Save order opens the saved order, which waits for an explicit acceptance on its page. Accept order and receive specimens saves the order, accepts it and goes on, on this page, to Receive specimens: the trail shows Receive specimens as the current step and the page is the same as Receive specimens (see that help), with its summary line, its three boxes and Next and Order beside them. Receive specimens creates the accession and opens Finish receiving; Cancel opens the accepted order, to receive later from its page."
       ]
     },
@@ -49,6 +49,7 @@
     "ui/src/features/accessioning/orders/orderValues.ts",
     "ui/src/features/accessioning/orders/labels.ts",
     "ui/src/features/accessioning/orders/PatientStep.tsx",
+    "ui/src/features/accessioning/orders/ExactSearch.tsx",
     "ui/src/features/accessioning/orders/PatientChoiceGrid.tsx",
     "crates/lis-orders/src/order_patients.rs",
     "crates/lis-engine/src/commands/order_patients.rs",
@@ -97,10 +98,10 @@
           "rules": "Read-only. Shown once something is typed, with a count such as 3 patients match “test”. At most 25 patients are listed, then the count starts with First: type more to narrow the list. Compare at least two supplied identifiers; a similar name is not a match. The whole row is the choice: it highlights on hover and ends with ›."
         },
         {
-          "name": "Exact search: Find by name, birth date or identifier / More filters",
-          "meaning": "The patient directory with its detailed searches, folded under Exact search.",
+          "name": "Exact search: Find by identifier / Find by name",
+          "meaning": "The exact patient searches, folded under Exact search.",
           "values": "Find by identifier: Identifier, Assigning authority and Identifier type, compared exactly. Find by name: a family-name prefix, or the complete family name with a given-name prefix, and an optional real birth date in YYYY-MM-DD format (typed or picked from the calendar, which offers no day after today).",
-          "rules": "Closed when the page opens; the directory is read only after you open it. Its rows show Name, Birth date, Administrative sex, Identifiers and Identity, 25 patients per page with Previous and Next. Choosing a row there also goes to Order details."
+          "rules": "Closed when the page opens. Opening it shows the two forms and no patients; patients are read only after you run a search (Find by identifier or Find by name). The result rows show Name, Birth date, Administrative sex, Identifiers and Identity, 25 patients per page with Previous and Next, and a count above them. Choosing a row there also goes to Order details."
         },
         {
           "name": "Selected patient / Change patient",
@@ -310,9 +311,9 @@
         },
         {
           "name": "Exact search",
-          "does": "Opens or closes the patient directory with its detailed searches.",
+          "does": "Opens or closes the exact patient searches.",
           "availableWhen": "On the Patient step.",
-          "result": "Shows Find, More filters (Find by identifier, Find by name), Show all patients, Previous and Next as on the Patients page; choosing a row goes to Order details."
+          "result": "Shows the Find by identifier and Find by name forms directly. After a search, the matching patients are listed with Previous and Next; choosing a row goes to Order details."
         },
         {
           "name": "Register patient",

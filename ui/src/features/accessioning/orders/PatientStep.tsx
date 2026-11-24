@@ -10,9 +10,9 @@ import type { FindOrderPatientsInput } from "@/generated/FindOrderPatientsInput"
 import type { OrderPatientChoice } from "@/generated/OrderPatientChoice";
 import type { OrderPatientChoices } from "@/generated/OrderPatientChoices";
 import { useCommandQuery } from "@/lib/commands";
-import { PatientDirectory } from "../patients/PatientDirectory";
 import { subjectName } from "../subjects";
 import { FIND_ORDER_PATIENTS } from "./contract";
+import { ExactSearch } from "./ExactSearch";
 import { PatientChoiceGrid } from "./PatientChoiceGrid";
 import styles from "./PatientStep.module.css";
 
@@ -44,7 +44,7 @@ export function PatientStep({ onChoose }: PatientStepProps) {
     <Section title="Who is the order for?">
       <FindField
         label="Find patient by name, birth date or identifier"
-        placeholder="Name, birth date (YYYY-MM-DD) or identifier such as MRN-00001"
+        placeholder="Name, birth date (YYYY-MM-DD) or identifier"
         isLabelHidden
         isWide
         autoFocus
@@ -84,7 +84,7 @@ export function PatientStep({ onChoose }: PatientStepProps) {
           </span>
         </summary>
         {exact && (
-          <PatientDirectory
+          <ExactSearch
             onChoose={(subject) => onChoose(subject.subjectId)}
             registrationPath={REGISTRATION_PATH}
           />
