@@ -3,6 +3,7 @@ import { Facts } from "@/components/Facts";
 import { Section } from "@/components/Section";
 import { optionalText } from "@/lib/choices";
 import { identifierText, orNotRecorded } from "../subjects";
+import { NO_PORTAL_EMAIL } from "./portalEmail";
 import { type PatientDetailsValues, trimIdentifier } from "./registration";
 
 /** The details about to be registered, as typed. */
@@ -26,6 +27,7 @@ export function DetailsSummary({
           },
           { label: "Source", value: details.source.trim() },
           { label: "Identifiers", value: identifierText(details.identifiers.map(trimIdentifier)) },
+          { label: "Email", value: optionalText(details.email) ?? NO_PORTAL_EMAIL },
         ]}
       />
       <div>{action}</div>

@@ -70,6 +70,7 @@ const VIEW: SubjectView = {
   ],
   openHolds: [],
   resolvedIntakes: [],
+  email: null,
 };
 
 const renderBanner = (banner: ReactElement) =>

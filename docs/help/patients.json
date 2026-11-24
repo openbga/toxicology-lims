@@ -2,7 +2,7 @@
   "id": "patients",
   "title": "Patients and registration",
   "summary": "Find a patient, review identifying details and check possible matches before registration.",
-  "reviewedOn": "2026-11-18",
+  "reviewedOn": "2026-11-24",
   "routes": ["/patients", "/patients/register", "/patients/:subjectId"],
   "sections": [
     {
@@ -43,6 +43,9 @@
     "ui/src/features/accessioning/patients/PatientDetailPage.tsx",
     "ui/src/features/accessioning/patients/DetailsSummary.tsx",
     "ui/src/features/accessioning/patients/IdentityHolds.tsx",
+    "ui/src/features/accessioning/patients/PatientEmailSection.tsx",
+    "ui/src/features/accessioning/patients/portalEmail.ts",
+    "crates/lis-identity/src/email.rs",
     "ui/src/features/accessioning/patients/IdentityHistory.tsx",
     "ui/src/features/accessioning/patients/intakeEvidence.ts",
     "crates/lis-identity/src/intake.rs",
@@ -212,6 +215,12 @@
           "rules": "Required."
         },
         {
+          "name": "Email",
+          "meaning": "The patient's email for the LIMSiq Patient Portal. Entering it means the patient agrees to see their results in the portal and to receive result notifications there; the text under the field says so.",
+          "values": "An email such as name@example.com, up to 254 characters. Spaces before and after are removed; the address is otherwise kept as typed. Blank means no email.",
+          "rules": "Optional. Leave it empty if the patient does not agree: nothing is sent to the portal. For a minor, use the parent's or guardian's email. An address without one @, a dot in the part after it, or with spaces inside is refused before the check."
+        },
+        {
           "name": "Identifiers: Identifier / Assigning authority / Identifier type",
           "meaning": "Each supplied patient identifier and its issuing namespace.",
           "values": "Source-supplied identifier, authority and type, each up to 64 characters.",
@@ -220,7 +229,7 @@
         {
           "name": "Details to register",
           "meaning": "Summary of the draft before saving.",
-          "values": "Read-only entered names, date, administrative sex, source and identifiers.",
+          "values": "Read-only entered names, date, administrative sex, source, identifiers and email; Email shows None. Nothing is sent to the patient portal. when it was left blank.",
           "rules": "Review this summary and match results before Register patient."
         },
         {
@@ -322,6 +331,12 @@
           "meaning": "Incomplete identity intake that was resolved by choosing this patient on Incomplete identity intake: what was supplied at first, and when, by whom and from what verification source it was resolved.",
           "values": "Read-only. Each intake starts with the Resolved from incomplete intake badge and the intake’s source reference. Supplied as shows the name exactly as supplied; Birth information shows Unknown, or Partial date or Supplied age followed by the exact supplied text (for example Partial date: 1985); Resolved shows the resolution time in the laboratory time zone and the account that recorded it; Source shows the verification source entered when resolving. One block per resolved intake, separated by a rule, oldest resolution first.",
           "rules": "The section appears only when at least one intake was resolved with this patient; declined and still-open intake never appear here. The supplied evidence is kept as it arrived and is never copied into the patient’s details or demographic history."
+        },
+        {
+          "name": "Patient portal: Email / Recorded",
+          "meaning": "The patient's email for the LIMSiq Patient Portal, which is the patient's consent to portal delivery, and when it was recorded.",
+          "values": "Read-only. Email shows the current address, or None. Nothing is sent to the patient portal. Recorded shows when the current address was saved, in the laboratory time zone; it is hidden when there is no email.",
+          "rules": "Every change, including removal, is kept in the patient's history and the audit trail with who made it and when; the earlier address is not shown here."
         },
         {
           "name": "Reason — Confirm different people",
@@ -696,6 +711,12 @@
           "does": "Closes the current unsaved editor or pending action dialog.",
           "availableWhen": "In an open editor when no save is pending.",
           "result": "Unsaved dialog entries are deliberately discarded when Cancel is chosen; saved records remain."
+        },
+        {
+          "name": "Add email / Change email / Save email",
+          "does": "Opens a dialog with the Email field and the consent text. Save email records the new address; clearing the field and saving removes the email, so nothing more is sent to the portal.",
+          "availableWhen": "Order entry authority (enter_orders). The dialog uses the patient record as shown; if someone changed the patient meanwhile, saving is refused and the record must be refreshed. Saving the same address again, or removing when there is none, is refused as nothing changed. A malformed address is refused.",
+          "result": "Email saved or Email removed. The section shows the new value at once; the earlier value stays in the history. Cancel closes the dialog without saving."
         },
         {
           "name": "Correct demographics / Check corrected identity / Save corrected demographics",

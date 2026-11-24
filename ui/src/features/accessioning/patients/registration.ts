@@ -11,6 +11,8 @@ export interface PatientDetailsValues {
   administrativeSex: string;
   source: string;
   identifiers: IdentifierInput[];
+  /** The portal email, the patient's consent to portal delivery; blank for none. */
+  email: string;
 }
 
 export const EMPTY_DETAILS: PatientDetailsValues = {
@@ -20,6 +22,7 @@ export const EMPTY_DETAILS: PatientDetailsValues = {
   administrativeSex: "",
   source: "",
   identifiers: [],
+  email: "",
 };
 
 function toDemographics(values: PatientDetailsValues): DemographicsInput {
