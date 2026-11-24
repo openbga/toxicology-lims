@@ -5,6 +5,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { LoadingState } from "@/components/LoadingState";
 import { PageHeader } from "@/components/Page";
 import type { CommandError } from "@/generated/CommandError";
+import styles from "./QueryContent.module.css";
 
 interface QueryContentProps<Data> {
   query: UseQueryResult<Data, CommandError>;
@@ -82,7 +83,13 @@ export function QueryContent<Data>({
       {empty?.when(query.data) ? (
         <EmptyState title={empty.title} description={empty.description} action={empty.action} />
       ) : (
-        children(query.data)
+        <div
+          className={query.isPlaceholderData ? `${styles.content} ${styles.stale}` : styles.content}
+          inert={query.isPlaceholderData}
+          aria-busy={query.isPlaceholderData}
+        >
+          {children(query.data)}
+        </div>
       )}
     </>
   );

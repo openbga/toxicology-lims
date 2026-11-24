@@ -8,9 +8,10 @@ import { Section } from "@/components/Section";
 import { useToast } from "@/components/Toast";
 import type { ExportedHandoffFile } from "@/generated/ExportedHandoffFile";
 import type { HandoffView } from "@/generated/HandoffView";
-import { useCommandMutation, useCommandQuery } from "@/lib/commands";
+import { useCommandMutation } from "@/lib/commands";
 import { useFormatTime } from "@/lib/format";
 import { usePersonText } from "@/lib/person";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import styles from "@/styles/layout.module.css";
 import { GET_BILLING_HANDOFF } from "../contract";
@@ -27,7 +28,7 @@ const HOME = { label: "Billing handoffs", href: "/billing/handoffs" };
  */
 export function HandoffPage() {
   const { handoffId = "" } = useParams();
-  const handoff = useCommandQuery<HandoffView>(GET_BILLING_HANDOFF, { input: { handoffId } });
+  const handoff = useRecordQuery<HandoffView>(GET_BILLING_HANDOFF, { input: { handoffId } });
   const toast = useToast();
   const exportFile = useCommandMutation<ExportedHandoffFile, { input: { handoffId: string } }>(
     "export_billing_handoff",
