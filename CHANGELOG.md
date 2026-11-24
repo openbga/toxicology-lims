@@ -172,9 +172,15 @@ newest first. The application shows the same list under **What's new**.
 
 ### Low impact
 
-- **Changed:** Clearer Users list and fewer impossible actions (2026-11-23)
+- **Fixed:** Readable order links, and Previous and Next without flicker (2026-11-23)
 
-  On Users, Active and Set up now show in green (Disabled is gray, Not set up stays yellow). A user with every role shows "All roles", other users show their roles with the full list on hover, and with an account open beside the list only Username, Display name and Status are shown, so the list no longer scrolls sideways. "Set up for one person" is replaced by "One-person laboratory" once the laboratory is set up that way, and "Disable user" is no longer offered on the only active administrator or quality manager.
+  On **Receive specimens** and **Finish receiving**, the link to the order now reads as the clinic's order number, or **Order · patient name · received date** when none was supplied. The internal order ID is no longer shown, and the breadcrumb on Finish receiving names the order.
+
+  On pages with **Previous** and **Next**, the record you are leaving stays on screen, dimmed, until the next one is loaded. The title, status, buttons and **Updated** no longer disappear, so the buttons stay where they are.
+
+  Technical notes:
+
+  New `useRecordQuery` keeps the previous record as placeholder data and marks the screen as switching; `QueryContent` and `PageHeader` make the stale record's content and actions inert meanwhile. No engine change.
 
 - **Changed:** Choose Compact, Default or Wide navigation width (2026-11-20)
 

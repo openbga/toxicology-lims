@@ -9,8 +9,8 @@ import { RefreshControl } from "@/components/RefreshControl";
 import { Section } from "@/components/Section";
 import { Tabs } from "@/components/Tabs";
 import type { ImportAttemptDetail } from "@/generated/ImportAttemptDetail";
-import { useCommandQuery } from "@/lib/commands";
 import { useFormatTime } from "@/lib/format";
+import { useRecordQuery } from "@/lib/recordQuery";
 import { useRecordSequence } from "@/lib/recordSequence";
 import { useRouteTabs } from "@/lib/routeTabs";
 import { GET_IMPORT_ATTEMPT } from "../contract";
@@ -37,7 +37,7 @@ import { SetAsideRows } from "./SetAsideRows";
 export function ImportAttemptPage() {
   const { importAttemptId = "" } = useParams();
   const formatTime = useFormatTime();
-  const attempt = useCommandQuery<ImportAttemptDetail>(GET_IMPORT_ATTEMPT, {
+  const attempt = useRecordQuery<ImportAttemptDetail>(GET_IMPORT_ATTEMPT, {
     input: { importAttemptId },
   });
   const { list, sequence, keep } = useRecordSequence(

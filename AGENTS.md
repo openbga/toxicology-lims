@@ -110,9 +110,10 @@ Every code change follows these, whoever writes it:
    - Update the affected canonical documents in `docs/`, including operator/developer guides, requirements and architecture where relevant. Remove obsolete instructions and repair affected links; avoid duplicate explanations in competing documents.
    - For user-visible changes, review and update the matching built-in help in `docs/help/*.json`, including page-by-page and field-by-field meaning, use, allowed values, defaults and limits; every action and its gates/outcomes; dialog/tab coverage; workflows, restrictions and recovery. A short page summary does not meet the user-manual requirement. Use the [user-manual skill](.ai/skills/user-manual/SKILL.md) and record the source files reviewed. Follow the [help authoring guide](docs/help/README.md) and [maintenance contract](docs/development/contextual-help.md). Advance `reviewedOn` only after checking the topic against the implemented behavior.
    - Every change that users, deployers or integrators can observe adds an entry in
-     `changelog.d/` and regenerates its outputs with `python3 scripts/changelog.py`
-     ([changelog-entry skill](.ai/skills/changelog-entry/SKILL.md)); a pull request with
-     nothing observable says so.
+     `changelog.d/` and checks it with `python3 scripts/changelog.py --check`; never commit
+     CHANGELOG.md or the What's new list, which are generated when a release is cut and at
+     build ([changelog-entry skill](.ai/skills/changelog-entry/SKILL.md)); a pull request
+     with nothing observable says so.
    - Run the relevant documentation checks and, when help changes, its coverage/metadata tests and UI build. Report which documents were updated or why the existing guidance remains accurate, plus any verification limits. Documentation updates are part of completion, not deferred follow-up work.
 7. **Verify according to the change.** Use `python3 scripts/select_checks.py` and the
    [quality-gate matrix](.ai/skills/quality-gate/SKILL.md#verification-matrix) locally

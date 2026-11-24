@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Section } from "@/components/Section";
 import type { OrderAccessionContext } from "@/generated/OrderAccessionContext";
 import type { OrderDetail } from "@/generated/OrderDetail";
+import { useOrderLabel } from "./orderLabel";
 import styles from "./receiving.module.css";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 
 /** Eligibility and its explanation come from the engine, including historical test names. */
 export function AccessionTestSelection({ order, context }: Props) {
+  const label = useOrderLabel(order);
   const blocked = context.items.filter((item) => !item.eligible);
   const names = new Map(
     order.items.map((item) => [item.itemId, `${item.orderableCode} ${item.orderableName}`]),
@@ -18,7 +20,7 @@ export function AccessionTestSelection({ order, context }: Props) {
   return (
     <Section title="Ordered tests" variant="plain">
       <p className={styles.hint}>
-        Order <Link to={`/orders/${order.orderId}`}>{order.placerOrderId ?? order.orderId}</Link>
+        <Link to={`/orders/${order.orderId}`}>{label.full}</Link>
       </p>
       {blocked.length > 0 && (
         <ul className={styles.list} aria-label="Tests unavailable for this accession">

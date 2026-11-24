@@ -16,6 +16,7 @@ import { AccessionProgress, allDecided } from "./AccessionProgress";
 import { AccessionSide } from "./AccessionSide";
 import { GET_ACCESSION } from "./contract";
 import { specimenTitle } from "./labels";
+import { useOrderLabel } from "./orderLabel";
 import styles from "./receiving.module.css";
 import { SpecimenPanel } from "./SpecimenPanel";
 
@@ -47,9 +48,7 @@ export function AccessionPage() {
         title={data ? `Finish receiving · ${data.accessionNumber}` : "Finish receiving"}
         breadcrumbs={[
           list,
-          ...(data && canOpenOrder
-            ? [{ label: data.accessionNumber, href: `/orders/${data.orderId}` }]
-            : []),
+          ...(data && canOpenOrder ? [{ label: "Order", href: `/orders/${data.orderId}` }] : []),
           { label: "Finish receiving", href: accessionPath(accessionId) },
         ]}
         sequence={sequence}
@@ -114,6 +113,7 @@ function AccessionBanner({ accession }: { accession: AccessionDetail }) {
   const clients = useCommandQuery<ClientView[]>(LIST_CLIENTS, undefined, {
     enabled: canOpenOrder,
   });
+  const orderLabel = useOrderLabel(order.data);
   const client = clients.data?.find((each) => each.id === order.data?.clientId);
   const tests = order.data?.items
     .filter((item) => accession.orderItemIds.includes(item.itemId))
@@ -130,7 +130,7 @@ function AccessionBanner({ accession }: { accession: AccessionDetail }) {
   const details = [
     {
       label: "Order",
-      value: <Link to={`/orders/${accession.orderId}`}>{accession.accessionNumber}</Link>,
+      value: <Link to={`/orders/${accession.orderId}`}>{orderLabel.detail}</Link>,
     },
     ...(client ? [{ label: "Client", value: client.name }] : []),
     ...(tests ? [{ label: "Tests", value: tests }] : []),

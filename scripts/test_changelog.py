@@ -135,18 +135,26 @@ class CommandTests(unittest.TestCase):
         self.assertIn("  Technical notes:\n\n  Line one.\n\n  Line two.\n", document)
         bundle = json.loads((self.root / BUNDLE).read_text())
         self.assertEqual([g["release"] for g in bundle["groups"]], [None, "0.1.1"])
-        self.assertEqual(self.run_main("--check")[0], 0)
 
-    def test_check_reports_stale_and_missing_outputs(self):
-        code, _, err = self.run_main("--check")
-        self.assertEqual(code, 1)
-        self.assertIn("Out of date: CHANGELOG.md", err)
-        self.run_main()
-        self.write("2026-11-18-third.md", entry_text(date="2026-11-18", title="Third"))
-        code, _, err = self.run_main("--check")
-        self.assertEqual(code, 1)
-        self.assertIn(BUNDLE, err)
+    def test_check_validates_entries_only_and_never_asks_for_outputs(self):
+        self.assertEqual(self.run_main("--check")[0], 0)
+        self.assertFalse((self.root / DOCUMENT).exists())
+        self.assertFalse((self.root / BUNDLE).exists())
+        self.write("2026-11-18-bad.md", entry_text(type="improved"))
+        self.assertEqual(self.run_main("--check")[0], 1)
+
+    def test_bundle_writes_only_the_bundle(self):
+        self.assertEqual(self.run_main("--bundle")[0], 0)
+        self.assertTrue((self.root / BUNDLE).is_file())
+        self.assertFalse((self.root / DOCUMENT).exists())
+
+    def test_require_release_also_needs_a_current_document(self):
+        self.run_main("--release", "0.1.2")
+        self.assertEqual(self.run_main("--check", "--require-release")[0], 0)
         (self.root / DOCUMENT).write_text((self.root / DOCUMENT).read_text() + "hand edit\n")
+        code, _, err = self.run_main("--check", "--require-release")
+        self.assertEqual(code, 1)
+        self.assertIn("CHANGELOG.md is out of date", err)
         self.assertEqual(self.run_main()[0], 0)
         self.assertNotIn("hand edit", (self.root / DOCUMENT).read_text())
 

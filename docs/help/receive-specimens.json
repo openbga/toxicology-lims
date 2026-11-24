@@ -2,14 +2,14 @@
   "id": "receive-specimens",
   "title": "Receiving specimens",
   "summary": "Register material for an accepted order, then verify labels and record receipt decisions.",
-  "reviewedOn": "2026-11-20",
+  "reviewedOn": "2026-11-23",
   "routes": ["/orders/:orderId/accession", "/accessions/:accessionId"],
   "sections": [
     {
       "title": "How to use this page",
       "paragraphs": [
         "Receive specimens, titled with the patient's name, shows one summary line (patient, order, client, ordering practitioner) and three numbered boxes: 1 · Tests for this material, 2 · Collection and 3 · Specimens received, with Next and Order beside them. Keep or choose the tests, enter the collection as supplied and the specimens that arrived; Receive specimens works once the line beside it says nothing is missing, and opens Finish receiving for the new accession. New order shows this same page after Accept order and receive specimens. The box you last clicked or moved into keeps a blue border until you click outside every box.",
-        "The accession page is titled Finish receiving with the accession number. The intake steps show Finish receipt as the current step, and every step done once each specimen has a receipt decision. The strip under them names the patient (with the MRN and any identity hold), the order by its accession number as a link, the client and the accession’s tests. Each specimen is a card: its status badge, its next step in one box and its containers. A specimen waiting for a decision has a blue border and the box says Scan the label on container with the barcode, Record receipt decision and Print labels; once recorded, the box shows the outcome, who recorded it and where work continues, and an accepted specimen’s card turns green. Specimens waiting for a decision come first. Collection and Order billing sit in the side column. A card you click keeps a blue border until you click outside every card; a specimen waiting for a decision already has one, and an accepted specimen's green border stays green. At the right end of the steps row, Updated shows when the page was last read and Refresh reads it again, with the latest printing outcome."
+        "The accession page is titled Finish receiving with the accession number. The intake steps show Finish receipt as the current step, and every step done once each specimen has a receipt decision. The breadcrumb follows where the page was opened from: Orders \u203a Order \u203a Finish receiving, or Container lookup \u203a Order \u203a Finish receiving after a scan (the Order step needs permission to enter orders). The strip under the steps names the patient (with the MRN and any identity hold), the order as a link named by the clinic\u2019s order number or, when none was supplied, Order \u00b7 patient name \u00b7 received date (the internal order ID is never shown), the client and the accession\u2019s tests, the client and the accession’s tests. Each specimen is a card: its status badge, its next step in one box and its containers. A specimen waiting for a decision has a blue border and the box says Scan the label on container with the barcode, Record receipt decision and Print labels; once recorded, the box shows the outcome, who recorded it and where work continues, and an accepted specimen’s card turns green. Specimens waiting for a decision come first. Collection and Order billing sit in the side column. A card you click keeps a blue border until you click outside every card; a specimen waiting for a decision already has one, and an accepted specimen's green border stays green. At the right end of the steps row, Updated shows when the page was last read and Refresh reads it again, with the latest printing outcome."
       ]
     },
     {
@@ -57,6 +57,7 @@
     "ui/src/features/accessioning/specimens/accessionValues.ts",
     "ui/src/features/accessioning/specimens/labels.ts",
     "ui/src/features/accessioning/specimens/AccessionPage.tsx",
+    "ui/src/features/accessioning/specimens/orderLabel.ts",
     "ui/src/features/accessioning/specimens/AccessionProgress.tsx",
     "ui/src/features/accessioning/specimens/SpecimenPanel.tsx",
     "ui/src/features/accessioning/specimens/ReceiptStep.tsx",
