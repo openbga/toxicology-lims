@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/Button";
 import { ReasonField } from "@/components/ReasonField";
+import { StatusBadge } from "@/components/StatusBadge";
+import { GET_SEPARATION_POLICY } from "@/features/operations/contract";
 import type { DesignateOnePersonLaboratoryInput } from "@/generated/DesignateOnePersonLaboratoryInput";
+import type { RoleInfo } from "@/generated/RoleInfo";
+import type { SeparationPolicyView } from "@/generated/SeparationPolicyView";
 import type { SessionInfo } from "@/generated/SessionInfo";
 import type { UserSummary } from "@/generated/UserSummary";
 import { CommandDialog } from "@/lib/CommandDialog";
@@ -17,10 +21,20 @@ import { DESIGNATE_ONE_PERSON_LABORATORY, LIST_USERS } from "./contract";
  */
 export function OnePersonAction({ users }: { users: readonly UserSummary[] | undefined }) {
   const session = useCommandQuery<SessionInfo | null>(CURRENT_SESSION).data;
+  const roles = useCommandQuery<RoleInfo[]>("list_roles").data;
+  const policy = useCommandQuery<SeparationPolicyView>(GET_SEPARATION_POLICY).data;
   const [isOpen, setOpen] = useState(false);
   const active = users?.filter((user) => user.status === "active") ?? [];
   const onlyActive = active.length === 1 && active[0]?.userId === session?.userId;
   if (!onlyActive || !session?.capabilities.includes("manage_users")) return null;
+  const own = active[0];
+  const hasAllRoles = Boolean(
+    roles?.length && roles.every((role) => own?.roles.includes(role.code)),
+  );
+  const policyAllows = policy && Object.values(policy.values).every(Boolean);
+  // Nothing left for the action to change: say so instead of offering it.
+  if (hasAllRoles && policyAllows)
+    return <StatusBadge tone="info">One-person laboratory</StatusBadge>;
   return (
     <>
       <Button onPress={() => setOpen(true)}>Set up for one person</Button>

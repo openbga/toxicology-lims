@@ -2,14 +2,15 @@
   "id": "users",
   "title": "Users and access",
   "summary": "Manage individual accounts and roles, and maintain your own security keys, optional unlock PIN and appearance from the signed-in menu.",
-  "reviewedOn": "2026-11-20",
+  "reviewedOn": "2026-11-23",
   "routes": ["/users"],
   "sections": [
     {
       "title": "How to use this page",
       "paragraphs": [
         "Open an account to inspect its status and roles. The available actions include creating accounts, changing roles, resetting credentials and changing account status. Sensitive actions require your password or security key and a reason where requested.",
-        "Clinical-role changes require quality authority after the first quality manager exists. Resetting credentials for a clinical account requires the corresponding administrative and quality authority. Set up for one person is offered only under the application’s eligibility rules."
+        "Clinical-role changes require quality authority after the first quality manager exists. Resetting credentials for a clinical account requires the corresponding administrative and quality authority. Set up for one person is offered only under the application’s eligibility rules. Once the laboratory is set up for one person and your account holds every role, the page shows One-person laboratory instead of the button.",
+        "Status shows Active in green and Disabled in gray; Authenticator shows Set up in green and Not set up in yellow, in the list and in the account panel. Roles shows All roles for an account that holds every role; otherwise it lists them, and hovering shows the full list. While an account is open beside the list, the list keeps only Username, Display name and Status; the panel shows the rest. Disable user is not offered on the only active administrator or quality manager, because the engine would refuse it."
       ]
     },
     {
