@@ -27,6 +27,7 @@
 }
 
 .panel {
+  position: relative;
   grid-area: 1 / 2;
   display: flex;
   flex-direction: column;
@@ -42,18 +43,18 @@
   overflow: hidden;
 }
 
-/* The whole picture, centred in the space under the headline: never cropped. */
+/* The whole picture, centred in the space under the headline and shrinking with the window:
+   never cropped, never over the card. It sits 3vw right of centre because its floor runs off
+   its left side, so its visible content is left of the middle. */
 .art img {
   position: absolute;
   top: 9rem;
-  left: var(--space-8);
-  right: calc(var(--card-offset) + var(--space-8));
+  left: calc(var(--space-8) + 3vw);
+  right: calc(var(--card-offset) + var(--space-8) - 3vw);
   width: auto;
   height: calc(100% - 9rem - var(--space-8));
   object-fit: contain;
   object-position: center;
-  /* The picture's floor runs off its left side, so its visible content sits left of centre. */
-  transform: translateX(3vw);
 }
 
 :global(:root[data-theme="dark"]) .artLight,
