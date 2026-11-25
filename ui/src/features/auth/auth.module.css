@@ -3,7 +3,9 @@
 .layout {
   display: grid;
   grid-template-columns: 11fr 9fr;
+  gap: var(--space-4);
   min-height: 100%;
+  padding: var(--space-4);
 }
 
 .layout:has([data-first-run]) {
@@ -24,6 +26,7 @@
 .art {
   position: relative;
   overflow: hidden;
+  border-radius: var(--radius-lg);
   background: linear-gradient(#e8eef0, #e2e9eb);
 }
 
@@ -35,9 +38,9 @@
 .art img {
   position: absolute;
   top: 9rem;
-  left: 0;
-  width: 100%;
-  height: calc(100% - 9rem);
+  left: var(--space-8);
+  width: calc(100% - 2 * var(--space-8));
+  height: calc(100% - 9rem - var(--space-8));
   object-fit: contain;
   object-position: center;
 }
@@ -110,6 +113,7 @@
   .layout,
   .layout:has([data-first-run]) {
     grid-template-columns: 1fr;
+    padding: 0;
   }
 
   .art {
