@@ -1,15 +1,25 @@
-/* Illustration left (about 55%), the screen right; a narrow window shows only the screen
-   (ticket #4951). The first-run setup is wider, so it gives the illustration less room. */
+/* The picture on the left, the screen on the right in a column as wide as its card; a narrow
+   window shows only the screen (ticket #4951). The picture is centred between the window's left
+   edge and the card, and the window takes the picture's background colours. The first-run setup
+   is wider, so its column is wider. */
 .layout {
   display: grid;
-  grid-template-columns: 11fr 9fr;
-  gap: var(--space-4);
+  grid-template-columns: 1fr calc(26rem + 2 * var(--space-8));
   min-height: 100%;
-  padding: var(--space-4);
 }
 
 .layout:has([data-first-run]) {
   grid-template-columns: 1fr 3fr;
+}
+
+@media (min-width: 901px) {
+  .layout {
+    background: linear-gradient(#e8eef0, #e2e9eb);
+  }
+
+  :global(:root[data-theme="dark"]) .layout {
+    background: linear-gradient(#0f1719, #131b1e);
+  }
 }
 
 .panel {
@@ -18,20 +28,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  padding: var(--space-6);
+  padding: var(--space-8);
 }
 
-/* The picture's own background colours continue over the whole side, so its edges do not show
-   (ticket #4951). */
 .art {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(#e8eef0, #e2e9eb);
-}
-
-:global(:root[data-theme="dark"]) .art {
-  background: linear-gradient(#0f1719, #131b1e);
 }
 
 /* The whole picture, centred in the space under the headline: never cropped. */
@@ -39,7 +41,7 @@
   position: absolute;
   top: 9rem;
   left: var(--space-8);
-  width: calc(100% - 2 * var(--space-8));
+  width: calc(100% - var(--space-8));
   height: calc(100% - 9rem - var(--space-8));
   object-fit: contain;
   object-position: center;
