@@ -54,7 +54,8 @@ export function PatientEmailSection({ subject }: { subject: SubjectView }) {
           <TextInput
             name="email"
             label="Email"
-            description={`${PORTAL_EMAIL_CONSENT} Clear the field to remove the email.`}
+            info={PORTAL_EMAIL_CONSENT}
+            description="Clear the field to remove the email."
             validate={validatePortalEmail}
             autoFocus
           />

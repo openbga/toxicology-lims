@@ -78,7 +78,7 @@ export function PatientDetailsForm({
           <TextInput
             name="email"
             label="Email"
-            description={PORTAL_EMAIL_CONSENT}
+            info={PORTAL_EMAIL_CONSENT}
             validate={validatePortalEmail}
           />
         </FieldGrid>

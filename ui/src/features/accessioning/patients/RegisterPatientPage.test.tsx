@@ -189,7 +189,13 @@ describe("RegisterPatientPage (REQ-IDN-001)", { timeout: WALKTHROUGH_TIMEOUT_MS 
       match_subject_candidates: () => NO_MATCHES,
       register_subject: register,
     });
-    expect(screen.getByText(/means the patient agrees to see their results/)).toBeTruthy();
+    expect(screen.queryByText(/means the patient agrees/)).toBeNull();
+    await user.hover(screen.getByRole("button", { name: "About Email" }));
+    expect(await screen.findByRole("tooltip")).toHaveProperty(
+      "textContent",
+      expect.stringMatching(/means the patient agrees to see their results/),
+    );
+    await user.unhover(screen.getByRole("button", { name: "About Email" }));
     await typeInto(user, /^Email/, " test.patient@example.com ");
     await user.click(screen.getByRole("textbox", { name: /^Family name/ }));
     await enterDetails(user);
@@ -207,7 +213,9 @@ describe("RegisterPatientPage (REQ-IDN-001)", { timeout: WALKTHROUGH_TIMEOUT_MS 
     await typeInto(user, /^Email/, "not-an-email");
     await user.click(screen.getByRole("textbox", { name: /^Family name/ }));
     await enterDetails(user);
-    expect(await screen.findByText("Enter an email such as name@example.com.")).toBeTruthy();
+    expect(
+      await screen.findByText("Wrong email format. Enter an email such as name@example.com."),
+    ).toBeTruthy();
     expect(match).not.toHaveBeenCalled();
   });
 

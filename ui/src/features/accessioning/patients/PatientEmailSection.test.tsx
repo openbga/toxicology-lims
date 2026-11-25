@@ -38,7 +38,9 @@ describe("Patient portal email", () => {
     expect(within(section).getByText("None. Nothing is sent to the patient portal.")).toBeTruthy();
     await user.click(within(section).getByRole("button", { name: "Add email" }));
     const dialog = await screen.findByRole("dialog", { name: "Add patient email" });
-    expect(within(dialog).getByText(/means the patient agrees to see their results/)).toBeTruthy();
+    await user.hover(within(dialog).getByRole("button", { name: "About Email" }));
+    // The tooltip opens outside the modal dialog, which hides the rest of the page from roles.
+    expect(await screen.findByText(/means the patient agrees to see their results/)).toBeTruthy();
     await user.type(
       within(dialog).getByRole("textbox", { name: "Email" }),
       "test.patient@example.com",
@@ -86,7 +88,9 @@ describe("Patient portal email", () => {
     await user.type(within(dialog).getByRole("textbox", { name: "Email" }), "not-an-email");
     await user.click(within(dialog).getByRole("button", { name: "Save email" }));
     expect(
-      await within(dialog).findByText("Enter an email such as name@example.com."),
+      await within(dialog).findByText(
+        "Wrong email format. Enter an email such as name@example.com.",
+      ),
     ).toBeTruthy();
     expect(setEmail).not.toHaveBeenCalled();
   });

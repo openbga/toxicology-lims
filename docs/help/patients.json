@@ -45,6 +45,7 @@
     "ui/src/features/accessioning/patients/IdentityHolds.tsx",
     "ui/src/features/accessioning/patients/PatientEmailSection.tsx",
     "ui/src/features/accessioning/patients/portalEmail.ts",
+    "ui/src/components/InfoTip/InfoTip.tsx",
     "crates/lis-identity/src/email.rs",
     "ui/src/features/accessioning/patients/IdentityHistory.tsx",
     "ui/src/features/accessioning/patients/intakeEvidence.ts",
@@ -216,9 +217,9 @@
         },
         {
           "name": "Email",
-          "meaning": "The patient's email for the LIMSiq Patient Portal. Entering it means the patient agrees to see their results in the portal and to receive result notifications there; the text under the field says so.",
+          "meaning": "The patient's email for the LIMSiq Patient Portal. Entering it means the patient agrees to see their results in the portal and to receive result notifications there; the info icon beside the label says so on hover or keyboard focus.",
           "values": "An email such as name@example.com, up to 254 characters. Spaces before and after are removed; the address is otherwise kept as typed. Blank means no email.",
-          "rules": "Optional. Leave it empty if the patient does not agree: nothing is sent to the portal. For a minor, use the parent's or guardian's email. An address without one @, a dot in the part after it, or with spaces inside is refused before the check."
+          "rules": "Optional. Leave it empty if the patient does not agree: nothing is sent to the portal. For a minor, use the parent's or guardian's email. Only the form of the address is checked, not whether the mailbox exists. Refused before the check: no @ or more than one; spaces or characters an address cannot hold; a dot at the start or end of the name, or two dots together; a domain that is not at least two parts separated by dots (letters, digits and inner hyphens), or whose ending is not at least two letters, such as name@j.o."
         },
         {
           "name": "Identifiers: Identifier / Assigning authority / Identifier type",
@@ -714,7 +715,7 @@
         },
         {
           "name": "Add email / Change email / Save email",
-          "does": "Opens a dialog with the Email field and the consent text. Save email records the new address; clearing the field and saving removes the email, so nothing more is sent to the portal.",
+          "does": "Opens a dialog with the Email field; its info icon shows the consent text. Save email records the new address; clearing the field and saving removes the email, so nothing more is sent to the portal.",
           "availableWhen": "Order entry authority (enter_orders). The dialog uses the patient record as shown; if someone changed the patient meanwhile, saving is refused and the record must be refreshed. Saving the same address again, or removing when there is none, is refused as nothing changed. A malformed address is refused.",
           "result": "Email saved or Email removed. The section shows the new value at once; the earlier value stays in the history. Cancel closes the dialog without saving."
         },

@@ -117,21 +117,46 @@ pub(crate) fn parse_email(email: Option<&Phi<String>>) -> Result<Option<String>,
     if email.chars().count() > EMAIL_MAX {
         return Err(invalid("email", "too_long", "Use at most 254 characters."));
     }
-    let well_formed = email.split_once('@').is_some_and(|(local, domain)| {
-        !local.is_empty()
-            && domain.contains('.')
-            && !domain.starts_with('.')
-            && !domain.ends_with('.')
-            && !domain.contains('@')
-    }) && !email.chars().any(char::is_whitespace);
+    let well_formed = email
+        .split_once('@')
+        .is_some_and(|(local, domain)| valid_local(local) && valid_domain(domain));
     if !well_formed {
         return Err(invalid(
             "email",
             "invalid_format",
-            "Enter an email such as name@example.com.",
+            "Wrong email format. Enter an email such as name@example.com.",
         ));
     }
     Ok(Some(email.to_owned()))
+}
+
+/// The part before `@`: 1 to 64 of the characters an address allows, with no dot at either
+/// end and no two dots together.
+fn valid_local(local: &str) -> bool {
+    (1..=64).contains(&local.len())
+        && !local.starts_with('.')
+        && !local.ends_with('.')
+        && !local.contains("..")
+        && local
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || ".!#$%&'*+/=?^_`{|}~-".contains(c))
+}
+
+/// The part after `@`: at least two labels of letters, digits and inner hyphens, each 1 to 63
+/// long, ending in a top-level domain of at least two letters, such as `example.com`.
+fn valid_domain(domain: &str) -> bool {
+    let labels: Vec<&str> = domain.split('.').collect();
+    let well_formed = |label: &&str| {
+        (1..=63).contains(&label.len())
+            && !label.starts_with('-')
+            && !label.ends_with('-')
+            && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+    };
+    labels.len() >= 2
+        && labels.iter().all(well_formed)
+        && labels
+            .last()
+            .is_some_and(|tld| tld.len() >= 2 && tld.chars().all(|c| c.is_ascii_alphabetic()))
 }
 
 #[cfg(test)]
@@ -166,11 +191,31 @@ mod tests {
             "name@example.",
             "a@b@example.com",
             "first last@example.com",
+            "madalina.s@j.o",
+            "name@example.c0m",
+            "name@exa_mple.com",
+            "name@-example.com",
+            "name@example..com",
+            ".name@example.com",
+            "na..me@example.com",
+            "name,other@example.com",
         ] {
             assert!(
                 matches!(parse(value), Err(IdentityError::Invalid(_))),
                 "{value} should be refused"
             );
+        }
+    }
+
+    #[test]
+    fn ordinary_addresses_are_accepted() {
+        for value in [
+            "test.patient@example.com",
+            "test+portal@mail.example.co.uk",
+            "o'brien@example.ro",
+            "t-p_1@sub-domain.example.org",
+        ] {
+            assert_eq!(parse(value).ok(), Some(Some(value.to_owned())), "{value}");
         }
     }
 

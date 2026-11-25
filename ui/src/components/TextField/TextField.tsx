@@ -3,6 +3,7 @@ import { TextField as AriaTextField, Input } from "react-aria-components";
 import { FieldHelp } from "@/components/Form/FieldHelp";
 import { FieldLabel } from "@/components/Form/FieldLabel";
 import formStyles from "@/components/Form/Form.module.css";
+import { InfoTip } from "@/components/InfoTip";
 
 interface TextFieldProps {
   label: string;
@@ -17,6 +18,8 @@ interface TextFieldProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   description?: string;
+  /** Help shown from an info icon beside the label, on hover or focus. */
+  info?: string;
   errorMessage?: string | undefined;
   autoComplete?: string;
   autoCapitalize?: string;
@@ -33,6 +36,7 @@ export function TextField({
   label,
   placeholder,
   description,
+  info,
   errorMessage,
   inputRef,
   isRequired,
@@ -60,7 +64,14 @@ export function TextField({
       isInvalid={errorMessage === undefined ? undefined : true}
       className={formStyles.field}
     >
-      <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
+      {info ? (
+        <div className={formStyles.labelRow}>
+          <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
+          <InfoTip label={label} text={info} />
+        </div>
+      ) : (
+        <FieldLabel isRequired={isRequired}>{label}</FieldLabel>
+      )}
       {adornment ? (
         <div className={formStyles.adorned}>
           {input}
