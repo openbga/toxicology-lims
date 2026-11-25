@@ -17,6 +17,8 @@ interface AuthGateProps {
   children: (session: SessionInfo) => ReactNode;
   /** Shown beside the signed-out screens, such as listener status (REQ-OPS-013). */
   aside?: ReactNode;
+  /** Shown at the left of the version line below the card, such as the development link. */
+  footer?: ReactNode;
 }
 
 /**
@@ -32,7 +34,7 @@ export function AuthGate(props: AuthGateProps) {
   );
 }
 
-function AuthGateContent({ children, aside }: AuthGateProps) {
+function AuthGateContent({ children, aside, footer }: AuthGateProps) {
   const session = useCommandQuery<SessionInfo | null>(CURRENT_SESSION);
   const DemoSetup = useContext(DemoSetupContext);
   const setup = useCommandQuery<SetupStatus>(SETUP_STATUS, undefined, {
@@ -44,14 +46,20 @@ function AuthGateContent({ children, aside }: AuthGateProps) {
     return (
       <>
         <IdleLock idleTimeoutSeconds={session.data.idleTimeoutSeconds} />
-        {progress ? <AuthLayout aside={aside}>{progress}</AuthLayout> : children(session.data)}
+        {progress ? (
+          <AuthLayout aside={aside} footer={footer}>
+            {progress}
+          </AuthLayout>
+        ) : (
+          children(session.data)
+        )}
       </>
     );
   }
   // The laboratory is named once the session is known, so a signed-in person's setup check
   // stays the only one (demo preparation).
   return (
-    <AuthLayout aside={aside} showLaboratory={!session.isPending}>
+    <AuthLayout aside={aside} footer={footer} showLaboratory={!session.isPending}>
       {signedOutView(session)}
     </AuthLayout>
   );

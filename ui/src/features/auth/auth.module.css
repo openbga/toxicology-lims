@@ -1,11 +1,90 @@
+/* The picture on the left (about 55%), the screen on the right; a narrow window shows only the
+   screen (ticket #4951). The picture is centred between the window's left edge and the card,
+   and the window takes the picture's background colours. --card-offset is the card's distance
+   from the window's right edge. The first-run setup is wider, so its right side is wider. */
 .layout {
+  --card-offset: calc(22.5% + 13rem);
+
+  display: grid;
+  grid-template-columns: 11fr 9fr;
+  min-height: 100%;
+}
+
+.layout:has([data-first-run]) {
+  --card-offset: min(75%, calc(62.5% + 34rem));
+
+  grid-template-columns: 1fr 3fr;
+}
+
+@media (min-width: 901px) {
+  .layout {
+    background: linear-gradient(#e8eef0, #e2e9eb);
+  }
+
+  :global(:root[data-theme="dark"]) .layout {
+    background: linear-gradient(#0f1719, #131b1e);
+  }
+}
+
+.panel {
+  position: relative;
+  grid-area: 1 / 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  min-height: 100%;
   padding: var(--space-6);
+}
+
+.art {
+  grid-area: 1 / 1 / 2 / -1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* The whole picture, centred in the space under the headline and shrinking with the window:
+   never cropped, never over the card. It sits 3vw right of centre because its floor runs off
+   its left side, so its visible content is left of the middle. */
+.art img {
+  position: absolute;
+  top: 9rem;
+  left: calc(var(--space-8) + 3vw);
+  right: calc(var(--card-offset) + var(--space-8) - 3vw);
+  width: auto;
+  height: calc(100% - 9rem - var(--space-8));
+  object-fit: contain;
+  object-position: center;
+}
+
+:global(:root[data-theme="dark"]) .artLight,
+:global(:root:not([data-theme="dark"])) .artDark {
+  display: none;
+}
+
+/* The website's headline over the top of the picture. */
+.headline {
+  position: absolute;
+  top: var(--space-8);
+  left: var(--space-8);
+  right: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
+
+.headline h2 span {
+  display: block;
+}
+
+.headline h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.headline p {
+  color: var(--color-text-muted);
 }
 
 .card {
@@ -42,8 +121,19 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-@media (max-width: 760px) {
-  .layout {
+@media (max-width: 900px) {
+  .layout,
+  .layout:has([data-first-run]) {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  .art {
+    display: none;
+  }
+
+  .panel {
+    grid-area: 1 / 1;
     padding: var(--space-4);
   }
 
@@ -59,11 +149,20 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--space-2);
-  width: min(40rem, 100%);
+  width: min(26rem, 100%);
+}
+
+/* The development link at the left and the version at the right, as wide as the card. */
+.footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: min(26rem, 100%);
 }
 
 .version {
-  text-align: center;
+  margin-left: auto;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
