@@ -1,0 +1,26 @@
+/* A small round icon button beside a field label. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: help;
+}
+
+.trigger[data-hovered],
+.trigger[data-focus-visible] {
+  color: var(--color-text);
+}
+
+.trigger[data-focus-visible] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.tooltip {
+  composes: tooltip from "../../app/Sidebar.module.css";
+}

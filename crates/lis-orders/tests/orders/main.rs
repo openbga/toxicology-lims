@@ -619,6 +619,7 @@ fn register_second_subject(fixture: &Fixture) -> SubjectId {
                     source: "synthetic_requisition".to_owned(),
                     identifiers: Vec::new(),
                     acknowledged_candidates: Vec::new(),
+                    email: None,
                 },
             )
             .map_err(lis_orders::OrderError::from)
@@ -1491,6 +1492,7 @@ fn identity_fixture(
                     source: "synthetic_requisition".to_owned(),
                     identifiers: Vec::new(),
                     acknowledged_candidates: Vec::new(),
+                    email: None,
                 },
             )
         })

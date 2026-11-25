@@ -175,6 +175,7 @@ fn intake_resolves_only_to_an_existing_patient() {
                         source: "new source-backed full date".into(),
                         identifiers: vec![],
                         acknowledged_candidates: vec![],
+                        email: None,
                     },
                 )
             },

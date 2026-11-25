@@ -1,5 +1,6 @@
 //! SQL for this module's tables, one function per statement.
 
+pub(crate) mod emails;
 pub(crate) mod holds;
 pub(crate) mod laboratory;
 pub(crate) mod organizations;

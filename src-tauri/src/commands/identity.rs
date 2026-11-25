@@ -7,9 +7,9 @@ use lis_engine::{
     ClientView, ConfirmDistinctSubjects, CreateClient, DeactivateSubjectIdentifier, Engine,
     GetSubjectInput, IdentifierAdded, IdentityHoldResolved, IdentityHoldView,
     LaboratoryProfileView, ListIdentityHoldsInput, PractitionerId, PractitionerView,
-    RegisterPractitioner, RegisterSubject, SetLaboratoryProfile, SubjectCandidates,
-    SubjectMatchQuery, SubjectRegistered, SubjectRevision, SubjectSearch, SubjectSummary,
-    SubjectView,
+    RegisterPractitioner, RegisterSubject, SetLaboratoryProfile, SetSubjectEmail,
+    SubjectCandidates, SubjectEmailSet, SubjectMatchQuery, SubjectRegistered, SubjectRevision,
+    SubjectSearch, SubjectSummary, SubjectView,
 };
 use tauri::State;
 
@@ -59,6 +59,14 @@ pub(crate) async fn add_subject_identifier(
     input: AddSubjectIdentifier,
 ) -> Result<IdentifierAdded, CommandError> {
     engine.add_subject_identifier(input).await
+}
+
+#[tauri::command]
+pub(crate) async fn set_subject_email(
+    engine: State<'_, Engine>,
+    input: SetSubjectEmail,
+) -> Result<SubjectEmailSet, CommandError> {
+    engine.set_subject_email(input).await
 }
 
 #[tauri::command]

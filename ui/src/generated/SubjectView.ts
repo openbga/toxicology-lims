@@ -2,6 +2,7 @@
 import type { IdentityAssertionView } from "./IdentityAssertionView";
 import type { IdentityHoldView } from "./IdentityHoldView";
 import type { IntakeDeferralView } from "./IntakeDeferralView";
+import type { SubjectEmailView } from "./SubjectEmailView";
 import type { SubjectIdentifierView } from "./SubjectIdentifierView";
 
 /**
@@ -31,4 +32,8 @@ openHolds: Array<IdentityHoldView>,
 /**
  * Incomplete identity intake resolved with this subject, oldest resolution first.
  */
-resolvedIntakes: Array<IntakeDeferralView>, };
+resolvedIntakes: Array<IntakeDeferralView>, 
+/**
+ * The portal email; absent when none was given or it was removed.
+ */
+email: SubjectEmailView | null, };

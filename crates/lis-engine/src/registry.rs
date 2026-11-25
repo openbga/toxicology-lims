@@ -82,6 +82,7 @@ pub const COMMANDS: &[CommandSpec] = &[
     crate::commands::identity::GET_SUBJECT,
     crate::commands::identity::ASSERT_DEMOGRAPHICS,
     crate::commands::identity::ADD_SUBJECT_IDENTIFIER,
+    crate::commands::identity::email::SET_SUBJECT_EMAIL,
     crate::commands::identity::DEACTIVATE_SUBJECT_IDENTIFIER,
     crate::commands::identity::LIST_IDENTITY_HOLDS,
     crate::commands::identity::RESOLVE_IDENTITY_HOLD,

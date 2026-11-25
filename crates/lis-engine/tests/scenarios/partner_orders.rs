@@ -344,6 +344,7 @@ pub(super) async fn register_patient(orders: &Orders) {
                 value: Phi::new("MRN-00042".to_owned()),
             }],
             acknowledged_candidates: Vec::new(),
+            email: None,
         })
         .await
         .unwrap();

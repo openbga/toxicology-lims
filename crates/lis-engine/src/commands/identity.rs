@@ -9,6 +9,7 @@
 //! `manage_configuration` sets it.
 
 pub(crate) mod directories;
+pub(crate) mod email;
 pub(crate) mod intake;
 mod profile;
 

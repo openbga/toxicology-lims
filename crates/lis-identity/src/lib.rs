@@ -38,11 +38,14 @@
 //!   against the expected current version; every version after the first
 //!   needs a reason, and versions are append-only and consecutive, so a
 //!   report can name the exact version it froze.
+//! - **Portal email** ([`set_subject_email`]): the patient's email for the LIMSiq
+//!   Patient Portal, as an append-only history. A filled email is the patient's consent to
+//!   portal delivery; removing it records that nothing more is sent.
 //! - **History for impact review**: [`identity_holds_touching`] returns open
 //!   and resolved holds with their times, so a hold opened after a report's
 //!   release still counts once resolved.
 //!
-//! Capabilities: initial identity capture and identifier addition
+//! Capabilities: initial identity capture, identifier addition and the portal email
 //! `enter_orders`; demographic correction, identifier deactivation and hold
 //! resolution `manage_quality` by a signed-in user; clients, locations and
 //! practitioners `manage_configuration`; the laboratory profile
@@ -51,7 +54,7 @@
 //! transaction. Queries perform no authorization; the engine checks and
 //! audits reads (see [`queries`]).
 //!
-//! PHI (names, birth dates, sex, identifier values) is held in
+//! PHI (names, birth dates, sex, identifier values, email) is held in
 //! [`lis_core::Phi`] in inputs and views and never reaches audit details,
 //! error text or logs. IPC types derive `ts_rs::TS`; names other areas could
 //! reuse carry an `Identity` or `Subject` prefix in TypeScript.
@@ -64,6 +67,7 @@ mod billing_model;
 mod billing_validation;
 mod commands;
 mod directories;
+mod email;
 mod error;
 mod intake;
 mod model;
@@ -96,6 +100,7 @@ pub use commands::subjects::{
     RegisterSubject, SubjectRegistered, SubjectRevision, add_subject_identifier,
     assert_demographics, deactivate_subject_identifier, register_subject,
 };
+pub use email::{SetSubjectEmail, SubjectEmailSet, SubjectEmailView, set_subject_email};
 pub use error::IdentityError;
 pub use model::{
     Client, ClientId, ClientLocation, ClientLocationId, DemographicsInput, IdentifierInput,
@@ -143,6 +148,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 5,
         name: "intake_deferrals",
         sql: include_str!("../migrations/0005_intake_deferrals.sql"),
+    },
+    Migration {
+        version: 6,
+        name: "subject_email",
+        sql: include_str!("../migrations/0006_subject_email.sql"),
     },
 ];
 

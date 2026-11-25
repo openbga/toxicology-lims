@@ -85,6 +85,7 @@ pub(crate) fn handler<R: Runtime>() -> impl Fn(Invoke<R>) -> bool + Send + Sync 
         identity::get_subject,
         identity::assert_demographics,
         identity::add_subject_identifier,
+        identity::set_subject_email,
         identity::deactivate_subject_identifier,
         identity::list_identity_holds,
         identity::resolve_identity_hold,

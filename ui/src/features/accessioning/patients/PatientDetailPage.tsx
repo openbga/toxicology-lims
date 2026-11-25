@@ -22,6 +22,7 @@ import { newOrderPath, orNotRecorded, patientPath, subjectName } from "../subjec
 import { MANAGE_QUALITY } from "./contract";
 import { IdentityHistory } from "./IdentityHistory";
 import { IdentityHolds } from "./IdentityHolds";
+import { PatientEmailSection } from "./PatientEmailSection";
 import { PatientMaintenance } from "./PatientMaintenance";
 
 const PATIENTS = { label: "Patients", href: "/patients" };
@@ -107,6 +108,7 @@ function PatientDetail({ subject }: { subject: SubjectView }) {
     <>
       <IdentityHolds subjectId={subject.id} holds={subject.openHolds} canResolve={canResolve} />
       <IdentityHistory intakes={subject.resolvedIntakes} />
+      <PatientEmailSection subject={subject} />
       <PatientMaintenance subject={subject} />
       {canEnterOrders && <StandingOrders subjectId={subject.id} />}
       {(canEnterOrders || canBill) && (

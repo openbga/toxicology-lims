@@ -6,6 +6,7 @@ import { FieldGrid, Form } from "@/components/Form";
 import { DATE_FORMAT, TextInput } from "@/components/FormFields";
 import type { CommandError } from "@/generated/CommandError";
 import { UnsavedChangesGuard } from "@/lib/UnsavedChangesGuard";
+import { PORTAL_EMAIL_CONSENT, validatePortalEmail } from "./portalEmail";
 import type { PatientDetailsValues } from "./registration";
 
 interface PatientDetailsFormProps {
@@ -73,6 +74,12 @@ export function PatientDetailsForm({
             label="Source of these details"
             description="Such as the paper requisition."
             isRequired
+          />
+          <TextInput
+            name="email"
+            label="Email"
+            info={PORTAL_EMAIL_CONSENT}
+            validate={validatePortalEmail}
           />
         </FieldGrid>
         <FieldList

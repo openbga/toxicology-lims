@@ -1,13 +1,14 @@
 //! Every command refuses a principal lacking its capability and writes nothing,
 //! even when the principal holds every other capability.
 
-use lis_core::{Capability, ErrorCode, Principal};
+use lis_core::{Capability, ErrorCode, Phi, Principal};
 use lis_identity::{
     AddClientLocation, AddSubjectIdentifier, AssertDemographics, ClientId, ConfirmDistinctSubjects,
     CreateClient, DeactivateSubjectIdentifier, IdentityError, IdentityHoldId, RegisterPractitioner,
-    RegisterSubject, SubjectId, SubjectIdentifierId, add_client_location, add_subject_identifier,
-    assert_demographics, confirm_distinct_subjects, create_client, deactivate_subject_identifier,
-    get_subject, register_practitioner, register_subject, set_laboratory_profile,
+    RegisterSubject, SetSubjectEmail, SubjectId, SubjectIdentifierId, add_client_location,
+    add_subject_identifier, assert_demographics, confirm_distinct_subjects, create_client,
+    deactivate_subject_identifier, get_subject, register_practitioner, register_subject,
+    set_laboratory_profile, set_subject_email,
 };
 use lis_store::CommandContext;
 
@@ -40,7 +41,7 @@ struct Fixture {
 
 type Case = fn(Fixture, &mut CommandContext<'_>) -> Result<(), IdentityError>;
 
-const CASES: [(&str, Capability, Case); 9] = [
+const CASES: [(&str, Capability, Case); 10] = [
     ("register_subject", Capability::EnterOrders, |_, ctx| {
         register_subject(
             ctx,
@@ -49,6 +50,18 @@ const CASES: [(&str, Capability, Case); 9] = [
                 source: "requisition".to_owned(),
                 identifiers: vec![],
                 acknowledged_candidates: vec![],
+                email: None,
+            },
+        )
+        .map(drop)
+    }),
+    ("set_subject_email", Capability::EnterOrders, |f, ctx| {
+        set_subject_email(
+            ctx,
+            SetSubjectEmail {
+                subject_id: f.subject,
+                expected_revision: 1,
+                email: Some(Phi::new("test.patient@example.com".to_owned())),
             },
         )
         .map(drop)

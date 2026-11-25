@@ -261,6 +261,7 @@ fn register_fixtures(
                 value: Phi::new(PATIENT.to_owned()),
             }],
             acknowledged_candidates: candidates,
+            email: None,
         },
     )?;
     Ok(())

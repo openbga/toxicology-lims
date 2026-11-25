@@ -35,6 +35,8 @@ interface TextInputProps {
   /** Shown but not editable, such as a value the engine no longer lets change. */
   isDisabled?: boolean;
   description?: string;
+  /** Help shown from an info icon beside the label, on hover or focus. */
+  info?: string;
   format?: TextFormat;
   autoFocus?: boolean;
   /** What to enter, shown in the empty field, such as "Scan or type a container barcode". */
@@ -58,6 +60,7 @@ export function TextInput({
   requiredMessage,
   isDisabled,
   description,
+  info,
   format,
   autoFocus,
   placeholder,
@@ -96,6 +99,7 @@ export function TextInput({
           {...textFieldProps(controller)}
           label={label}
           description={description ?? format?.description}
+          info={info}
           isRequired={isRequired}
           isDisabled={isDisabled}
           autoFocus={autoFocus}

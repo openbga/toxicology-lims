@@ -44,6 +44,7 @@ impl Fixture {
                             source: "Synthetic fixture".to_owned(),
                             identifiers: vec![],
                             acknowledged_candidates: vec![],
+                            email: None,
                         },
                     )
                 },

@@ -4,6 +4,7 @@ import { useToast } from "@/components/Toast";
 import type { RegisterSubject } from "@/generated/RegisterSubject";
 import type { SubjectRegistered } from "@/generated/SubjectRegistered";
 import type { SubjectSummary } from "@/generated/SubjectSummary";
+import { optionalText } from "@/lib/choices";
 import { useCommandMutation } from "@/lib/commands";
 import { MATCH_SUBJECT_CANDIDATES, REGISTER_SUBJECT, SEARCH_SUBJECTS } from "./contract";
 import { type PatientDetailsValues, toMatchQuery } from "./registration";
@@ -38,6 +39,7 @@ export function RegisterButton({
           ...toMatchQuery(details),
           source: details.source.trim(),
           acknowledgedCandidates: candidates.map((candidate) => candidate.subjectId),
+          email: optionalText(details.email),
         },
       },
       {

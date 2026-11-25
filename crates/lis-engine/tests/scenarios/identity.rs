@@ -7,7 +7,8 @@ use lis_core::{CommandError, ErrorCode, Phi, UserId};
 use lis_engine::{
     AddClientLocation, AddSubjectIdentifier, AssertDemographics, ConfirmDistinctSubjects,
     CreateClient, DeactivateSubjectIdentifier, Engine, GetSubjectInput, ListIdentityHoldsInput,
-    RegisterPractitioner, RegisterSubject, SetLaboratoryProfile, SubjectMatchQuery, SubjectSearch,
+    RegisterPractitioner, RegisterSubject, SetLaboratoryProfile, SetSubjectEmail,
+    SubjectMatchQuery, SubjectSearch,
 };
 use lis_identity::{DemographicsInput, IdentifierInput, IdentityHoldId, SubjectIdentifierId};
 
@@ -39,6 +40,7 @@ fn registration(identifiers: Vec<IdentifierInput>) -> RegisterSubject {
         source: "requisition".to_owned(),
         identifiers,
         acknowledged_candidates: vec![],
+        email: None,
     }
 }
 
@@ -94,6 +96,14 @@ pub(crate) async fn identity_call(
                 subject_id,
                 expected_revision: 1,
                 identifier: mrn("SYN-9"),
+            })
+            .await
+            .map(drop),
+        "set_subject_email" => engine
+            .set_subject_email(SetSubjectEmail {
+                subject_id,
+                expected_revision: 1,
+                email: Some(Phi::new("test.patient@example.com".to_owned())),
             })
             .await
             .map(drop),

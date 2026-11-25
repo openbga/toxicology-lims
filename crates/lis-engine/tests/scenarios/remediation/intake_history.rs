@@ -105,6 +105,7 @@ async fn register_unrelated_subject(t: &TestEngine) -> SubjectId {
             source: "Synthetic requisition R-3".into(),
             identifiers: vec![],
             acknowledged_candidates: vec![],
+            email: None,
         })
         .await
         .unwrap()

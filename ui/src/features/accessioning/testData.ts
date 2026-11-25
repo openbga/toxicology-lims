@@ -63,6 +63,7 @@ export const SUBJECT_VIEW: SubjectView = {
   identifiers: [MRN],
   openHolds: [],
   resolvedIntakes: [],
+  email: null,
 };
 
 /** Synthetic incomplete intake, resolved with `SUBJECT_ID` by the test accessioner. */

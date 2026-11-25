@@ -66,7 +66,12 @@ describe("RegisterPatientPage (REQ-IDN-001)", { timeout: WALKTHROUGH_TIMEOUT_MS 
     await user.keyboard("{Enter}");
     expect(await screen.findByText(`Navigated to /patients/${SUBJECT_ID}`)).toBeTruthy();
     expect(register).toHaveBeenCalledWith({
-      input: { ...EXPECTED_QUERY, source: "Paper requisition", acknowledgedCandidates: [] },
+      input: {
+        ...EXPECTED_QUERY,
+        source: "Paper requisition",
+        acknowledgedCandidates: [],
+        email: null,
+      },
     });
     expect(screen.getByText("Patient registered")).toBeTruthy();
   });
@@ -178,6 +183,42 @@ describe("RegisterPatientPage (REQ-IDN-001)", { timeout: WALKTHROUGH_TIMEOUT_MS 
     expect(screen.getByText("Enter source of these details.")).toBeTruthy();
     expect(match).not.toHaveBeenCalled();
   });
+  it("registers the email with the consent text shown, and lists it before saving", async () => {
+    const register = vi.fn(() => REGISTERED);
+    const { user } = renderPage({
+      match_subject_candidates: () => NO_MATCHES,
+      register_subject: register,
+    });
+    expect(screen.queryByText(/means the patient agrees/)).toBeNull();
+    await user.hover(screen.getByRole("button", { name: "About Email" }));
+    expect(await screen.findByRole("tooltip")).toHaveProperty(
+      "textContent",
+      expect.stringMatching(/means the patient agrees to see their results/),
+    );
+    await user.unhover(screen.getByRole("button", { name: "About Email" }));
+    await typeInto(user, /^Email/, " test.patient@example.com ");
+    await user.click(screen.getByRole("textbox", { name: /^Family name/ }));
+    await enterDetails(user);
+    expect(await screen.findByText("test.patient@example.com")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Register patient" }));
+    expect(await screen.findByText(`Navigated to /patients/${SUBJECT_ID}`)).toBeTruthy();
+    expect(register).toHaveBeenCalledWith({
+      input: expect.objectContaining({ email: "test.patient@example.com" }),
+    });
+  });
+
+  it("refuses a malformed email before looking for matches", async () => {
+    const match = vi.fn(() => NO_MATCHES);
+    const { user } = renderPage({ match_subject_candidates: match });
+    await typeInto(user, /^Email/, "not-an-email");
+    await user.click(screen.getByRole("textbox", { name: /^Family name/ }));
+    await enterDetails(user);
+    expect(
+      await screen.findByText("Wrong email format. Enter an email such as name@example.com."),
+    ).toBeTruthy();
+    expect(match).not.toHaveBeenCalled();
+  });
+
   it("returns a newly registered patient directly to the new-order task", async () => {
     const register = vi.fn(() => REGISTERED);
     const { user } = renderPage(

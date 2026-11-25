@@ -6,6 +6,7 @@
 
 mod authorization;
 mod billing;
+mod email;
 mod holds;
 mod laboratory;
 mod organizations;
@@ -22,7 +23,7 @@ use lis_store::{CommandContext, StoreError, lint_schema};
 use rusqlite::Connection;
 
 /// Every table this module and the audit trail write.
-const TABLES: [&str; 10] = [
+const TABLES: [&str; 11] = [
     "idn_subjects",
     "idn_identity_assertions",
     "idn_subject_identifiers",
@@ -33,6 +34,7 @@ const TABLES: [&str; 10] = [
     "idn_practitioners",
     "idn_laboratory_profiles",
     "idn_patient_billing_profiles",
+    "idn_subject_emails",
 ];
 
 pub(crate) fn open() -> TestDatabase {
@@ -135,6 +137,7 @@ pub(crate) fn register(
                 source: "requisition".to_owned(),
                 identifiers,
                 acknowledged_candidates,
+                email: None,
             },
         )
     })

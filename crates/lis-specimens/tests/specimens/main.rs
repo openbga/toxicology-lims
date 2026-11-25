@@ -117,6 +117,7 @@ fn synthetic_subject() -> RegisterSubject {
         source: "requisition".to_owned(),
         identifiers: Vec::new(),
         acknowledged_candidates: Vec::new(),
+        email: None,
     }
 }
 
