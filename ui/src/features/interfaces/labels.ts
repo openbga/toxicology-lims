@@ -17,7 +17,15 @@ import type { Schedule } from "@/generated/Schedule";
 import type { UnroutedResolution } from "@/generated/UnroutedResolution";
 import type { WaitReason } from "@/generated/WaitReason";
 import { INTAKE_REASONS, receivedDetail, receivedOutcome } from "./intakeLabels";
-import { ackOutcome, LISTENER_PROBLEMS, MLLP_PROBLEMS, sentText, socketText } from "./mllpLabels";
+import {
+  ackOutcome,
+  answers,
+  LISTENER_PROBLEMS,
+  MLLP_PROBLEMS,
+  sentText,
+  socketText,
+} from "./mllpLabels";
+import { PORTAL_PROBLEMS } from "./portalLabels";
 
 export interface Labelled {
   label: string;
@@ -98,6 +106,8 @@ export function connectionDescription({
       return `Uploads ${file} to ${partner}'s SFTP server when ${when}.`;
     case "mllp_connect":
       return `Sends ${file} to ${partner}'s interface over MLLP when ${when}.`;
+    case "portal_https":
+      return `Sends ${file} to the LIMSiq Patient Portal over HTTPS when ${when}.`;
     default:
       return `Writes ${file} to ${partner}'s folder when ${when}.`;
   }
@@ -133,6 +143,7 @@ export const PROTOCOLS: Record<PartnerProtocol, string> = {
   sftp: "SFTP",
   mllp_connect: "MLLP – LIS connects",
   mllp_listen: "MLLP – LIS listens",
+  portal_https: "LIMSiq Patient Portal",
 };
 
 /** How a message that left shows in Logs: what each transport can say. */
@@ -142,15 +153,18 @@ const LEFT_AS: Record<PartnerProtocol, string> = {
   mllp_connect: "Sent",
   // A listener only receives; nothing leaves it.
   mllp_listen: "Sent",
+  portal_https: "Sent",
 };
 
 /**
  * Where a connection writes or reads, as the Connections table shows it: a folder,
- * `host:folder`, the MLLP partner's `address:port`, or `LAN address:port` the LIS listens on.
+ * `host:folder`, the MLLP partner's `address:port`, `LAN address:port` the LIS listens on, or
+ * the portal's ingest address.
  */
-export function destinationText({ folder, settings }: PartnerConnection): string {
+export function destinationText({ folder, settings, ingestUrl }: PartnerConnection): string {
   if (settings.mllp) return socketText(settings.mllp);
   if (settings.mllpListener) return `LAN ${socketText(settings.mllpListener)}`;
+  if (ingestUrl) return ingestUrl;
   const sftp = settings.sftp;
   if (sftp === null) return folder;
   const port = sftp.port === 22 ? "" : `:${sftp.port}`;
@@ -238,6 +252,7 @@ const PROBLEMS: Record<string, string> = {
 export const problemText = (code: string) =>
   PROBLEMS[code] ??
   MLLP_PROBLEMS[code] ??
+  PORTAL_PROBLEMS[code] ??
   LISTENER_PROBLEMS[code] ??
   INTAKE_REASONS[code] ??
   code.replaceAll("_", " ");
@@ -264,6 +279,10 @@ const WAITING: Record<WaitReason, string> = {
   impact_review: "Paused while the report's impact review is open",
   not_mapped: "Held: a test or analyte has no approved code mapping",
   no_patient_identifier: "Held: the patient has no identifier; add one on the patient's page",
+  no_portal_email:
+    "Held: the patient has no email for the patient portal (their consent); add it on the patient's page",
+  no_practitioner_phone:
+    "Held: the ordering practitioner has no phone; add it in Laboratory setup › Practitioners",
 };
 
 const RESOLUTIONS: Record<UnroutedResolution, string> = {
@@ -349,19 +368,22 @@ function stateText(row: PartnerMessageRow, formatTime: (at: string) => string): 
       : RESOLUTIONS[row.resolution];
   }
   if (row.writtenPath !== null) {
-    return row.connection?.protocol === "mllp_connect"
-      ? sentText(row)
-      : `Written as ${row.writtenPath}`;
+    return answers(row) ? sentText(row) : `Written as ${row.writtenPath}`;
   }
   return attemptsText(row, formatTime) ?? (row.waiting === null ? "" : WAITING[row.waiting]);
 }
+
+/** What a message that failed every attempt never was; a folder or SFTP: "not written". */
+const GIVEN_UP: Partial<Record<PartnerProtocol, string>> = {
+  mllp_connect: "not acknowledged",
+  portal_https: "not taken by the portal",
+};
 
 /** A message whose attempts failed: given up, or when it is tried next; `null` before any. */
 function attemptsText(row: PartnerMessageRow, formatTime: (at: string) => string): string | null {
   const problem = row.errorCode === null ? "" : problemText(row.errorCode);
   if (row.givenUp) {
-    const outcome =
-      row.connection?.protocol === "mllp_connect" ? "not acknowledged" : "not written";
+    const outcome = GIVEN_UP[row.connection?.protocol ?? "folder"] ?? "not written";
     return `${problem}; ${outcome} after ${row.attempts} attempt${row.attempts === 1 ? "" : "s"}`;
   }
   if (row.attempts > 0 && row.nextAttemptAt !== null) {

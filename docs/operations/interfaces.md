@@ -1,12 +1,12 @@
 # Interfaces
 
-Status: **implemented on synthetic data**. The Interfaces menu receives HL7 orders from a clinic's EMR and sends HL7 results, issued report PDFs and billing handoff files to outside systems, through a folder or the partner's SFTP server, and HL7 over MLLP with a partner on the lab network: results sent, orders received (REQ-INT-001–004, REQ-INT-006, REQ-ORD-001, REQ-RPT-003, REQ-RPT-011–013, REQ-BIL-002). The built-in help, Interfaces topic, describes every field and action; this guide covers setup, behavior and recovery. Analyzers are configured separately, under Laboratory setup › Instruments.
+Status: **implemented on synthetic data**. The Interfaces menu receives HL7 orders from a clinic's EMR and sends HL7 results, issued report PDFs and billing handoff files to outside systems, through a folder or the partner's SFTP server, HL7 over MLLP with a partner on the lab network: results sent, orders received, and HL7 results posted to the LIMSiq Patient Portal over HTTPS (REQ-INT-001–004, REQ-INT-006, REQ-ORD-001, REQ-RPT-003, REQ-RPT-011–013, REQ-BIL-002). The built-in help, Interfaces topic, describes every field and action; this guide covers setup, behavior and recovery. Analyzers are configured separately, under Laboratory setup › Instruments.
 
 ## What is available
 
 | Message type | Made when | Direction | Protocol | Default file name |
 | --- | --- | --- | --- | --- |
-| HL7 Results (ORU^R01, v2.5.1) | A report revision is released; a withdrawal message when the report is withdrawn | Out | Folder, the partner's SFTP server, or MLLP – LIS connects | `{report}_r{revision}_{date}.hl7` (none over MLLP) |
+| HL7 Results (ORU^R01, v2.5.1) | A report revision is released; a withdrawal message when the report is withdrawn | Out | Folder, the partner's SFTP server, MLLP – LIS connects, or LIMSiq Patient Portal | `{report}_r{revision}_{date}.hl7` (none over MLLP or to the portal) |
 | Report PDF | A report revision is released; its withdrawal notice when the report is withdrawn | Out | Folder, or the partner's SFTP server | `{report}_r{revision}_{date}.pdf` |
 | Billing JSON (`bil-handoff-v2`) | A billing handoff is created | Out | Folder, or the partner's SFTP server | `bh-{handoff_id}_{accession}.json` |
 
@@ -54,6 +54,38 @@ An HL7 Results connection can send over MLLP: the LIS opens a TCP connection to 
 - **Tests.** **Test connection** connects to the address and port and closes, sending nothing. **Send test message** sends the synthetic ORU^R01 (processing ID `T`) and shows the partner's answer.
 - **Destination check.** It covers the partner's address and port. Changing either needs a new check; changing the ACK timeout does not.
 - **Problems** in Logs and on Overview: `not_lab_network`, `partner_unreachable` (no answer or refused within 10 seconds), `connection_lost` (closed before the ACK), `no_ack`, `ack_unreadable`, `ack_other_message`.
+
+## LIMSiq Patient Portal
+
+An HL7 Results connection can post each result to the LIMSiq Patient Portal's ingest API over HTTPS (#4672, authorized in `AGENTS.md` on 2026-11-24; [integrations](../architecture/integrations.md)). LIMSiq creates the laboratory's channel and gives the laboratory four values: the ingest address, the laboratory code, the API user and the API token. How LIMSiq hands them over is LIMSiq's process.
+
+- **Settings.**
+  - **Ingest address:** `https://` and a host name, with an optional port. A path, query, user or `http://` is refused.
+  - **Laboratory code:** letters, digits, `-` and `_`, up to 64 characters.
+  - **API user:** up to 100 printable characters, without `:`.
+  - **API token:** sealed with the installation key, like an SFTP password. It is never shown again. Leaving it blank when editing keeps it while the address, laboratory code and API user stay the same; changing any of them needs the token again.
+  - The connection has no folder and no file name.
+- **The request.** Each message is posted to `{address}/api/labs/{laboratory code}/ingest`:
+  - signed in with HTTP Basic (API user and token);
+  - with the body `{"payload": {"hl7": "…"}}`;
+  - with the delivery ID as the `Idempotency-Key`, so a retry is never filed twice.
+  - The request takes at most 60 seconds, and no redirect is followed. TLS uses the platform's certificate verifier.
+- **The message.** HL7 Results in the [portal profile](../architecture/integrations.md):
+  - PID-3 is the subject's identifier, with the laboratory's CLIA number as its authority.
+  - PID-14 is the patient's current email.
+  - Every ORC and OBR carries the accession.
+  - OBR-17 is the ordering practitioner's current phone.
+  - NTE carries the laboratory's name, CLIA number and phone.
+  - A last OBX of type ED carries the revision's PDF. A withdrawal carries no PDF.
+  - The email and phone are read when the message is made, so one added after release counts.
+- **Held.** Without the patient's email, which is their consent, the message waits as **no_portal_email**. Without the practitioner's phone, it waits as **no_practitioner_phone**. Once the missing value is added, the message goes at the next pass. As for any change to a released patient, adding the email opens the report's impact review first.
+- **Answers.**
+  - 202 shows as **Accepted (AA)**, "Accepted by the portal."; 200 as **Accepted (AA)**, "Already received by the portal."
+  - 422 shows as **Rejected (AR)**, with the portal's code, message and missing fields. 413 shows as **Rejected (AR)**, "too large". A rejected message is not posted again.
+  - 401 and 403 (`portal_unauthorized`), 429 (`portal_busy`), 5xx or another answer (`portal_unavailable`), and no answer or a failed TLS check (`portal_unreachable`) are retried at the usual times. A token that cannot be opened shows as `token_unreadable`.
+  - An acceptance means the portal took the message, not that it processed it or that the patient saw it. The portal's processing errors show in its lab portal **Exceptions**.
+- **Tests.** **Test connection** posts an empty request without an `Idempotency-Key`. The portal signs in and then refuses it for the missing key, filing nothing. A 422 means the address, laboratory code, user and token work. **Send test message** is not available: the portal would file the synthetic patient as a real patient's results.
+- **Destination check.** It covers the ingest address, the laboratory code and the API user.
 
 ## MLLP – LIS listens
 
@@ -166,4 +198,5 @@ A message that matched no connection waits in **Interfaces › Unrouted messages
 - The folder's network share, permissions and the partner's process for reading files are the laboratory's to qualify. Passing tests on synthetic data is not qualification.
 - The SFTP transport is tested against an in-process server on synthetic files, not against a partner's server. Each partner's server, network path and account are the laboratory's to qualify.
 - The MLLP transport is tested against an in-process partner on localhost with synthetic messages. Each partner's interface, its acknowledgement behavior, the network path or VPN, and what AA, AE and AR mean for it are the laboratory's to qualify in the partner's contract.
+- The LIMSiq Patient Portal transport is tested against an in-process server on localhost over plain HTTP, with synthetic messages; the portal's parser read the profile's message from a synthetic example. The `https://` requirement is checked in the settings and again before each request. The portal's TLS endpoint, its proxy or firewall rules (such as a bot check in front of the ingest API), its size limits and its processing are checked in the end-to-end test on the portal's development environment.
 - The MLLP listener is tested with an in-process EMR client on localhost and synthetic orders. The EMR's resend behavior after no answer or a closed connection, this computer's firewall and its lab-network address are the laboratory's to qualify. While the app is closed, as when an update installs, nothing listens.

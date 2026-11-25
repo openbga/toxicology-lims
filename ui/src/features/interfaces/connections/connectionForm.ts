@@ -6,6 +6,7 @@ import type { PartnerConnection } from "@/generated/PartnerConnection";
 import type { PartnerConnectionSettings } from "@/generated/PartnerConnectionSettings";
 import type { PartnerMessageType } from "@/generated/PartnerMessageType";
 import type { PartnerProtocol } from "@/generated/PartnerProtocol";
+import type { PortalSettings } from "@/generated/PortalSettings";
 import type { RuleCondition } from "@/generated/RuleCondition";
 import type { RuleField } from "@/generated/RuleField";
 import type { Schedule } from "@/generated/Schedule";
@@ -47,6 +48,14 @@ export interface MllpValues {
   ackTimeoutSeconds: string;
 }
 
+/** The patient portal's channel as LIMSiq gave it; `token` is sent apart and never shown. */
+interface PortalValues {
+  baseUrl: string;
+  labCode: string;
+  apiUser: string;
+  token: string;
+}
+
 export const validPort = (value: string) =>
   /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= 65535
     ? true
@@ -68,6 +77,7 @@ interface ConnectionFields {
   sftp: SftpValues;
   mllp: MllpValues;
   mllpListener: ListenerValues;
+  portal: PortalValues;
   /** For incoming orders: how the input folder is read and what is accepted. */
   intake: IntakeValues;
   rules: RuleValues[];
@@ -108,6 +118,15 @@ function toMllpValues(mllp: MllpPartner | null | undefined): MllpValues {
   };
 }
 
+function toPortalValues(portal: PortalSettings | null | undefined): PortalValues {
+  return {
+    baseUrl: portal?.baseUrl ?? "",
+    labCode: portal?.labCode ?? "",
+    apiUser: portal?.apiUser ?? "",
+    token: "",
+  };
+}
+
 export function toValues(connection: PartnerConnection | null): ConnectionValues {
   const settings = connection?.settings;
   const schedule = settings?.schedule;
@@ -126,6 +145,7 @@ export function toValues(connection: PartnerConnection | null): ConnectionValues
     sftp: toSftpValues(settings?.sftp),
     mllp: toMllpValues(settings?.mllp),
     mllpListener: toListenerValues(settings?.mllpListener),
+    portal: toPortalValues(settings?.portal),
     intake: toIntakeValues(settings?.intake),
     rules: settings?.rules.map((rule) => ({ ...rule })) ?? [],
     schedule: {
@@ -164,18 +184,34 @@ export function toMllp(values: MllpValues): MllpPartner {
   };
 }
 
+/** The portal's settings as entered; the engine trims them and drops a trailing slash. */
+function toPortal({ token: _, ...values }: PortalValues): PortalSettings {
+  return values;
+}
+
 /** The password to send: typed, for password sign-in; otherwise none (a saved one is kept). */
 export function typedPassword(values: SftpValues): string | undefined {
   return values.auth === "password" && values.password !== "" ? values.password : undefined;
 }
 
 /**
+ * The secret the engine seals, sent as `password`: the SFTP password, or the portal's API
+ * token; none when left empty, which keeps the saved one.
+ */
+export function typedSecret(values: ConnectionValues): string | undefined {
+  if (values.protocol === "sftp") return typedPassword(values.sftp);
+  if (values.protocol !== "portal_https") return undefined;
+  return values.portal.token === "" ? undefined : values.portal.token;
+}
+
+/**
  * The settings to save. An incoming connection routes, schedules and names nothing; an MLLP
- * connection names no file.
+ * or patient portal connection names no file.
  */
 export function toSettings(values: ConnectionValues): PartnerConnectionSettings {
   const incoming = isIncoming(values.messageType);
   const mllp = values.protocol === "mllp_connect";
+  const portal = values.protocol === "portal_https";
   return {
     name: values.name.trim(),
     partner: values.partner.trim(),
@@ -187,10 +223,11 @@ export function toSettings(values: ConnectionValues): PartnerConnectionSettings 
           field === "" || condition === "" ? [] : [{ field, condition, value: value.trim() }],
         ),
     schedule: incoming ? { kind: "immediately" } : toSchedule(values.schedule),
-    fileNamePattern: incoming || mllp ? "" : values.fileNamePattern.trim(),
+    fileNamePattern: incoming || mllp || portal ? "" : values.fileNamePattern.trim(),
     sftp: values.protocol === "sftp" ? toSftp(values.sftp) : null,
     intake: incoming ? toIntake(values.intake, values.protocol) : null,
     mllp: mllp ? toMllp(values.mllp) : null,
     mllpListener: values.protocol === "mllp_listen" ? toListener(values.mllpListener) : null,
+    portal: portal ? toPortal(values.portal) : null,
   };
 }

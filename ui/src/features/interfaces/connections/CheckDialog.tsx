@@ -12,17 +12,19 @@ interface CheckValues {
   method: string;
 }
 
-/** What the check covers, by protocol; SFTP names its user and fingerprint too. */
+/** What the check covers, by protocol; SFTP names its user and fingerprint, the portal its API user. */
 const DESTINATION_LABELS: Record<PartnerProtocol, string> = {
   folder: "Folder",
   sftp: "SFTP server",
   mllp_connect: "MLLP partner",
   mllp_listen: "MLLP listener",
+  portal_https: "Portal ingest address",
 };
 
 /**
  * Records how the connection's current folder, SFTP server with its user, folder and
- * fingerprint, MLLP partner, or MLLP listener with its allowed partners, was confirmed as the
+ * fingerprint, MLLP partner, MLLP listener with its allowed partners, or patient portal
+ * ingest address with its API user, was confirmed as the
  * partner's (REQ-RPT-012), before any patient data is written there or received. A second person records it, or the person who chose the destination where
  * the laboratory's policy allows and they confirm it (ADR 0015).
  */
@@ -33,7 +35,7 @@ export function CheckDialog({
   connection: PartnerConnection;
   onClose: () => void;
 }) {
-  const { sftp, mllpListener } = connection.settings;
+  const { sftp, mllpListener, portal } = connection.settings;
   return (
     <CommandDialog<CheckValues, RecordPartnerDestinationCheck>
       title="Record destination check"
@@ -56,6 +58,12 @@ export function CheckDialog({
           {mllpListener && (
             <>
               , from <strong>{partnersText(mllpListener.allowedPartners)}</strong>
+            </>
+          )}
+          {portal && (
+            <>
+              {" "}
+              as <strong>{portal.apiUser}</strong>
             </>
           )}
         </p>

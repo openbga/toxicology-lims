@@ -22,6 +22,10 @@ export const socketText = ({ address, port }: Pick<MllpPartner, "address" | "por
 export const awaitsAck = (connection: PartnerConnection) =>
   connection.settings.protocol === "mllp_connect";
 
+/** Whether the destination answers each message: an MLLP partner or the patient portal. */
+export const answers = (row: PartnerMessageRow) =>
+  row.connection?.protocol === "mllp_connect" || row.connection?.protocol === "portal_https";
+
 /** Why a message sent over MLLP got no acknowledgement, or a test failed. */
 export const MLLP_PROBLEMS: Record<string, string> = {
   not_lab_network: "The address is not on the lab network",
@@ -45,9 +49,10 @@ export function ackOutcome(row: PartnerMessageRow): { label: string; tone: Tone 
   return row.awaitingAck ? { label: "Awaiting application ACK", tone: "warning" } : null;
 }
 
-/** Where it was sent and, when the partner did not accept it, the partner's reason. */
+/** Where it was sent and, when the partner or portal did not accept it, its reason. */
 export function sentText(row: PartnerMessageRow): string {
-  const reason = row.ackCode !== "AA" && row.ackText ? ` · Partner: ${row.ackText}` : "";
+  const who = row.connection?.protocol === "portal_https" ? "Portal" : "Partner";
+  const reason = row.ackCode !== "AA" && row.ackText ? ` · ${who}: ${row.ackText}` : "";
   return `Sent to ${row.writtenPath}${reason}`;
 }
 

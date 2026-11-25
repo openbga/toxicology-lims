@@ -21,6 +21,10 @@ folder: string,
  */
 processedFolder: string | null, failedFolder: string | null, 
 /**
+ * For the LIMSiq Patient Portal: the address each message is posted to.
+ */
+ingestUrl: string | null, 
+/**
  * For SFTP password sign-in: whether a password is kept. The password itself never
  * leaves the engine.
  */

@@ -47,13 +47,23 @@ const code = (key: string, text: string) => (
  * Where it writes, as in the mockup: the protocol and folder; for SFTP the protocol with the
  * server, the remote folder and the sign-in with the server's fingerprint; for MLLP the
  * partner's address and the acknowledgement the LIS waits for, or where the LIS listens, for
- * whom, and whether it listens now.
+ * whom, and whether it listens now; for the patient portal its ingest address, laboratory code
+ * and API user. A sealed secret is never shown.
  */
 function destinationItems(
-  { folder, settings, listener }: PartnerConnection,
+  { folder, settings, listener, ingestUrl }: PartnerConnection,
   formatTime: (at: string) => string,
 ): [string, ReactNode][] {
-  const { sftp, mllp, mllpListener } = settings;
+  const { sftp, mllp, mllpListener, portal } = settings;
+  if (portal) {
+    return [
+      ["Protocol", `${PROTOCOLS.portal_https} – HTTPS`],
+      ["Ingest address", code("ingest", ingestUrl ?? "")],
+      ["Laboratory code", portal.labCode],
+      ["API user", portal.apiUser],
+      ["API token", "Kept sealed"],
+    ];
+  }
   if (mllpListener) {
     return [
       ["Protocol", `${PROTOCOLS.mllp_listen} – ${socketText(mllpListener)}`],
@@ -112,9 +122,10 @@ function workingItems(connection: PartnerConnection): [string, ReactNode][] {
     ];
   }
   const type = settings.messageType;
-  const fileName: [string, ReactNode][] = settings.mllp
-    ? []
-    : [["File name", code("file-name", settings.fileNamePattern)]];
+  const fileName: [string, ReactNode][] =
+    settings.mllp || settings.portal
+      ? []
+      : [["File name", code("file-name", settings.fileNamePattern)]];
   return [
     ["Send when", `${SEND_WHEN[type]} · ${scheduleText(settings.schedule).toLowerCase()}`],
     ...fileName,

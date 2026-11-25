@@ -36,10 +36,10 @@
   gap: var(--space-2);
 }
 
-/* The four cards share one line; they wrap only on a narrow window. */
+/* The five cards share one line; they wrap only on a narrow window. */
 .card {
   display: flex;
-  flex: 1 1 13rem;
+  flex: 1 1 10rem;
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-3);

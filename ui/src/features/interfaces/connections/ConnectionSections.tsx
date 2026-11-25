@@ -94,8 +94,9 @@ export function WhenSection() {
   const { control } = useFormContext<ConnectionValues>();
   const scheduleKind = useWatch({ control, name: "schedule.kind" });
   const messageType = useWatch({ control, name: "messageType" });
-  // An MLLP message travels as it is: there is no file to name.
-  const namesFiles = useWatch({ control, name: "protocol" }) !== "mllp_connect";
+  // An MLLP or portal message travels as it is: there is no file to name.
+  const protocol = useWatch({ control, name: "protocol" });
+  const namesFiles = protocol !== "mllp_connect" && protocol !== "portal_https";
   const sendWhen =
     messageType === ""
       ? []

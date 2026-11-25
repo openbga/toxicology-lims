@@ -14,6 +14,7 @@ use super::contracts::partner_contract;
 use super::error::PartnerError;
 use super::mllp::NO_ACK;
 use super::model::{PartnerConnectionId, PartnerMessageType};
+use super::portal_settings::PortalSettings;
 use super::received_queries::intake_counts;
 use super::repo::{self, ConnectionRow};
 use crate::folder_path::without_verbatim_prefix;
@@ -154,8 +155,9 @@ fn connection_view(
         "set_partner_connection_active".to_owned(),
         "test_partner_folder".to_owned(),
     ];
-    // An incoming connection only reads: the LIS sends it nothing.
-    if !row.settings.message_type.incoming() {
+    // An incoming connection only reads: the LIS sends it nothing. The portal would file a
+    // test message as a patient's results.
+    if !row.settings.message_type.incoming() && row.settings.portal.is_none() {
         allowed_actions.push("send_partner_test_message".to_owned());
     }
     if verification.is_none() {
@@ -168,6 +170,7 @@ fn connection_view(
     });
     Ok(PartnerConnection {
         id: row.id,
+        ingest_url: row.settings.portal.as_ref().map(PortalSettings::ingest_url),
         settings: row.settings,
         folder: without_verbatim_prefix(&row.folder),
         processed_folder,

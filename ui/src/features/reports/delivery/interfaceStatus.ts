@@ -14,6 +14,7 @@ const LEFT_AS: Record<PartnerProtocol, string> = {
   sftp: "Uploaded",
   mllp_connect: "Sent",
   mllp_listen: "Sent",
+  portal_https: "Sent",
 };
 
 /** The decision a person recorded on a message that matched no connection. */

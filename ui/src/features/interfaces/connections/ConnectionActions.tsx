@@ -19,6 +19,7 @@ import { problemText } from "../labels";
 import { socketText, testAnswerText } from "../mllpLabels";
 import { CheckDialog } from "./CheckDialog";
 import { ConnectionDialog } from "./ConnectionDialog";
+import styles from "./ConnectionPage.module.css";
 import { type TestOutcome, TestStatus } from "./TestStatus";
 
 type Open = "edit" | "active" | "check" | null;
@@ -35,6 +36,8 @@ export function ConnectionActions({ connection }: { connection: PartnerConnectio
   const allowed = (action: string) => connection.allowedActions.includes(action);
   const mllp = connection.settings.protocol === "mllp_connect";
   const listener = connection.settings.mllpListener;
+  // The portal would file a test message as a patient's results: the engine offers none.
+  const portal = connection.settings.protocol === "portal_https";
   // An MLLP partner that answers AE or AR has the message, but did not accept it.
   const tested = (done: (outcome: FolderTestResult) => string) => (outcome: FolderTestResult) => {
     if (outcome.problem !== null) {
@@ -44,14 +47,7 @@ export function ConnectionActions({ connection }: { connection: PartnerConnectio
     const ok = outcome.ackCode === undefined || outcome.ackCode === "AA";
     setResult({ ok, text: `${ok ? "✓" : "✗"} ${done(outcome)}` });
   };
-  const test = useCommandMutation<FolderTestResult, { input: { connectionId: string } }>(
-    TEST_FOLDER,
-    { invalidates: [] },
-  );
-  const sendTest = useCommandMutation<FolderTestResult, { input: { connectionId: string } }>(
-    SEND_TEST_MESSAGE,
-    { invalidates: CONNECTION_QUERIES },
-  );
+  const { test, sendTest } = useTests();
   const input = { connectionId: connection.id };
   const testError = test.error ?? sendTest.error;
   return (
@@ -68,12 +64,7 @@ export function ConnectionActions({ connection }: { connection: PartnerConnectio
               test.mutate(
                 { input },
                 {
-                  onSuccess: tested(() => {
-                    if (listener) return `The LIS can listen on ${socketText(listener)}.`;
-                    return mllp
-                      ? "The partner's interface takes a connection; nothing was sent."
-                      : "The LIS can create, write and remove files here.";
-                  }),
+                  onSuccess: tested(() => reachedText(connection)),
                 },
               )
             }
@@ -105,6 +96,7 @@ export function ConnectionActions({ connection }: { connection: PartnerConnectio
         )}
         <TestStatus status={result} />
       </div>
+      {portal && <p className={styles.hint}>{NO_PORTAL_TEST}</p>}
       {testError && <ErrorState title="Test not run" error={testError} />}
       {open === "edit" && (
         <ConnectionDialog connection={connection} onClose={() => setOpen(null)} />
@@ -113,6 +105,32 @@ export function ConnectionActions({ connection }: { connection: PartnerConnectio
       {open === "active" && <ActiveDialog connection={connection} onClose={() => setOpen(null)} />}
     </>
   );
+}
+
+/** Test connection, which writes nothing, and Send test message, which logs the test. */
+function useTests() {
+  type Input = { input: { connectionId: string } };
+  const test = useCommandMutation<FolderTestResult, Input>(TEST_FOLDER, { invalidates: [] });
+  const sendTest = useCommandMutation<FolderTestResult, Input>(SEND_TEST_MESSAGE, {
+    invalidates: CONNECTION_QUERIES,
+  });
+  return { test, sendTest };
+}
+
+const NO_PORTAL_TEST =
+  "No test message to the portal: it would file it as a patient's results. Test connection signs in without filing anything.";
+
+/** What a passed Test connection (or Test listener) found, by protocol. */
+function reachedText({ settings }: PartnerConnection): string {
+  if (settings.mllpListener) return `The LIS can listen on ${socketText(settings.mllpListener)}.`;
+  switch (settings.protocol) {
+    case "portal_https":
+      return "The portal accepted the API user and token; nothing was filed.";
+    case "mllp_connect":
+      return "The partner's interface takes a connection; nothing was sent.";
+    default:
+      return "The LIS can create, write and remove files here.";
+  }
 }
 
 /** Stop or Start, with a reason. */

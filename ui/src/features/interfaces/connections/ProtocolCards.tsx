@@ -5,8 +5,8 @@ import type { ConnectionValues } from "./connectionForm";
 
 /**
  * The protocols of the Interfaces mockup and the message types each carries: a folder and SFTP
- * carry every type; the LIS connects over MLLP to send HL7 results, and listens over MLLP to
- * receive HL7 orders.
+ * carry every type; the LIS connects over MLLP to send HL7 results, listens over MLLP to
+ * receive HL7 orders, and posts HL7 results to the LIMSiq Patient Portal over HTTPS.
  */
 const PROTOCOLS = [
   { id: "folder", label: "Folder", hint: "Shared folder on the lab network", carries: () => true },
@@ -28,11 +28,17 @@ const PROTOCOLS = [
     hint: "Partner connects on the lab network only",
     carries: (type: string) => type === "hl7_orders",
   },
+  {
+    id: "portal_https",
+    label: "LIMSiq Patient Portal",
+    hint: "HL7 results to the patient portal, over HTTPS",
+    carries: (type: string) => type === "hl7_oru",
+  },
 ] as const;
 
 /**
  * Section 2, the protocol, as one choice among cards. A card the chosen message cannot travel
- * by is shown, not offered, and the line below says which messages MLLP carries.
+ * by is shown, not offered, and the line below says which messages MLLP and the portal carry.
  */
 export function ProtocolCards() {
   const { control } = useFormContext<ConnectionValues>();
@@ -71,7 +77,8 @@ export function ProtocolCards() {
         )}
       />
       <p className={styles.hint}>
-        MLLP – LIS connects sends HL7 Results. MLLP – LIS listens receives HL7 Orders.
+        MLLP – LIS connects and LIMSiq Patient Portal send HL7 Results. MLLP – LIS listens receives
+        HL7 Orders.
       </p>
     </>
   );
