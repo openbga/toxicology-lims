@@ -29,6 +29,10 @@ givenNames: string | null,
  */
 active: boolean, 
 /**
+ * Telephone number; required, so a practitioner without one gets it at the next correction.
+ */
+phone: string, 
+/**
  * Required explanation of the factual correction or retirement.
  */
 reason: string, };

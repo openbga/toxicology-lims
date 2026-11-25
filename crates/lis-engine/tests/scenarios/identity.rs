@@ -160,6 +160,7 @@ async fn organization_call(engine: &Engine, name: &str) -> Option<Result<(), Com
                 npi: "1234567893".to_owned(),
                 family_name: "Synthetic".to_owned(),
                 given_names: None,
+                phone: "(555) 555-0100".to_owned(),
             })
             .await
             .map(drop),
@@ -381,6 +382,7 @@ async fn an_administrator_configures_clients_and_practitioners_for_order_entry()
             npi: "1234567893".to_owned(),
             family_name: "Synthetic".to_owned(),
             given_names: Some("Prescriber".to_owned()),
+            phone: "(555) 555-0100".to_owned(),
         })
         .await
         .unwrap();
@@ -398,6 +400,7 @@ async fn an_administrator_configures_clients_and_practitioners_for_order_entry()
             npi: "1234567890".to_owned(),
             family_name: "Synthetic".to_owned(),
             given_names: None,
+            phone: "(555) 555-0100".to_owned(),
         })
         .await
         .unwrap_err();

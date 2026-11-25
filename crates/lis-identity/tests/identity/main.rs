@@ -10,6 +10,7 @@ mod email;
 mod holds;
 mod laboratory;
 mod organizations;
+mod practitioner_phone;
 mod search;
 mod subjects;
 

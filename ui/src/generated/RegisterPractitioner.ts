@@ -15,4 +15,8 @@ familyName: string,
 /**
  * Given names.
  */
-givenNames?: string | null, };
+givenNames?: string | null, 
+/**
+ * Telephone number, which the patient portal shows with each result.
+ */
+phone: string, };

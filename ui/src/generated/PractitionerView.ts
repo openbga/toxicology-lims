@@ -27,4 +27,8 @@ familyName: string,
 /**
  * Given names.
  */
-givenNames: string | null, };
+givenNames: string | null, 
+/**
+ * Telephone number; absent for a practitioner registered before it was required.
+ */
+phone: string | null, };

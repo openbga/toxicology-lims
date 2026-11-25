@@ -249,6 +249,8 @@ pub struct PractitionerView {
     pub family_name: String,
     /// Given names.
     pub given_names: Option<String>,
+    /// Telephone number; absent for a practitioner registered before it was required.
+    pub phone: Option<String>,
 }
 
 /// A subject as search results and other modules show it: the current

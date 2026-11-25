@@ -150,6 +150,7 @@ async fn directory(engine: &Engine, existing: usize) {
                 npi,
                 family_name: format!("SYN-PRACTITIONER-{index:05}"),
                 given_names: Some("Capacity fixture".to_owned()),
+                phone: "(555) 555-0100".to_owned(),
             })
             .await
             .unwrap();

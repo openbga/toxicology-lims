@@ -5,11 +5,13 @@ import { CommandDialog } from "@/lib/CommandDialog";
 import { optionalText } from "@/lib/choices";
 import { DIRECTORY_STATES } from "../clients/CorrectClientDialog";
 import { LIST_PRACTITIONERS } from "../contract";
+import { formatPhoneAsTyped, PRACTITIONER_PHONE_HELP, validatePractitionerPhone } from "./phone";
 
 interface Values {
   npi: string;
   familyName: string;
   givenNames: string;
+  phone: string;
   state: string | null;
   reason: string;
 }
@@ -32,6 +34,7 @@ export function CorrectPractitionerDialog({
         npi: practitioner.npi,
         familyName: practitioner.familyName,
         givenNames: practitioner.givenNames ?? "",
+        phone: practitioner.phone ?? "",
         state: practitioner.active ? "active" : "retired",
         reason: "",
       }}
@@ -41,6 +44,7 @@ export function CorrectPractitionerDialog({
         npi: values.npi.trim(),
         familyName: values.familyName.trim(),
         givenNames: optionalText(values.givenNames),
+        phone: values.phone.trim(),
         active: values.state === "active",
         reason: values.reason.trim(),
       })}
@@ -69,6 +73,18 @@ export function CorrectPractitionerDialog({
         name="givenNames"
         label="Given names"
         description="Optional supplied names, up to 200 characters."
+      />
+      <TextInput
+        name="phone"
+        label="Phone"
+        isRequired
+        info={PRACTITIONER_PHONE_HELP}
+        validate={validatePractitionerPhone}
+        mask={formatPhoneAsTyped}
+        placeholder="(555) 555-0100"
+        description={
+          practitioner.phone ? undefined : "Not recorded yet. Required with this correction."
+        }
       />
       <ChoiceInput
         name="state"

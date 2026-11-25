@@ -576,6 +576,7 @@ async fn accepted_order(
             npi: "1234567893".to_owned(),
             family_name: "Synthetic".to_owned(),
             given_names: None,
+            phone: "(555) 555-0100".to_owned(),
         })
         .await
         .unwrap();

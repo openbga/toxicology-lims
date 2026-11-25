@@ -96,6 +96,7 @@ async fn directory_call(engine: &Engine, name: &str) -> Option<Result<(), Comman
                 given_names: None,
                 active: true,
                 reason: "Verified correction".into(),
+                phone: "(555) 555-0100".to_owned(),
             })
             .await
             .map(drop),

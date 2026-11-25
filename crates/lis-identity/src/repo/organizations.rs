@@ -68,6 +68,7 @@ pub(crate) struct NewPractitioner<'a> {
     pub(crate) npi: &'a Npi,
     pub(crate) family_name: &'a str,
     pub(crate) given_names: Option<&'a str>,
+    pub(crate) phone: &'a str,
     pub(crate) created_at: UtcTimestamp,
 }
 
@@ -76,14 +77,15 @@ pub(crate) fn insert_practitioner(
     new: &NewPractitioner<'_>,
 ) -> rusqlite::Result<()> {
     conn.prepare_cached(
-        "INSERT INTO idn_practitioners (id, npi, family_name, given_names, created_at) \
-         VALUES (?1, ?2, ?3, ?4, ?5)",
+        "INSERT INTO idn_practitioners (id, npi, family_name, given_names, phone, created_at) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
     )?
     .execute(params![
         new.id,
         new.npi.as_str(),
         new.family_name,
         new.given_names,
+        new.phone,
         new.created_at,
     ])?;
     Ok(())
@@ -145,12 +147,13 @@ fn practitioner_view(row: &Row<'_>) -> rusqlite::Result<PractitionerView> {
         given_names: row.get(3)?,
         active: row.get(4)?,
         revision: row.get(5)?,
+        phone: row.get(6)?,
     })
 }
 
 pub(crate) fn practitioners(conn: &Connection) -> rusqlite::Result<Vec<PractitionerView>> {
     conn.prepare_cached(
-        "SELECT id, npi, family_name, given_names, active, revision FROM idn_practitioners \
+        "SELECT id, npi, family_name, given_names, active, revision, phone FROM idn_practitioners \
          ORDER BY family_name, id",
     )?
     .query_map([], practitioner_view)?
@@ -162,7 +165,7 @@ pub(crate) fn practitioner(
     id: PractitionerId,
 ) -> rusqlite::Result<Option<PractitionerView>> {
     conn.prepare_cached(
-        "SELECT id, npi, family_name, given_names, active, revision FROM idn_practitioners WHERE id = ?1",
+        "SELECT id, npi, family_name, given_names, active, revision, phone FROM idn_practitioners WHERE id = ?1",
     )?
     .query_row([id], practitioner_view)
     .optional()

@@ -3,4 +3,8 @@
 /**
  * Saved facts from a single revision.
  */
-export type DirectorySnapshot = { "kind": "client", code: string, name: string, active: boolean, } | { "kind": "location", code: string, name: string, active: boolean, } | { "kind": "practitioner", npi: string, family_name: string, given_names: string | null, active: boolean, };
+export type DirectorySnapshot = { "kind": "client", code: string, name: string, active: boolean, } | { "kind": "location", code: string, name: string, active: boolean, } | { "kind": "practitioner", npi: string, family_name: string, given_names: string | null, active: boolean, 
+/**
+ * Absent in revisions from before the phone was required.
+ */
+phone: string | null, };

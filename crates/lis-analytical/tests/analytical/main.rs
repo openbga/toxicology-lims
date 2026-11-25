@@ -151,6 +151,7 @@ pub(crate) fn fixture_on(modules: &[lis_core::ModuleSchema]) -> Fixture {
                 npi: "1234567893".to_owned(),
                 family_name: "Synthetic".to_owned(),
                 given_names: Some("Prescriber".to_owned()),
+                phone: "(555) 555-0100".to_owned(),
             },
         )
     });

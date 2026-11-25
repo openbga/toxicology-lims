@@ -230,6 +230,7 @@ fn register_fixtures(
             npi: NPI.to_owned(),
             family_name: "Acceptance".to_owned(),
             given_names: Some("Synthetic".to_owned()),
+            phone: "(555) 555-0100".to_owned(),
         },
     );
     match registered {

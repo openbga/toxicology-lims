@@ -165,42 +165,50 @@
     {
       "npi": "2395716998",
       "familyName": "Tessingham",
-      "givenNames": "Anika"
+      "givenNames": "Anika",
+      "phone": "(555) 555-0101"
     },
     {
       "npi": "1391039819",
       "familyName": "Marrowby",
-      "givenNames": "Theodore"
+      "givenNames": "Theodore",
+      "phone": "(555) 555-0102"
     },
     {
       "npi": "1923772028",
       "familyName": "Dunmarrow",
-      "givenNames": "Rosalind"
+      "givenNames": "Rosalind",
+      "phone": "(555) 555-0103"
     },
     {
       "npi": "1299566574",
       "familyName": "Harrowmere",
-      "givenNames": "Emeka"
+      "givenNames": "Emeka",
+      "phone": "(555) 555-0104"
     },
     {
       "npi": "2767634027",
       "familyName": "Corbinwyck",
-      "givenNames": "Lucia"
+      "givenNames": "Lucia",
+      "phone": "(555) 555-0105"
     },
     {
       "npi": "2319071785",
       "familyName": "Sundermere",
-      "givenNames": "Samuel"
+      "givenNames": "Samuel",
+      "phone": "(555) 555-0106"
     },
     {
       "npi": "2280606353",
       "familyName": "Eldermoor",
-      "givenNames": "Hana"
+      "givenNames": "Hana",
+      "phone": "(555) 555-0107"
     },
     {
       "npi": "1307140347",
       "familyName": "Bexhallow",
-      "givenNames": "Gideon"
+      "givenNames": "Gideon",
+      "phone": "(555) 555-0108"
     }
   ],
   "patients": [

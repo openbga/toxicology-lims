@@ -2,7 +2,7 @@
   "id": "laboratory-directory",
   "title": "Laboratory and ordering directories",
   "summary": "Set the laboratory profile and register the clients and practitioners referenced by orders.",
-  "reviewedOn": "2026-11-17",
+  "reviewedOn": "2026-11-25",
   "routes": [
     "/configuration/laboratory",
     "/configuration/clients",
@@ -420,6 +420,12 @@
           "rules": "Optional; absent values show Not provided."
         },
         {
+          "name": "Phone",
+          "meaning": "The ordering practitioner's phone. The LIMSiq Patient Portal shows it to patients with each result, so they can call the practitioner; the info icon beside the label says so.",
+          "values": "A US number of 10 digits, (555) 555-0100. Type only the digits: the field adds the brackets, space and hyphen as you type, ignores letters and anything after the tenth digit, and drops a pasted +1 country code. Deleting a bracket, space or hyphen deletes the digit before it. The list's Phone column shows a yellow Not recorded badge, and the panel shows Not recorded, for a practitioner registered before the phone was required. The panel of such a practitioner also shows the warning Phone not recorded, with an Add phone button that opens Correct practitioner for people who can manage configuration.",
+          "rules": "Required in Register practitioner and in Correct practitioner. A number with fewer than 10 digits is refused as Wrong phone format. A practitioner without a phone keeps working for orders; Correct practitioner says Not recorded yet. Required with this correction."
+        },
+        {
           "name": "Availability / Revision",
           "meaning": "Shows whether this retained directory identity may be selected for new orders and which correction revision is displayed.",
           "values": "Active or Retired; positive revision number.",
@@ -434,15 +440,15 @@
         {
           "name": "Correction history: Revision / Saved facts / Recorded / Recorded by / Reason",
           "meaning": "Shows original registration and each factual correction or retirement, newest revision first.",
-          "values": "Saved code/name or NPI/names and availability; timestamp, the acting person’s account name (an account that cannot be found shows as user followed by its identifier), explanation.",
+          "values": "Saved NPI, names, the practitioner's phone (No phone in revisions from before it was required) and availability; timestamp, the acting person’s account name (an account that cannot be found shows as user followed by its identifier), explanation.",
           "rules": "Read-only and immutable. Migrated baseline shows Unknown — legacy baseline: its retained creation time does not establish earlier edit chronology or an author. No historical attribution is invented."
         }
       ],
       "actions": [
         {
           "name": "Register practitioner",
-          "does": "Save the supplied NPI and names.",
-          "availableWhen": "Manage configuration; NPI is valid and unused.",
+          "does": "Save the supplied NPI, names and phone.",
+          "availableWhen": "Manage configuration; NPI is valid and unused; Phone is filled in and well formed.",
           "result": "Opens the registered practitioner panel with current facts and correction history."
         },
         {
@@ -453,8 +459,8 @@
         },
         {
           "name": "Correct practitioner / Save correction",
-          "does": "Records corrected supplied names/NPI or availability on the same practitioner identity.",
-          "availableWhen": "Manage configuration, current revision, valid unique NPI, at least one changed NPI, name or Availability value, and required reason.",
+          "does": "Records corrected supplied names/NPI, phone or availability on the same practitioner identity.",
+          "availableWhen": "Manage configuration, current revision, valid unique NPI, a well-formed Phone (required, also for a practitioner who had none), at least one changed NPI, name, phone or Availability value, and required reason.",
           "result": "Appends immutable prior/current facts and actor audit. Retired practitioners disappear from new order choices; historical lookup and accepted orders remain."
         },
         {
@@ -516,6 +522,8 @@
     "ui/src/features/configuration/clients/CorrectClientDialog.tsx",
     "ui/src/features/configuration/clients/DirectoryHistory.tsx",
     "ui/src/features/configuration/practitioners/CorrectPractitionerDialog.tsx",
+    "ui/src/features/configuration/practitioners/phone.ts",
+    "crates/lis-identity/migrations/0007_practitioner_phone.sql",
     "crates/lis-identity/src/directories.rs",
     "crates/lis-identity/migrations/0004_directory_history.sql",
     "crates/lis-identity/src/directories/history.rs"

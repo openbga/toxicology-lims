@@ -16,7 +16,7 @@ Strict JSON, UTF-8, camelCase keys. Records map one-to-one onto the input types 
 | `clients[]` | object | `CreateClient`: `code`, `name` |
 | `clients[].locations[]` | object | `AddClientLocation`: `code` (unique within the client), `name`; the loader supplies `clientId` |
 | `clients[].destinations[]` | object | `CreateDeliveryDestinationInput`: `channel` (`fax`, `email`, `mail`, `courier`, `pickup`), `address` (omitted for pickup; optional for courier), `label`; the loader supplies `clientId`. *Loader:* `locationCode` (optional) names a location of the same client and resolves to `clientLocationId`; absent means client-level |
-| `practitioners[]` | object | `RegisterPractitioner`: `npi`, `familyName`, `givenNames` |
+| `practitioners[]` | object | `RegisterPractitioner`: `npi`, `familyName`, `givenNames`, `phone` (fictitious `(555) 555-01xx`) |
 | `demoCutoffs[]` | object | *Loader only.* `method` and `analyte` (Standard Catalog codes), `value` (lexical decimal string, in the method analyte's unit) and `label`, which must be exactly `Demo value, not a recommended cutoff`. Fills that cutoff in the loading user's draft of the method when it is blank; never replaces a value. Optional; absent means none |
 | `patients[]` | object | `RegisterSubject`: `demographics` (`DemographicsInput`: `familyName`, `givenNames` optional, `birthDate` as `YYYY-MM-DD`, `administrativeSex` optional), `source`, `identifiers[]` (`IdentifierInput`: `assigningAuthority`, `identifierType`, `value`). *Loader:* `key` (file-local id, `P01`...) and `acknowledgeCandidates` (keys of earlier patients), which the loader resolves to `acknowledgedCandidates` subject IDs |
 
