@@ -13,7 +13,9 @@
 mod folder_write;
 pub(crate) mod hl7_message;
 pub(crate) mod hl7_payload;
+pub(crate) mod hl7_portal;
 pub(crate) mod mllp;
+pub(crate) mod portal;
 pub(crate) mod sftp;
 
 use std::path::Path;
@@ -27,6 +29,7 @@ use lis_auth::DataKey;
 use lis_core::{Capability, CorrelationId, Principal, UtcTimestamp};
 use lis_interfaces::partner::{
     AttemptOutcome, Destination, DueDelivery, MessageSource, PartnerError, PartnerMessageType,
+    PortalSettings,
 };
 use lis_reporting::ReportRevisionId;
 use lis_store::{ArtifactDigest, Database};
@@ -147,8 +150,13 @@ impl PartnerDeliveries {
         };
         let outcome = match bytes {
             Some(bytes) => {
-                let (date, time) = stamp(delivery.created_at, zone);
-                let name = delivery.file_name(&date, &time);
+                // The portal files nothing by name: the delivery ID keys a retry instead.
+                let name = if delivery.destination.portal.is_some() {
+                    delivery.delivery_id.to_string()
+                } else {
+                    let (date, time) = stamp(delivery.created_at, zone);
+                    delivery.file_name(&date, &time)
+                };
                 let key = locked(&self.ops.key).usable().ok();
                 send(db, key.as_ref(), &delivery.destination, &name, &bytes)
             }
@@ -187,7 +195,8 @@ fn stored(db: &Database, digest: &str) -> Option<Vec<u8>> {
 }
 
 /// Writes `bytes` as `name` into the destination's folder or onto its SFTP server, with the
-/// installation `key` for the sign-in, or sends them to its MLLP partner, unnamed.
+/// installation `key` for the sign-in, sends them to its MLLP partner, unnamed, or posts
+/// them to the LIMSiq Patient Portal with `name`, the delivery ID, as the idempotency key.
 /// Blocking: call it off the async runtime.
 pub(crate) fn send(
     db: &Database,
@@ -211,6 +220,9 @@ pub(crate) fn send(
             },
         };
     }
+    if let Some(portal) = &destination.portal {
+        return post_to_portal(key, destination, portal, name, bytes);
+    }
     let Some(server) = &destination.sftp else {
         return written(write_file(Path::new(&destination.folder), name, bytes));
     };
@@ -231,11 +243,44 @@ pub(crate) fn send(
     }
 }
 
+/// Posts `bytes` to the portal with the connection's token, `idempotency_key` naming the
+/// delivery. Blocking.
+fn post_to_portal(
+    key: Option<&DataKey>,
+    destination: &Destination,
+    portal: &PortalSettings,
+    idempotency_key: &str,
+    bytes: &[u8],
+) -> AttemptOutcome {
+    let Some(token) = portal::token(key, destination.sealed_password.as_deref()) else {
+        return AttemptOutcome::Failed {
+            error_code: "token_unreadable",
+        };
+    };
+    let sent = tokio::runtime::Handle::current().block_on(portal::send(
+        portal,
+        &token,
+        idempotency_key,
+        bytes,
+    ));
+    match sent {
+        Ok(answer) => AttemptOutcome::Acknowledged {
+            to: portal.ingest_url(),
+            code: answer.code,
+            text: Some(answer.text),
+        },
+        Err(problem) => AttemptOutcome::Failed {
+            error_code: problem.code(),
+        },
+    }
+}
+
 /// Why a destination test failed.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum ProbeProblem {
     Sftp(sftp::SftpProblem),
     Mllp(mllp::MllpProblem),
+    Portal(portal::PortalProblem),
     /// The LIS cannot listen there, such as `port_in_use`.
     Listener(&'static str),
 }
@@ -246,6 +291,7 @@ impl ProbeProblem {
         match self {
             Self::Sftp(problem) => problem.code(),
             Self::Mllp(problem) => problem.code(),
+            Self::Portal(problem) => problem.code(),
             Self::Listener(code) => code,
         }
     }
@@ -263,6 +309,13 @@ pub(crate) fn probe_destination(
         return tokio::runtime::Handle::current()
             .block_on(mllp::probe(partner))
             .map_err(ProbeProblem::Mllp);
+    }
+    if let Some(settings) = &destination.portal {
+        let token = portal::token(key, destination.sealed_password.as_deref())
+            .ok_or(ProbeProblem::Portal(portal::PortalProblem::Unauthorized))?;
+        return tokio::runtime::Handle::current()
+            .block_on(portal::probe(settings, &token))
+            .map_err(ProbeProblem::Portal);
     }
     let input = Path::new(&destination.folder);
     let Some(server) = &destination.sftp else {

@@ -175,6 +175,11 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "reject_held_received",
         sql: include_str!("../migrations/0018_reject_held_received.sql"),
     },
+    Migration {
+        version: 19,
+        name: "portal_connections",
+        sql: include_str!("../migrations/0019_portal_connections.sql"),
+    },
 ];
 
 /// Schema descriptor for tables owned by this crate.

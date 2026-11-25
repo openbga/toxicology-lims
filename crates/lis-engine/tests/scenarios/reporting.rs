@@ -11,6 +11,7 @@ mod partner_hl7;
 mod partner_message_detail;
 mod partner_mllp;
 mod partner_pdfs;
+mod partner_portal;
 
 use std::path::PathBuf;
 

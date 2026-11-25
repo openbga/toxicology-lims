@@ -35,6 +35,7 @@ fn settings() -> PartnerConnectionSettings {
         intake: None,
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 

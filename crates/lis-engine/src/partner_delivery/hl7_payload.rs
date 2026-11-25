@@ -2,7 +2,9 @@
 //! connection's approved code mappings, kept in the artifact store with the mapping
 //! version, and read back for every retry, so a retry writes the same bytes. Without a
 //! mapping, or without a patient identifier for PID-3 (#4676), the delivery is held and
-//! nothing is recorded; every pass looks again.
+//! nothing is recorded; every pass looks again. For the LIMSiq Patient Portal (#4672) the
+//! message takes the portal profile and the revision's PDF, and waits without the
+//! patient's email or the practitioner's phone.
 
 use std::collections::HashMap;
 
@@ -17,6 +19,7 @@ use lis_store::Database;
 use rusqlite::Connection;
 
 use super::hl7_message::{self, Header, Missing};
+use super::hl7_portal::{portal_gap, portal_oru};
 use super::{COMPONENT, stored};
 use crate::commands::partner::ReportRoutingError;
 
@@ -40,6 +43,8 @@ pub(crate) struct Target {
     pub(crate) source_id: Option<String>,
     /// Sent over MLLP, which answers each message.
     pub(crate) acknowledged: bool,
+    /// Sent to the LIMSiq Patient Portal: its profile, with the PDF.
+    pub(crate) portal: bool,
 }
 
 impl Target {
@@ -52,12 +57,14 @@ impl Target {
             source: delivery.source,
             source_id: delivery.source_id.clone(),
             acknowledged: delivery.destination.mllp.is_some(),
+            portal: delivery.destination.portal.is_some(),
         }
     }
 }
 
-/// The ORU and the mapping version it used, or what it misses.
-pub(crate) type Made = Result<(Oru, i64), Vec<Missing>>;
+/// The ORU, the mapping version it used and, for the portal, the digest of the PDF to
+/// attach; or what it misses.
+pub(crate) type Made = Result<(Oru, i64, Option<String>), Vec<Missing>>;
 
 /// Reads what the message needs, in one read, and makes it. When the released revision
 /// names no patient identifier, PID-3 carries the patient's active identifiers now: the
@@ -75,13 +82,19 @@ pub(crate) fn make(conn: &Connection, target: &Target) -> Result<Made, ReportRou
         acknowledged: target.acknowledged,
     };
     let version = mappings.as_ref().map_or(0, |mappings| mappings.version);
-    let mut made = hl7_message::oru(&revision, mappings.as_ref(), &loinc, &header);
-    if let Ok(oru) = &mut made
-        && oru.patient.identifiers.is_empty()
-    {
+    let mut oru = match hl7_message::oru(&revision, mappings.as_ref(), &loinc, &header) {
+        Ok(oru) => oru,
+        Err(missing) => return Ok(Err(missing)),
+    };
+    if target.portal {
+        // A withdrawn report's content was wrong: its PDF is not sent again.
+        let pdf = (!header.withdrawal).then(|| revision.artifact_sha256.clone());
+        return Ok(Ok((portal_oru(conn, &revision, oru)?, version, pdf)));
+    }
+    if oru.patient.identifiers.is_empty() {
         oru.patient.identifiers = current_identifiers(conn, revision.snapshot.subject.subject_id)?;
     }
-    Ok(made.map(|oru| (oru, version)))
+    Ok(Ok((oru, version, None)))
 }
 
 /// The patient's active identifiers: value, assigning authority and type.
@@ -135,7 +148,7 @@ pub(crate) fn payload(db: &Database, delivery: &DueDelivery) -> Payload {
     }
     let delivery_id = delivery.delivery_id;
     let target = Target::of(delivery);
-    let (oru, version) = match db.read_blocking(move |conn| make(conn, &target)) {
+    let (mut oru, version, pdf) = match db.read_blocking(move |conn| make(conn, &target)) {
         Ok(Ok(made)) => made,
         Ok(Err(_missing)) => return Payload::Held,
         Err(error) => {
@@ -143,9 +156,17 @@ pub(crate) fn payload(db: &Database, delivery: &DueDelivery) -> Payload {
             return Payload::Held;
         }
     };
-    // PID-3 is required: never sent empty; Logs say why it waits.
-    if oru.patient.identifiers.is_empty() {
+    // PID-3 is required: never sent empty; for the portal, neither the email nor the
+    // practitioner's phone. Logs say why it waits.
+    if oru.patient.identifiers.is_empty() || portal_gap(&oru).is_some() {
         return Payload::Held;
+    }
+    if let (Some(digest), Some(fields)) = (pdf, oru.portal.as_mut()) {
+        let Some(bytes) = stored(db, &digest) else {
+            tracing::warn!(%delivery_id, error_code = "pdf_missing", "HL7 message not made");
+            return Payload::Held;
+        };
+        fields.pdf = Some(bytes);
     }
     let bytes = oru.encode();
     if let Err(code) = keep(db, delivery_id, &bytes, version) {

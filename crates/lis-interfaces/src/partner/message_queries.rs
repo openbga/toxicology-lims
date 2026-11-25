@@ -85,6 +85,13 @@ text_enum! {
         /// The patient has no identifier for PID-3, which HL7 v2.5.1 requires: it is
         /// held until one is added (#4676). Set by the engine.
         NoPatientIdentifier = "no_patient_identifier",
+        /// For the LIMSiq Patient Portal: the patient has no email, which is their
+        /// consent, so nothing goes to the portal until one is added (#4672). Set by the
+        /// engine.
+        NoPortalEmail = "no_portal_email",
+        /// For the LIMSiq Patient Portal: the ordering practitioner has no phone, which
+        /// the portal shows with each result (#4672). Set by the engine.
+        NoPractitionerPhone = "no_practitioner_phone",
     }
 }
 

@@ -30,7 +30,7 @@ pub fn outgoing_cases(
         let mappings = approved_mappings(conn, row.id)?;
         cases.extend(hl7_cases(settings, mappings.as_ref()));
     }
-    if !settings.message_type.incoming() && !settings.over_mllp() {
+    if !settings.message_type.incoming() && !settings.without_files() {
         cases.push(file_name_case(settings));
     }
     Ok(cases)

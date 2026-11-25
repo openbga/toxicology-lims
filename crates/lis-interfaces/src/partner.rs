@@ -45,6 +45,7 @@ mod mllp_model;
 mod mllp_rejections;
 mod mllp_settings;
 mod model;
+mod portal_settings;
 mod queries;
 mod queue;
 mod received;
@@ -112,6 +113,7 @@ pub use model::{
     RoutingValue, RuleCondition, RuleField, Schedule, SetPartnerConnectionActive, SftpAuth,
     SftpSettings, UnknownPatient, UnroutedResolution, UpdatePartnerConnection,
 };
+pub use portal_settings::{PortalSettings, valid_portal_settings};
 pub use queries::{carries, get_partner_connection, list_partner_connections};
 pub use queue::{FailedItem, UnroutedItem, failed_queue, unrouted_queue};
 pub use received::{

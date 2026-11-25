@@ -192,6 +192,15 @@ impl Engine {
             self.authorize(&call).await?;
             let id = input.connection_id;
             let target = self.connection_folder(&call, id).await?;
+            // The portal files every message it takes as a patient's results.
+            if target.destination.portal.is_some() {
+                return Err(Failure::refused(
+                    ErrorCode::Conflict,
+                    "The LIMSiq Patient Portal would file a test message as a patient's \
+                     results. Use Test connection: it checks the address and token and files \
+                     nothing.",
+                ));
+            }
             let now = self.clock.now();
             let db = Arc::clone(&self.db);
             let laboratory = blocking(move || {

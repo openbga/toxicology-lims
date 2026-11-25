@@ -8,6 +8,7 @@ pub use super::intake_model::{IntakeSettings, MovedTo, MovedToChoice, UnknownPat
 pub use super::mllp_model::{
     AckCode, AllowedPartner, CharacterSet, MllpAcknowledgement, MllpListener, MllpPartner,
 };
+use super::portal_settings::PortalSettings;
 
 /// Marker for one connection to an outside system.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,6 +66,8 @@ text_enum! {
         MllpConnect = "mllp_connect",
         /// HL7 over MLLP from the partner, on the lab network only; the LIS listens.
         MllpListen = "mllp_listen",
+        /// HL7 results posted over HTTPS to the LIMSiq Patient Portal's ingest API (#4672).
+        PortalHttps = "portal_https",
     }
 }
 
@@ -259,6 +262,9 @@ pub struct PartnerConnectionSettings {
     /// Where the LIS listens, for MLLP – LIS listens; `None` otherwise.
     #[serde(default)]
     pub mllp_listener: Option<MllpListener>,
+    /// The portal's ingest API, for the LIMSiq Patient Portal; `None` otherwise.
+    #[serde(default)]
+    pub portal: Option<PortalSettings>,
 }
 
 impl PartnerConnectionSettings {
@@ -266,6 +272,12 @@ impl PartnerConnectionSettings {
     #[must_use]
     pub const fn over_mllp(&self) -> bool {
         self.mllp.is_some() || self.mllp_listener.is_some()
+    }
+
+    /// Whether messages travel over MLLP or to the portal: no folder, no file name.
+    #[must_use]
+    pub const fn without_files(&self) -> bool {
+        self.over_mllp() || self.portal.is_some()
     }
 }
 

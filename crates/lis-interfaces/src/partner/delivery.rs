@@ -23,6 +23,7 @@ use super::model::{
     PartnerConnectionId, PartnerDeliveryId, PartnerMessageId, PartnerMessageType, RoutingFacts,
     Schedule, SftpSettings,
 };
+use super::portal_settings::PortalSettings;
 use super::repo::{ConnectionRow, load_connection};
 use super::settings::{FileNameParts, file_name};
 
@@ -44,6 +45,8 @@ pub struct Destination {
     pub mllp: Option<MllpPartner>,
     /// For orders received over MLLP: where the LIS listens and who may connect.
     pub mllp_listener: Option<MllpListener>,
+    /// The LIMSiq Patient Portal's ingest API; its token is `sealed_password`.
+    pub portal: Option<PortalSettings>,
 }
 
 impl Destination {
@@ -55,6 +58,7 @@ impl Destination {
             moved_to: connection.moved_to.clone(),
             mllp: connection.settings.mllp.clone(),
             mllp_listener: connection.settings.mllp_listener.clone(),
+            portal: connection.settings.portal.clone(),
         }
     }
 }

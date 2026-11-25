@@ -13,14 +13,15 @@ use super::repo::ConnectionRow;
 const COLUMNS: &str = "id, name, partner, message_type, protocol, folder, folder_set_by, rules, \
      schedule, schedule_minutes, schedule_time, file_name_pattern, active, revision, sftp_host, \
      sftp_port, sftp_username, sftp_auth, sftp_fingerprint, sftp_password, destination, intake, \
-     processed_folder, failed_folder, mllp";
+     processed_folder, failed_folder, mllp, portal";
 
-/// The row, with its rules, intake and MLLP settings still as JSON.
+/// The row, with its rules, intake, MLLP and portal settings still as JSON.
 struct Stored {
     row: ConnectionRow,
     rules: String,
     intake: Option<String>,
     mllp: Option<String>,
+    portal: Option<String>,
 }
 
 fn connection_row(row: &Row<'_>) -> rusqlite::Result<Stored> {
@@ -62,6 +63,7 @@ fn connection_row(row: &Row<'_>) -> rusqlite::Result<Stored> {
                 intake: None,
                 mllp: None,
                 mllp_listener: None,
+                portal: None,
             },
             folder,
             moved_to,
@@ -74,6 +76,7 @@ fn connection_row(row: &Row<'_>) -> rusqlite::Result<Stored> {
         rules: row.get(7)?,
         intake: row.get(21)?,
         mllp: row.get(24)?,
+        portal: row.get(25)?,
     })
 }
 
@@ -85,6 +88,7 @@ fn decoded(stored: Stored) -> Result<ConnectionRow, PartnerError> {
         rules,
         intake,
         mllp,
+        portal,
     } = stored;
     row.settings.rules = serde_json::from_str(&rules)?;
     // The MLLP column holds the partner the LIS connects to, or where it listens.
@@ -94,6 +98,9 @@ fn decoded(stored: Stored) -> Result<ConnectionRow, PartnerError> {
         } else {
             row.settings.mllp = Some(serde_json::from_str(mllp)?);
         }
+    }
+    if let Some(portal) = portal.as_deref() {
+        row.settings.portal = Some(serde_json::from_str(portal)?);
     }
     if let Some(intake) = intake {
         let intake: IntakeSettings = serde_json::from_str(&intake)?;
@@ -178,7 +185,7 @@ pub(crate) fn insert_connection(
         &format!(
             "INSERT INTO ifc_partner_connections ({COLUMNS}, acceptance_key) VALUES (?1, ?2, \
              ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, \
-             ?21, ?22, ?23, ?24, ?25, ?26)"
+             ?21, ?22, ?23, ?24, ?25, ?26, ?27)"
         ),
         row,
     )
@@ -197,13 +204,13 @@ pub(crate) fn update_connection(
          revision = ?14, sftp_host = ?15, sftp_port = ?16, sftp_username = ?17, \
          sftp_auth = ?18, sftp_fingerprint = ?19, sftp_password = ?20, destination = ?21, \
          intake = ?22, processed_folder = ?23, failed_folder = ?24, mllp = ?25, \
-         acceptance_key = ?26 WHERE id = ?1",
+         portal = ?26, acceptance_key = ?27 WHERE id = ?1",
         row,
     )
 }
 
-/// Runs `sql` with the row's values as `?1`–`?25`, in [`COLUMNS`] order, and its acceptance
-/// key, from what is stored now, as `?26`.
+/// Runs `sql` with the row's values as `?1`–`?26`, in [`COLUMNS`] order, and its acceptance
+/// key, from what is stored now, as `?27`.
 fn write_connection(conn: &Connection, sql: &str, row: &ConnectionRow) -> Result<(), PartnerError> {
     let (schedule, minutes, time) = schedule_columns(&row.settings.schedule);
     let (host, port, username, auth, fingerprint) = sftp_columns(&row.settings);
@@ -236,6 +243,11 @@ fn write_connection(conn: &Connection, sql: &str, row: &ConnectionRow) -> Result
             moved_to.map(|moved_to| &moved_to.processed),
             moved_to.map(|moved_to| &moved_to.failed),
             mllp_column(&row.settings)?,
+            row.settings
+                .portal
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?,
             acceptance_key(conn, row)?
         ],
     )?;
