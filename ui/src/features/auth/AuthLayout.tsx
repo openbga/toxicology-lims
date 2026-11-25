@@ -30,7 +30,9 @@ export function AuthLayout({ children, aside, showLaboratory }: AuthLayoutProps)
         <img className={styles.artLight} src={labLight} alt="" />
         <img className={styles.artDark} src={labDark} alt="" />
         <div className={styles.headline}>
-          <h2>A free toxicology LIS on a computer your lab owns.</h2>
+          <h2>
+            <span>A free toxicology LIS</span> <span>on a computer your lab owns.</span>
+          </h2>
           <p>From the first order to the final report.</p>
         </div>
       </section>

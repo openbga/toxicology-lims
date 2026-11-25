@@ -20,42 +20,20 @@ const SUMMARY_ORDER: readonly ListenerState[] = [
   "disabled",
 ];
 
-/** Whether the card shows one row per analyzer, remembered on this computer (ticket #4885). */
-const OPEN_KEY = "vibe-tox.sign-in-analyzers-open-v1";
-
-function readOpen(): boolean {
-  try {
-    return localStorage.getItem(OPEN_KEY) === "true";
-  } catch {
-    // An unavailable store means the card starts closed.
-    return false;
-  }
-}
-
-function saveOpen(open: boolean) {
-  try {
-    localStorage.setItem(OPEN_KEY, String(open));
-  } catch {
-    // Continue with the in-memory choice when this webview cannot persist it.
-  }
-}
-
 /**
  * The analyzers on the sign-in and lock screens, as a card under the form (REQ-OPS-013,
  * ticket #4885): one line counting them by state, which opens one row per analyzer with its
- * state and last activity. The engine keeps listening whoever is signed in.
+ * state and last activity. The card starts closed on every start (ticket #4951); the engine
+ * keeps listening whoever is signed in.
  */
-export function ListenerStatus() {
+export function ListenerStatus({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
   const listeners = useListeners();
-  const [isOpen, setOpen] = useState(readOpen);
+  const [isOpen, setOpen] = useState(initiallyOpen);
   const listId = useId();
   const { tone, text } = summarize(listeners);
   const all = listeners.isSuccess ? listeners.data : [];
   const summary = <StatusBadge tone={tone}>{text}</StatusBadge>;
-  const toggle = () => {
-    setOpen(!isOpen);
-    saveOpen(!isOpen);
-  };
+  const toggle = () => setOpen(!isOpen);
   const Chevron = isOpen ? ChevronDown : ChevronRight;
   return (
     <section aria-label="Analyzers" className={styles.card}>
