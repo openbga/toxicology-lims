@@ -52,6 +52,8 @@
   height: calc(100% - 9rem - var(--space-8));
   object-fit: contain;
   object-position: center;
+  /* The picture's floor runs off its left side, so its visible content sits left of centre. */
+  transform: translateX(3vw);
 }
 
 :global(:root[data-theme="dark"]) .artLight,
