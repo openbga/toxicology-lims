@@ -7,6 +7,12 @@
 //! and acceptance tests decide that (REQ-INT-001).
 
 pub use super::hl7_sex::administrative_sex;
+pub use portal::PortalFields;
+
+#[path = "hl7_portal.rs"]
+mod portal;
+#[path = "hl7_synthetic.rs"]
+mod synthetic;
 
 /// The sending application in MSH-3.
 pub const SENDING_APPLICATION: &str = "VIBETOX LIS";
@@ -34,6 +40,8 @@ pub struct Oru {
     pub groups: Vec<ObservationGroup>,
     /// SPM: the specimen.
     pub specimen: Specimen,
+    /// The LIMSiq Patient Portal's fields ([`Oru::for_portal`]); none for other partners.
+    pub portal: Option<PortalFields>,
 }
 
 /// An organization: its name and identifier (a CLIA number or a client code).
@@ -135,56 +143,6 @@ pub struct Specimen {
 }
 
 impl Oru {
-    /// A synthetic message with no patient data, processing ID `T`: the synthetic patient
-    /// TEST^SYNTHETIC with sex recorded as Unknown, a test provider, a synthetic specimen and `groups`, all at `at`. For the
-    /// test message and the acceptance tests.
-    #[must_use]
-    pub fn synthetic(
-        control_id: String,
-        at: &str,
-        laboratory: Organization,
-        partner: &str,
-        groups: Vec<ObservationGroup>,
-    ) -> Self {
-        Self {
-            control_id,
-            created_at: at.to_owned(),
-            processing_id: "T",
-            laboratory,
-            receiving_facility: partner.to_owned(),
-            acknowledged: false,
-            patient: Patient {
-                identifiers: vec![(
-                    "TEST-00000".to_owned(),
-                    "VIBETOX".to_owned(),
-                    "MR".to_owned(),
-                )],
-                family_name: "TEST".to_owned(),
-                given_names: Some("SYNTHETIC".to_owned()),
-                birth_date: "19000101".to_owned(),
-                sex: Some("Unknown".to_owned()),
-            },
-            location: None,
-            order: Order {
-                placer_order: None,
-                provider: ("0000000000".to_owned(), "TEST".to_owned(), None),
-                facility: Organization {
-                    name: partner.to_owned(),
-                    id: String::new(),
-                },
-                collected_at: at.to_owned(),
-                released_at: at.to_owned(),
-            },
-            groups,
-            specimen: Specimen {
-                id: "TEST-1".to_owned(),
-                kind: ("TEST".to_owned(), "Synthetic".to_owned()),
-                collected_at: at.to_owned(),
-                received_at: at.to_owned(),
-            },
-        }
-    }
-
     /// The message's bytes: segments separated by carriage returns, UTF-8.
     #[must_use]
     pub fn encode(&self) -> Vec<u8> {
@@ -192,8 +150,14 @@ impl Oru {
         for (index, group) in self.groups.iter().enumerate() {
             segments.push(self.orc(group));
             segments.push(self.obr(index + 1, group));
+            if index == 0 {
+                segments.extend(self.portal_notes());
+            }
             for (number, observation) in group.observations.iter().enumerate() {
                 segments.push(obx(number + 1, observation));
+            }
+            if index + 1 == self.groups.len() {
+                segments.extend(self.portal_document(group.observations.len() + 1));
             }
             segments.push(self.spm());
         }
@@ -233,19 +197,21 @@ impl Oru {
             .map(|(value, authority, kind)| comp(&[value, "", "", authority, kind]))
             .collect();
         let given = patient.given_names.as_deref().unwrap_or_default();
-        segment(
-            "PID",
-            &[
-                "1".to_owned(),
-                String::new(),
-                identifiers.join("~"),
-                String::new(),
-                comp(&[&patient.family_name, given]),
-                String::new(),
-                esc(&patient.birth_date),
-                administrative_sex(patient.sex.as_deref()).to_owned(),
-            ],
-        )
+        let mut fields = vec![
+            "1".to_owned(),
+            String::new(),
+            identifiers.join("~"),
+            String::new(),
+            comp(&[&patient.family_name, given]),
+            String::new(),
+            esc(&patient.birth_date),
+            administrative_sex(patient.sex.as_deref()).to_owned(),
+        ];
+        if let Some(email) = self.portal_email() {
+            fields.resize(14, String::new());
+            fields[13] = esc(email);
+        }
+        segment("PID", &fields)
     }
 
     fn pv1(&self) -> String {
@@ -264,7 +230,9 @@ impl Oru {
         fields[1] = esc(self.order.placer_order.as_deref().unwrap_or_default());
         fields[2] = filler(&group.filler_order);
         fields[11] = self.provider();
-        fields[20] = organization(&self.order.facility);
+        if self.portal.is_none() {
+            fields[20] = organization(&self.order.facility);
+        }
         segment("ORC", &fields)
     }
 
@@ -276,6 +244,7 @@ impl Oru {
         fields[3] = coded(&group.service);
         fields[6] = esc(&self.order.collected_at);
         fields[15] = self.provider();
+        fields[16] = self.portal_provider_phone();
         fields[21] = esc(&self.order.released_at);
         fields[24] = group.status.to_owned();
         segment("OBR", &fields)

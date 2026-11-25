@@ -2,14 +2,28 @@
 
 use super::*;
 
-fn laboratory() -> Organization {
+pub(super) fn laboratory() -> Organization {
     Organization {
         name: "Synthetic Tox Lab".to_owned(),
         id: "00D0000000".to_owned(),
     }
 }
 
-fn message() -> Oru {
+fn patient() -> Patient {
+    Patient {
+        identifiers: vec![(
+            "MRN-00000".to_owned(),
+            "CLINIC-A".to_owned(),
+            "MR".to_owned(),
+        )],
+        family_name: "Doe".to_owned(),
+        given_names: Some("Jane".to_owned()),
+        birth_date: "19800101".to_owned(),
+        sex: Some("Female".to_owned()),
+    }
+}
+
+pub(super) fn message() -> Oru {
     Oru {
         control_id: "01a1a000-0000-7000-8000-000000000011".to_owned(),
         created_at: "20261104102000-0600".to_owned(),
@@ -17,17 +31,7 @@ fn message() -> Oru {
         laboratory: laboratory(),
         receiving_facility: "CLINIC-A".to_owned(),
         acknowledged: false,
-        patient: Patient {
-            identifiers: vec![(
-                "MRN-00000".to_owned(),
-                "CLINIC-A".to_owned(),
-                "MR".to_owned(),
-            )],
-            family_name: "Doe".to_owned(),
-            given_names: Some("Jane".to_owned()),
-            birth_date: "19800101".to_owned(),
-            sex: Some("Female".to_owned()),
-        },
+        patient: patient(),
         location: Some(("LOC-1".to_owned(), "Main office".to_owned())),
         order: Order {
             placer_order: Some("ORD-000124".to_owned()),
@@ -89,6 +93,7 @@ fn message() -> Oru {
             collected_at: "20261103083000-0500".to_owned(),
             received_at: "20261103120000-0600".to_owned(),
         },
+        portal: None,
     }
 }
 
