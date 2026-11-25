@@ -16,10 +16,12 @@ export function SessionRoot() {
           <LabTimeZoneContext.Provider value={lastLabTimeZone()}>
             <ListenerStatus />
           </LabTimeZoneContext.Provider>
-          {import.meta.env.DEV && (
-            <Link to={GALLERY_PATH}>Component gallery (development build)</Link>
-          )}
         </>
+      }
+      footer={
+        import.meta.env.DEV ? (
+          <Link to={GALLERY_PATH}>Component gallery (development build)</Link>
+        ) : undefined
       }
     >
       {(session) => <AppShell session={session} />}

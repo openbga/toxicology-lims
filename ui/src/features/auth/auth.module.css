@@ -151,8 +151,17 @@
   width: min(26rem, 100%);
 }
 
+/* The development link at the left and the version at the right, as wide as the card. */
+.footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: min(26rem, 100%);
+}
+
 .version {
-  text-align: center;
+  margin-left: auto;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }

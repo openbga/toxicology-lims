@@ -11,6 +11,8 @@ import labLight from "./illustrations/lab-light.svg";
 interface AuthLayoutProps {
   children: ReactNode;
   aside?: ReactNode;
+  /** Shown at the left of the version line, such as the development link. */
+  footer?: ReactNode;
   /** Names the laboratory under the product, on the setup, sign-in and lock screens. */
   showLaboratory?: boolean;
 }
@@ -21,7 +23,7 @@ interface AuthLayoutProps {
  * screen, then the analyzers and the running version below the card (tickets #4885, #4916).
  * A narrow window shows only the right side.
  */
-export function AuthLayout({ children, aside, showLaboratory }: AuthLayoutProps) {
+export function AuthLayout({ children, aside, footer, showLaboratory }: AuthLayoutProps) {
   // A public read; without an answer the line is left out.
   const version = useCommandQuery<AppInfo>("app_info").data?.appVersion;
   return (
@@ -47,7 +49,12 @@ export function AuthLayout({ children, aside, showLaboratory }: AuthLayoutProps)
           {children}
         </div>
         {aside && <div className={styles.aside}>{aside}</div>}
-        {version && <p className={styles.version}>Version {version}</p>}
+        {(footer || version) && (
+          <div className={styles.footer}>
+            {footer}
+            {version && <p className={styles.version}>Version {version}</p>}
+          </div>
+        )}
       </div>
     </main>
   );
