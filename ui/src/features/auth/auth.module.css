@@ -1,14 +1,18 @@
-/* The picture on the left, the screen on the right in a column as wide as its card; a narrow
-   window shows only the screen (ticket #4951). The picture is centred between the window's left
-   edge and the card, and the window takes the picture's background colours. The first-run setup
-   is wider, so its column is wider. */
+/* The picture on the left (about 55%), the screen on the right; a narrow window shows only the
+   screen (ticket #4951). The picture is centred between the window's left edge and the card,
+   and the window takes the picture's background colours. --card-offset is the card's distance
+   from the window's right edge. The first-run setup is wider, so its right side is wider. */
 .layout {
+  --card-offset: calc(22.5% + 13rem);
+
   display: grid;
-  grid-template-columns: 1fr calc(26rem + 2 * var(--space-8));
+  grid-template-columns: 11fr 9fr;
   min-height: 100%;
 }
 
 .layout:has([data-first-run]) {
+  --card-offset: min(75%, calc(62.5% + 34rem));
+
   grid-template-columns: 1fr 3fr;
 }
 
@@ -23,15 +27,17 @@
 }
 
 .panel {
+  grid-area: 1 / 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  padding: var(--space-8);
+  padding: var(--space-6);
 }
 
 .art {
+  grid-area: 1 / 1 / 2 / -1;
   position: relative;
   overflow: hidden;
 }
@@ -41,7 +47,8 @@
   position: absolute;
   top: 9rem;
   left: var(--space-8);
-  width: calc(100% - var(--space-8));
+  right: calc(var(--card-offset) + var(--space-8));
+  width: auto;
   height: calc(100% - 9rem - var(--space-8));
   object-fit: contain;
   object-position: center;
@@ -123,6 +130,7 @@
   }
 
   .panel {
+    grid-area: 1 / 1;
     padding: var(--space-4);
   }
 
