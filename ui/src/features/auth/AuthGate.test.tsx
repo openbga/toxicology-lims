@@ -156,6 +156,14 @@ describe("AuthGate sign-in steps (NFR-19)", () => {
     const { container } = renderGate();
     expect(await screen.findByRole("heading", { level: 1, name: "Sign in" })).toBeTruthy();
     expect(screen.getByText("Listener status")).toBeTruthy();
+    // The illustration side carries the website's headline (ticket #4951).
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "A free toxicology LIS on a computer your lab owns.",
+      }),
+    ).toBeTruthy();
+    expect(screen.getByText("From the first order to the final report.")).toBeTruthy();
     expect(screen.queryByText(/Signed in as/)).toBeNull();
     await expectNoA11yViolations(container, { wholePage: true });
   });

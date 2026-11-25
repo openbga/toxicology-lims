@@ -5,6 +5,8 @@ import type { SetupStatus } from "@/generated/SetupStatus";
 import { useCommandQuery } from "@/lib/commands";
 import styles from "./auth.module.css";
 import { SETUP_STATUS } from "./contract";
+import labDark from "./illustrations/lab-dark.svg";
+import labLight from "./illustrations/lab-light.svg";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -14,25 +16,37 @@ interface AuthLayoutProps {
 }
 
 /**
- * The centered frame of the signed-out screens: the product, the laboratory's name under it,
- * the screen, then the analyzers and the running version below the card (ticket #4885).
+ * The frame of the signed-out screens, split in two (ticket #4951): the laboratory illustration
+ * and headline on the left, and on the right the product, the laboratory's name under it, the
+ * screen, then the analyzers and the running version below the card (tickets #4885, #4916).
+ * A narrow window shows only the right side.
  */
 export function AuthLayout({ children, aside, showLaboratory }: AuthLayoutProps) {
   // A public read; without an answer the line is left out.
   const version = useCommandQuery<AppInfo>("app_info").data?.appVersion;
   return (
     <main className={styles.layout}>
-      <div className={styles.card}>
-        <div className={styles.identity}>
-          <p className={styles.appName}>
-            <BrandLockup />
-          </p>
-          {showLaboratory && <LaboratoryName />}
+      <section className={styles.art}>
+        <img className={styles.artLight} src={labLight} alt="" />
+        <img className={styles.artDark} src={labDark} alt="" />
+        <div className={styles.headline}>
+          <h2>A free toxicology LIS on a computer your lab owns.</h2>
+          <p>From the first order to the final report.</p>
         </div>
-        {children}
+      </section>
+      <div className={styles.panel}>
+        <div className={styles.card}>
+          <div className={styles.identity}>
+            <p className={styles.appName}>
+              <BrandLockup />
+            </p>
+            {showLaboratory && <LaboratoryName />}
+          </div>
+          {children}
+        </div>
+        {aside && <div className={styles.aside}>{aside}</div>}
+        {version && <p className={styles.version}>Version {version}</p>}
       </div>
-      {aside && <div className={styles.aside}>{aside}</div>}
-      {version && <p className={styles.version}>Version {version}</p>}
     </main>
   );
 }
