@@ -8,7 +8,8 @@ link: /interfaces/connections
 ---
 An HL7 Results connection can now send each released result to the **LIMSiq Patient
 Portal** over HTTPS. Enter the ingest address, laboratory code, API user and API token that
-LIMSiq gives the laboratory; the token is kept sealed and never shown again. A result waits
+LIMSiq gives the laboratory; the token is kept sealed and never shown again. The address
+must be https://, except http://localhost for a test portal on this computer. A result waits
 while the patient has no email, which is their consent to the portal, or the ordering
 practitioner has no phone, and goes once they are added. **Test connection** checks the
 address and token without filing anything in the portal. **Send test message** is not

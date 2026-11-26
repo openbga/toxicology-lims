@@ -305,7 +305,7 @@
           "name": "Ingest address",
           "meaning": "For LIMSiq Patient Portal: the address of the portal's ingest API, as LIMSiq gave it. Each result is posted to <address>/api/labs/<laboratory code>/ingest.",
           "values": "https:// and a host name, with an optional port, such as https://ingest.example.com or https://ingest.example.com:8443; no path, query or user. A trailing / is removed when saved.",
-          "rules": "Required. Only https:// is accepted, so patient data never travels unencrypted; the form says so before saving, and the LIS checks the address again when saving and before each post. No redirect is followed. Changing it needs the API token again and a new destination check."
+          "rules": "Required. Only https:// is accepted, so patient data never travels unencrypted, except http:// to localhost or 127.0.0.1, a test portal on this computer, where nothing leaves it; the form says so before saving, and the LIS checks the address again when saving and before each post. No redirect is followed. Changing it needs the API token again and a new destination check."
         },
         {
           "name": "Laboratory code",
@@ -622,7 +622,7 @@
         },
         {
           "problem": "Saving says to enter an https:// address with no path",
-          "recovery": "Enter only https:// and the host, with a port if LIMSiq gave one, such as https://ingest.example.com; leave out /api/labs/… and anything after the host. http:// is never accepted."
+          "recovery": "Enter only https:// and the host, with a port if LIMSiq gave one, such as https://ingest.example.com; leave out /api/labs/… and anything after the host. http:// is accepted only for a test portal on this computer: http://localhost or http://127.0.0.1, with its port."
         },
         {
           "problem": "Test connection says no usable sign-in on this computer",

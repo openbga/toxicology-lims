@@ -6,10 +6,11 @@ import { textFieldProps } from "@/lib/form";
 import styles from "./ConnectionDialog.module.css";
 import type { ConnectionValues } from "./connectionForm";
 
+/** https://, or http:// to a test portal on this computer; the engine checks the rest. */
 const httpsOnly = (value: string) =>
-  /^https:\/\//i.test(value)
+  /^https:\/\//i.test(value) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/i.test(value)
     ? true
-    : "Enter an https:// address, such as https://ingest.example.com.";
+    : "Enter an https:// address, such as https://ingest.example.com. http:// is accepted only for localhost or 127.0.0.1.";
 
 /** The API token, masked; a saved one is kept while the field is empty. */
 function TokenInput({ hasToken }: { hasToken: boolean }) {
@@ -52,7 +53,7 @@ export function PortalFields({ hasToken }: { hasToken: boolean }) {
         <TextInput
           name="portal.baseUrl"
           label="Ingest address"
-          description="https:// and the host, with no path, such as https://ingest.example.com."
+          description="https:// and the host, with no path, such as https://ingest.example.com; http:// only for a test portal on this computer (localhost)."
           isRequired
           validate={httpsOnly}
         />

@@ -122,9 +122,9 @@ async fn nothing_listening_is_unreachable() {
 }
 
 #[tokio::test]
-async fn only_an_https_address_is_ever_used() {
+async fn only_an_https_address_is_ever_used_off_this_computer() {
     let portal = PortalSettings {
-        base_url: "http://127.0.0.1:9".to_owned(),
+        base_url: "http://ingest.example.com".to_owned(),
         lab_code: "demo-lab".to_owned(),
         api_user: "user".to_owned(),
     };

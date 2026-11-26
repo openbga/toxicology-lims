@@ -3,7 +3,7 @@
 //! user and token, the message in `{"payload": {"hl7": …}}`, and the delivery ID as the
 //! `Idempotency-Key`, so a retry is never filed twice. The portal answers 202 when it takes
 //! the message, 200 when it already has it and 422 when it refuses it; an acceptance is
-//! not proof that the portal processed it. Only `https://` is ever used. Codes are PHI-free;
+//! not proof that the portal processed it. Only `https://` is used, or `http://` to this computer for a test portal. Codes are PHI-free;
 //! nothing here logs the address, token or content.
 
 use std::time::Duration;

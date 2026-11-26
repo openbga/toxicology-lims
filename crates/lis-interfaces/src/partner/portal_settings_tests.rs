@@ -28,12 +28,17 @@ fn valid_settings_are_trimmed_and_name_the_ingest_address() {
         "https://ingest.example.com/api/labs/demo-lab/ingest as lab-7-abcd1234"
     );
     assert!(valid_portal_settings(settings("https://localhost:8443")).is_ok());
+    // A portal on this computer, for testing: nothing leaves it.
+    assert!(valid_portal_settings(settings("http://localhost:8080")).is_ok());
+    assert!(valid_portal_settings(settings("http://127.0.0.1:8080")).is_ok());
 }
 
 #[test]
 fn only_an_https_address_without_a_path_is_accepted() {
     for url in [
         "http://ingest.example.com",
+        "http://192.168.1.20:8080",
+        "http://localhost.example.com",
         "ingest.example.com",
         "https://",
         "https://ingest.example.com/api",

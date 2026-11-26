@@ -1,7 +1,9 @@
 //! A connection to the LIMSiq Patient Portal (#4672): HL7 results posted over HTTPS to the
 //! portal's ingest API, `POST {base URL}/api/labs/{lab code}/ingest`, signed in with the
 //! channel's API user and token. The token is kept sealed with the installation key, like
-//! an SFTP password. Only `https://` is accepted, so patient data never travels in clear.
+//! an SFTP password. Only `https://` is accepted, so patient data never travels in clear;
+//! `http://` only to `localhost` or `127.0.0.1`, a portal on this computer for testing, where
+//! nothing leaves the computer.
 //! Pure.
 
 use serde::{Deserialize, Serialize};
@@ -73,7 +75,8 @@ pub fn valid_portal_settings(portal: PortalSettings) -> Result<PortalSettings, P
         return Err(invalid(
             "settings.portal.baseUrl",
             "invalid_address",
-            "Enter an https:// address with no path, such as https://ingest.example.com.",
+            "Enter an https:// address with no path, such as https://ingest.example.com. \
+             http:// is accepted only for localhost or 127.0.0.1.",
         ));
     }
     let lab_code = portal.lab_code.trim().to_owned();
@@ -108,14 +111,20 @@ pub fn valid_portal_settings(portal: PortalSettings) -> Result<PortalSettings, P
 }
 
 /// `https://` and a host name, with an optional port; no user, path, query or fragment.
+/// `http://` only to this computer.
 fn valid_base_url(url: &str) -> bool {
-    let Some(authority) = url.strip_prefix("https://") else {
-        return false;
+    let (authority, clear) = match (url.strip_prefix("https://"), url.strip_prefix("http://")) {
+        (Some(authority), _) => (authority, false),
+        (None, Some(authority)) => (authority, true),
+        (None, None) => return false,
     };
     let (host, port) = match authority.rsplit_once(':') {
         Some((host, port)) => (host, Some(port)),
         None => (authority, None),
     };
+    if clear && !matches!(host, "localhost" | "127.0.0.1") {
+        return false;
+    }
     let port_ok = port.is_none_or(|port| port.parse::<u16>().is_ok_and(|port| port > 0));
     let host_ok = (1..=HOST_MAX).contains(&host.len())
         && host.split('.').all(|label| {
