@@ -165,6 +165,7 @@ async fn order_tests_pass_where_their_synthetic_provider_is_not_registered() {
             given_names: practitioner.given_names,
             active: true,
             reason: "Synthetic: NPI corrected".to_owned(),
+            phone: "(555) 555-0100".to_owned(),
         })
         .await
         .unwrap();

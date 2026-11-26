@@ -61,6 +61,24 @@ pub(crate) fn optional_text(
     lis_core::optional_text(field, value, max).map_err(IdentityError::Invalid)
 }
 
+/// A telephone number as printed: digits with spaces and `+ - ( ) .`, 7 to 15 digits,
+/// at most 40 characters, such as `(555) 555-0100`.
+pub(crate) fn parse_phone(field: &str, value: &str) -> Result<String, IdentityError> {
+    let phone = required_text(field, value, 40)?;
+    let digits = phone.chars().filter(char::is_ascii_digit).count();
+    let allowed = phone
+        .chars()
+        .all(|c| c.is_ascii_digit() || " +-().".contains(c));
+    if !allowed || !(7..=15).contains(&digits) {
+        return Err(crate::error::invalid(
+            field,
+            "invalid_format",
+            "Wrong phone format. Enter a phone number such as (555) 555-0100.",
+        ));
+    }
+    Ok(phone)
+}
+
 /// Demographics as provided by a source.
 #[derive(Debug, Clone, Deserialize, TS)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]

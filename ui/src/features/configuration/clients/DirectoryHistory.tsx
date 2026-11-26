@@ -6,7 +6,7 @@ function facts(row: DirectoryHistoryEntry) {
   const value = row.snapshot;
   const label =
     value.kind === "practitioner"
-      ? `${value.npi} · ${value.family_name}, ${value.given_names ?? ""}`
+      ? `${value.npi} · ${value.family_name}, ${value.given_names ?? ""} · ${value.phone ?? "No phone"}`
       : `${value.code} · ${value.name}`;
   return `${label} · ${value.active ? "Active" : "Retired"}`;
 }

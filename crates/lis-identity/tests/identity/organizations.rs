@@ -55,6 +55,7 @@ fn practitioner(
                 npi,
                 family_name: "Doctorperson".to_owned(),
                 given_names: Some("Delta".to_owned()),
+                phone: "(555) 555-0100".to_owned(),
             },
         )
     })
@@ -273,6 +274,7 @@ fn retired_locations_and_practitioners_are_readable_but_refused_for_new_order_so
                 given_names: Some("Delta".into()),
                 active: false,
                 reason: "No longer ordering".into(),
+                phone: "(555) 555-0100".to_owned(),
             },
         )
     })
@@ -388,6 +390,7 @@ fn directory_correction_refuses_a_correction_that_changes_nothing() {
                     given_names: Some(" Delta".into()),
                     active: true,
                     reason: reason(),
+                    phone: "(555) 555-0100".to_owned(),
                 },
             )
             .map(|_| ())
@@ -422,8 +425,10 @@ fn migrated_directory_baseline_preserves_facts_without_inventing_attribution() {
     }
     let id = ClientId::generate();
     conn.execute("INSERT INTO idn_client_organizations(id,code,name,created_at) VALUES(?1,'LEGACY','Synthetic retained clinic','2020-01-02T03:04:05.000000000Z')",[id]).unwrap();
-    conn.execute_batch(lis_identity::SCHEMA.migrations[3].sql)
-        .unwrap();
+    // The baseline comes from migration 4; later ones bring the schema up to date.
+    for migration in &lis_identity::SCHEMA.migrations[3..] {
+        conn.execute_batch(migration.sql).unwrap();
+    }
     let current = get_client(&conn, id).unwrap();
     assert_eq!(current.code, "LEGACY");
     assert!(current.active);

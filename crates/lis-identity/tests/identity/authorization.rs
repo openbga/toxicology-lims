@@ -173,6 +173,7 @@ const CASES: [(&str, Capability, Case); 10] = [
                     npi: "1000000004".to_owned(),
                     family_name: "Doctorperson".to_owned(),
                     given_names: None,
+                    phone: "(555) 555-0100".to_owned(),
                 },
             )
             .map(drop)

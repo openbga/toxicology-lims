@@ -107,6 +107,8 @@ pub struct RegisterPractitioner {
     #[serde(default)]
     #[ts(optional = nullable)]
     pub given_names: Option<String>,
+    /// Telephone number, which the patient portal shows with each result.
+    pub phone: String,
 }
 
 /// Registers an ordering practitioner identified by NPI.
@@ -118,6 +120,7 @@ pub fn register_practitioner(
     let npi = Npi::parse(&input.npi)?;
     let family_name = required_text("familyName", &input.family_name, NAME_MAX)?;
     let given_names = optional_text("givenNames", input.given_names.as_deref(), NAME_MAX)?;
+    let phone = crate::model::parse_phone("phone", &input.phone)?;
     if repo::npi_exists(ctx.tx(), &npi)? {
         return Err(IdentityError::Duplicate("practitioner"));
     }
@@ -129,6 +132,7 @@ pub fn register_practitioner(
             npi: &npi,
             family_name: &family_name,
             given_names: given_names.as_deref(),
+            phone: &phone,
             created_at: ctx.now(),
         },
     )?;

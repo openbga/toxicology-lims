@@ -50,6 +50,8 @@ interface TextInputProps {
   picker?: (value: string, pick: (value: string) => void) => ReactNode;
   /** For a date field: the calendar offers no day after today in the laboratory's timezone. */
   isPastOnly?: boolean;
+  /** Reformats each change as it is typed, given the new and the previous value. */
+  mask?: (next: string, previous: string) => string;
 }
 
 /** A text field bound to the surrounding react-hook-form form. */
@@ -67,6 +69,7 @@ export function TextInput({
   validate,
   picker,
   isPastOnly,
+  mask,
 }: TextInputProps) {
   const { control, setValue } = useFormContext();
   const labTimeZone = useContext(LabTimeZoneContext);
@@ -97,6 +100,9 @@ export function TextInput({
       render={(controller) => (
         <TextField
           {...textFieldProps(controller)}
+          onChange={(value: string) =>
+            controller.field.onChange(mask ? mask(value, controller.field.value) : value)
+          }
           label={label}
           description={description ?? format?.description}
           info={info}

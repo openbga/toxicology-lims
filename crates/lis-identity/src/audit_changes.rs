@@ -327,10 +327,12 @@ fn directory_values(
             family_name,
             given_names,
             active,
+            phone,
         } => vec![
             ("NPI", Some(npi.clone())),
             ("Family name", Some(family_name.clone())),
             ("Given names", given_names.clone()),
+            ("Phone", phone.clone()),
             ("Active", Some(yes_no(*active))),
         ],
     };

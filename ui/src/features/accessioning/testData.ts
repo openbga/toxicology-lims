@@ -141,6 +141,7 @@ export const PRACTITIONERS: PractitionerView[] = [
     npi: "0000000000",
     familyName: "Doctor",
     givenNames: "Test",
+    phone: "(555) 555-0100",
   },
 ];
 

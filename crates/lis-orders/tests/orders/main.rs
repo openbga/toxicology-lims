@@ -1517,6 +1517,7 @@ fn identity_fixture(
                     npi: "1234567893".to_owned(),
                     family_name: "Synthetic".to_owned(),
                     given_names: Some("Practitioner".to_owned()),
+                    phone: "(555) 555-0100".to_owned(),
                 },
             )
         })

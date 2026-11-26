@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Alert } from "@/components/Alert";
 import { Button } from "@/components/Button";
 import type { DataGridColumn } from "@/components/DataGrid";
 import { DetailPanel } from "@/components/DetailPanel";
 import { Facts } from "@/components/Facts";
+import { StatusBadge } from "@/components/StatusBadge";
 import type { PractitionerView } from "@/generated/PractitionerView";
 import { useCommandQuery, useHasCapability } from "@/lib/commands";
 import { useOpenRecord } from "@/lib/openRecord";
@@ -12,6 +14,9 @@ import { LIST_PRACTITIONERS } from "../contract";
 import { byId, Directory } from "../Directory";
 import { CorrectPractitionerDialog } from "./CorrectPractitionerDialog";
 import { RegisterPractitionerDialog } from "./RegisterPractitionerDialog";
+
+/** A practitioner registered before the phone was required. */
+const NO_PHONE = "Not recorded";
 
 function practitionerName({ familyName, givenNames }: PractitionerView): string {
   return givenNames ? `${familyName}, ${givenNames}` : familyName;
@@ -31,6 +36,12 @@ const COLUMNS: readonly DataGridColumn<PractitionerView>[] = [
     cell: (row) => (row.active === false ? "Retired" : "Active"),
   },
   { id: "npi", header: "NPI", cell: (row) => row.npi, sortValue: (row) => row.npi, width: 160 },
+  {
+    id: "phone",
+    header: "Phone",
+    cell: (row) => row.phone ?? <StatusBadge tone="warning">{NO_PHONE}</StatusBadge>,
+    width: 170,
+  },
 ];
 
 const FIND_FIELDS = (row: PractitionerView) => [practitionerName(row), row.npi];
@@ -67,11 +78,18 @@ export function PractitionersPage() {
           onPrevious={record.previous}
           onNext={record.next}
         >
+          {!open.phone && (
+            <Alert tone="warning" title="Phone not recorded">
+              The patient portal shows the practitioner's phone with each result. Add it with a
+              correction. {canEdit && <Button onPress={() => setEditing(true)}>Add phone</Button>}
+            </Alert>
+          )}
           <Facts
             items={[
               { label: "Family name", value: open.familyName },
               { label: "Given names", value: open.givenNames ?? "Not provided" },
               { label: "NPI", value: open.npi },
+              { label: "Phone", value: open.phone ?? NO_PHONE },
               { label: "Availability", value: open.active === false ? "Retired" : "Active" },
               { label: "Revision", value: open.revision },
             ]}

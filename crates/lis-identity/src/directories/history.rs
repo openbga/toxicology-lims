@@ -50,6 +50,8 @@ pub enum DirectorySnapshot {
         family_name: String,
         given_names: Option<String>,
         active: bool,
+        /// Absent in revisions from before the phone was required.
+        phone: Option<String>,
     },
 }
 /// One immutable revision. Legacy baseline attribution is explicitly unknown.
@@ -89,12 +91,12 @@ pub fn directory_history(
     input: DirectoryHistoryInput,
 ) -> Result<Vec<DirectoryHistoryEntry>, IdentityError> {
     let (kind, id) = input.record.key();
-    let rows=conn.prepare_cached("SELECT revision,code,name,given_names,active,recorded_at,recorded_by,reason,origin FROM idn_directory_history WHERE record_kind=?1 AND record_id=?2 ORDER BY revision")?.query_map(params![kind,id],|row| {
+    let rows=conn.prepare_cached("SELECT revision,code,name,given_names,active,recorded_at,recorded_by,reason,origin,phone FROM idn_directory_history WHERE record_kind=?1 AND record_id=?2 ORDER BY revision")?.query_map(params![kind,id],|row| {
         let code:String=row.get(1)?; let name:String=row.get(2)?; let active:bool=row.get(4)?;
         let snapshot=match input.record {
             DirectoryRecord::Client(_)=>DirectorySnapshot::Client{code,name,active},
             DirectoryRecord::Location(_)=>DirectorySnapshot::Location{code,name,active},
-            DirectoryRecord::Practitioner(_)=>DirectorySnapshot::Practitioner{npi:code,family_name:name,given_names:row.get(3)?,active},
+            DirectoryRecord::Practitioner(_)=>DirectorySnapshot::Practitioner{npi:code,family_name:name,given_names:row.get(3)?,active,phone:row.get(9)?},
         };
         Ok(DirectoryHistoryEntry{revision:row.get(0)?,snapshot,recorded_at:row.get(5)?,recorded_by:row.get(6)?,recorded_by_display:None,reason:row.get(7)?,origin:row.get(8)?})
     })?.collect::<Result<Vec<_>,_>>()?;

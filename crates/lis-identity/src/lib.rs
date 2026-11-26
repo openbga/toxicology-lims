@@ -154,6 +154,11 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "subject_email",
         sql: include_str!("../migrations/0006_subject_email.sql"),
     },
+    Migration {
+        version: 7,
+        name: "practitioner_phone",
+        sql: include_str!("../migrations/0007_practitioner_phone.sql"),
+    },
 ];
 
 /// This module's schema descriptor.

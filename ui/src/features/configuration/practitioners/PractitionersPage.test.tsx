@@ -17,6 +17,7 @@ const DOCTOR: PractitionerView = {
   npi: "1234567893",
   familyName: "Doctor",
   givenNames: "Test",
+  phone: "(555) 555-0100",
 };
 
 const EXAMPLE: PractitionerView = {
@@ -26,6 +27,7 @@ const EXAMPLE: PractitionerView = {
   npi: "1000000004",
   familyName: "Example",
   givenNames: null,
+  phone: null,
 };
 
 function renderPage(commands: Record<string, (args: unknown) => unknown> = {}, path = "") {
@@ -99,6 +101,7 @@ describe("PractitionersPage (REQ-ORD-001 references)", { timeout: WALKTHROUGH_TI
       npi: "1234567893",
       familyName: "Newcomer",
       givenNames: null,
+      phone: "(555) 555-0101",
     };
     const register = vi
       .fn()
@@ -129,6 +132,7 @@ describe("PractitionersPage (REQ-ORD-001 references)", { timeout: WALKTHROUGH_TI
     ).toBeTruthy();
     await user.keyboard("1234567890");
     await typeInto(user, /^Family name/, "Newcomer");
+    await typeInto(user, /^Phone/, "(555) 555-0101");
     await user.keyboard("{Enter}");
     expect(
       await within(dialog).findByText("This NPI is not valid. Please check the number for a typo."),
@@ -138,7 +142,12 @@ describe("PractitionersPage (REQ-ORD-001 references)", { timeout: WALKTHROUGH_TI
     await user.keyboard("{Control>}a{/Control}1234567893{Enter}");
     expect(await screen.findByText("Newcomer registered")).toBeTruthy();
     expect(register).toHaveBeenLastCalledWith({
-      input: { npi: "1234567893", familyName: "Newcomer", givenNames: null },
+      input: {
+        npi: "1234567893",
+        familyName: "Newcomer",
+        givenNames: null,
+        phone: "(555) 555-0101",
+      },
     });
     expect(await screen.findByRole("region", { name: "Newcomer" })).toBeTruthy();
     expect(router.state.location.search).toBe(`?open=${added.id}`);
@@ -160,6 +169,40 @@ describe("PractitionersPage (REQ-ORD-001 references)", { timeout: WALKTHROUGH_TI
     expect(alert.textContent).toContain("You cannot see practitioners.");
     expect(alert.textContent).toContain("A laboratory administrator can change roles.");
   });
+  it("asks for the phone of a practitioner registered without one", async () => {
+    const save = vi.fn(() => ({ ...EXAMPLE, phone: "(555) 555-0102", revision: 2 }));
+    const { user } = renderPage({ update_practitioner: save }, `?open=${EXAMPLE.id}`);
+    const panel = within(await screen.findByRole("region", { name: "Example" }));
+    expect(panel.getByText("Not recorded")).toBeTruthy();
+    expect(panel.getByText("Phone not recorded")).toBeTruthy();
+    await user.click(panel.getByRole("button", { name: "Add phone" }));
+    const dialog = await screen.findByRole("dialog", { name: "Correct practitioner" });
+    expect(
+      within(dialog).getByText("Not recorded yet. Required with this correction."),
+    ).toBeTruthy();
+    await user.type(within(dialog).getByRole("textbox", { name: /^Reason/ }), "Phone from clinic");
+    await user.click(within(dialog).getByRole("button", { name: "Save correction" }));
+    expect(await within(dialog).findByText("Enter phone.")).toBeTruthy();
+    const phone = within(dialog).getByRole("textbox", { name: /^Phone/ });
+    await user.type(phone, "55501");
+    expect((phone as HTMLInputElement).value).toBe("(555) 01");
+    await user.click(within(dialog).getByRole("button", { name: "Save correction" }));
+    expect(
+      await within(dialog).findByText(
+        "Wrong phone format. Enter the 10 digits of a phone number such as (555) 555-0100.",
+      ),
+    ).toBeTruthy();
+    expect(save).not.toHaveBeenCalled();
+    await user.clear(phone);
+    await user.type(phone, "555555010299");
+    expect((phone as HTMLInputElement).value).toBe("(555) 555-0102");
+    await user.click(within(dialog).getByRole("button", { name: "Save correction" }));
+    expect(await screen.findByText("Practitioner correction saved")).toBeTruthy();
+    expect(save).toHaveBeenCalledWith({
+      input: expect.objectContaining({ phone: "(555) 555-0102", active: true }),
+    });
+  });
+
   it("corrects a practitioner's supplied facts without replacing the identity", async () => {
     const save = vi.fn(() => ({ ...DOCTOR, familyName: "Corrected Doctor", revision: 2 }));
     const { user } = renderPage({ update_practitioner: save }, `?open=${DOCTOR.id}`);
@@ -182,6 +225,7 @@ describe("PractitionersPage (REQ-ORD-001 references)", { timeout: WALKTHROUGH_TI
         npi: DOCTOR.npi,
         familyName: "Corrected Doctor",
         givenNames: DOCTOR.givenNames,
+        phone: "(555) 555-0100",
         active: false,
         reason: "Supplied retirement evidence",
       },

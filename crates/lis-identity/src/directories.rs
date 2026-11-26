@@ -25,29 +25,36 @@ pub(crate) fn record_registration(
 ) -> Result<(), IdentityError> {
     let actor = ActorRef::user(ctx.principal())?;
     let (kind, id) = record.key();
-    let (code, name, given, active, revision) = current_values(ctx.tx(), record)?;
-    ctx.tx().execute("INSERT INTO idn_directory_history(record_kind,record_id,revision,code,name,given_names,active,recorded_at,recorded_by,origin) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,'registered')",params![kind,id,revision,code,name,given,active,ctx.now(),actor.id])?;
+    let (code, name, given, active, revision, phone) = current_values(ctx.tx(), record)?;
+    ctx.tx().execute("INSERT INTO idn_directory_history(record_kind,record_id,revision,code,name,given_names,active,recorded_at,recorded_by,origin,phone) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,'registered',?10)",params![kind,id,revision,code,name,given,active,ctx.now(),actor.id,phone])?;
     Ok(())
 }
 
-type DirectoryValues = (String, String, Option<String>, bool, i64);
+type DirectoryValues = (String, String, Option<String>, bool, i64, Option<String>);
 
-/// The record's projected code (or NPI), name, given names, availability and revision.
+/// The record's projected code (or NPI), name, given names, availability, revision and phone.
 fn current_values(conn: &Connection, record: DirectoryRecord) -> rusqlite::Result<DirectoryValues> {
     let (_, id) = record.key();
     let sql = match record {
         DirectoryRecord::Client(_) => {
-            "SELECT code,name,NULL,active,revision FROM idn_client_organizations WHERE id=?1"
+            "SELECT code,name,NULL,active,revision,NULL FROM idn_client_organizations WHERE id=?1"
         }
         DirectoryRecord::Location(_) => {
-            "SELECT code,name,NULL,active,revision FROM idn_client_locations WHERE id=?1"
+            "SELECT code,name,NULL,active,revision,NULL FROM idn_client_locations WHERE id=?1"
         }
         DirectoryRecord::Practitioner(_) => {
-            "SELECT npi,family_name,given_names,active,revision FROM idn_practitioners WHERE id=?1"
+            "SELECT npi,family_name,given_names,active,revision,phone FROM idn_practitioners WHERE id=?1"
         }
     };
     conn.query_row(sql, [&id], |r| {
-        Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?))
+        Ok((
+            r.get(0)?,
+            r.get(1)?,
+            r.get(2)?,
+            r.get(3)?,
+            r.get(4)?,
+            r.get(5)?,
+        ))
     })
 }
 
@@ -58,6 +65,7 @@ struct Correction<'a> {
     name: &'a str,
     given: Option<&'a str>,
     active: bool,
+    phone: Option<&'a str>,
     reason: &'a str,
 }
 fn append_correction(
@@ -65,15 +73,25 @@ fn append_correction(
     value: Correction<'_>,
 ) -> Result<(), IdentityError> {
     let actor = ActorRef::user(ctx.principal())?;
-    let (code, name, given, active, _) = current_values(ctx.tx(), value.record)?;
-    if (code.as_str(), name.as_str(), given.as_deref(), active)
-        == (value.code, value.name, value.given, value.active)
-    {
+    let (code, name, given, active, _, phone) = current_values(ctx.tx(), value.record)?;
+    if (
+        code.as_str(),
+        name.as_str(),
+        given.as_deref(),
+        active,
+        phone.as_deref(),
+    ) == (
+        value.code,
+        value.name,
+        value.given,
+        value.active,
+        value.phone,
+    ) {
         return Err(IdentityError::NothingChanged);
     }
     let reason = required_text("reason", value.reason, REASON_MAX)?;
     let (kind, id) = value.record.key();
-    ctx.tx().execute("INSERT INTO idn_directory_history(record_kind,record_id,revision,code,name,given_names,active,recorded_at,recorded_by,reason,origin) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'corrected')",params![kind,id,value.revision+1,value.code,value.name,value.given,value.active,ctx.now(),actor.id,reason])?;
+    ctx.tx().execute("INSERT INTO idn_directory_history(record_kind,record_id,revision,code,name,given_names,active,recorded_at,recorded_by,reason,origin,phone) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'corrected',?11)",params![kind,id,value.revision+1,value.code,value.name,value.given,value.active,ctx.now(),actor.id,reason,value.phone])?;
     let action = match value.record {
         DirectoryRecord::Client(_) => "identity.update_client",
         DirectoryRecord::Location(_) => "identity.update_client_location",
@@ -134,6 +152,7 @@ pub fn update_client(
             name: &name,
             given: None,
             active: input.active,
+            phone: None,
             reason: &input.reason,
         },
     )?;
@@ -188,6 +207,7 @@ pub fn update_client_location(
             name: &name,
             given: None,
             active: input.active,
+            phone: None,
             reason: &input.reason,
         },
     )?;
@@ -222,6 +242,8 @@ pub struct UpdatePractitioner {
     pub given_names: Option<String>,
     /// Availability for new ordering.
     pub active: bool,
+    /// Telephone number; required, so a practitioner without one gets it at the next correction.
+    pub phone: String,
     /// Required explanation of the factual correction or retirement.
     pub reason: String,
 }
@@ -236,6 +258,7 @@ pub fn update_practitioner(
     let npi = Npi::parse(&input.npi)?;
     let name = required_text("familyName", &input.family_name, NAME_MAX)?;
     let given = optional_text("givenNames", input.given_names.as_deref(), NAME_MAX)?;
+    let phone = crate::model::parse_phone("phone", &input.phone)?;
     if ctx.tx().query_row(
         "SELECT EXISTS(SELECT 1 FROM idn_practitioners WHERE npi=?1 AND id<>?2)",
         params![npi.as_str(), input.practitioner_id],
@@ -252,10 +275,11 @@ pub fn update_practitioner(
             name: &name,
             given: given.as_deref(),
             active: input.active,
+            phone: Some(&phone),
             reason: &input.reason,
         },
     )?;
-    ctx.tx().execute("UPDATE idn_practitioners SET npi=?1,family_name=?2,given_names=?3,active=?4,revision=revision+1 WHERE id=?5",params![npi.as_str(),name,given,input.active,input.practitioner_id])?;
+    ctx.tx().execute("UPDATE idn_practitioners SET npi=?1,family_name=?2,given_names=?3,active=?4,phone=?5,revision=revision+1 WHERE id=?6",params![npi.as_str(),name,given,input.active,phone,input.practitioner_id])?;
     crate::get_practitioner(ctx.tx(), input.practitioner_id)
 }
 
