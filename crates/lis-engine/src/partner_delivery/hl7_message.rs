@@ -93,6 +93,7 @@ pub(crate) fn oru(
         order: order(revision, &zone),
         groups,
         specimen: specimen(snapshot, &zone),
+        portal: None,
     })
 }
 
