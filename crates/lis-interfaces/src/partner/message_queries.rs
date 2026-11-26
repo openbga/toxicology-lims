@@ -89,6 +89,10 @@ text_enum! {
         /// consent, so nothing goes to the portal until one is added (#4672). Set by the
         /// engine.
         NoPortalEmail = "no_portal_email",
+        /// For the LIMSiq Patient Portal: the patient has no given name, which the portal
+        /// requires to match the patient (PID-5.2); it would refuse the message (#4672). Set
+        /// by the engine.
+        NoGivenName = "no_given_name",
         /// For the LIMSiq Patient Portal: the ordering practitioner has no phone, which
         /// the portal shows with each result (#4672). Set by the engine.
         NoPractitionerPhone = "no_practitioner_phone",

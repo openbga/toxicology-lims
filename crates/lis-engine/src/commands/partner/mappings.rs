@@ -164,6 +164,7 @@ pub(super) fn hold_reason(
         Err(missing) => (!missing.is_empty()).then_some(WaitReason::NotMapped),
         Ok((oru, ..)) => match portal_gap(&oru) {
             Some(PortalGap::Email) => Some(WaitReason::NoPortalEmail),
+            Some(PortalGap::GivenName) => Some(WaitReason::NoGivenName),
             Some(PortalGap::PractitionerPhone) => Some(WaitReason::NoPractitionerPhone),
             None => oru
                 .patient

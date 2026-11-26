@@ -11,7 +11,8 @@ Portal** over HTTPS. Enter the ingest address, laboratory code, API user and API
 LIMSiq gives the laboratory; the token is kept sealed and never shown again. The address
 must be https://, except http://localhost for a test portal on this computer. A result waits
 while the patient has no email, which is their consent to the portal, or the ordering
-practitioner has no phone, and goes once they are added. **Test connection** checks the
+practitioner has no phone, or the patient has no given name, which the portal requires, and
+goes once they are added. **Test connection** checks the
 address and token without filing anything in the portal. **Send test message** is not
 offered for the portal, which would file it as a patient's results.
 
@@ -23,5 +24,6 @@ the column that keeps an SFTP password. Each message is posted to
 `{address}/api/labs/{code}/ingest` with HTTP Basic, `{"payload": {"hl7": …}}` and the delivery
 ID as `Idempotency-Key`, in the portal profile of the ORU^R01 with the revision's PDF. 202 and
 200 are recorded as AA, 413 and 422 as AR with the portal's reason; 401, 403, 429, 5xx and
-network problems are retried. New wait reasons `no_portal_email` and
-`no_practitioner_phone`. `reqwest` and `rustls` come from the updater's tree: no new crate.
+network problems are retried. New wait reasons `no_portal_email`,
+`no_given_name` and `no_practitioner_phone`; the portal profile also carries the specimen's
+receipt in OBR-14. `reqwest` and `rustls` come from the updater's tree: no new crate.

@@ -166,7 +166,7 @@ Implemented on synthetic data: outgoing ORU^R01 results written to a partner fol
 
 - PID-3 carries the subject's identifier, with the laboratory's CLIA number as its assigning authority and type `PI`. The portal refuses the same identifier under another authority, so the authority never changes.
 - PID-14 carries the patient's email. A recorded email is the patient's consent to the portal.
-- The accession, not one number per test, goes in every ORC-3 and OBR-3, so the portal makes one order.
+- The accession, not one number per test, goes in every ORC-3 and OBR-3, so the portal makes one order. OBR-14 carries the specimen's receipt, which the portal reads there rather than in SPM-18.
 - OBR-17 carries the ordering practitioner's phone.
 - Three NTE segments after the first OBR carry `LAB NAME:`, `CLIA:` and `LAB PHONE:`.
 - A last OBX of type ED carries the revision's PDF as `^AP^PDF^Base64^…`. A withdrawal carries no PDF.
@@ -174,7 +174,7 @@ Implemented on synthetic data: outgoing ORU^R01 results written to a partner fol
 
 The portal's own parser reads all of these from a synthetic message. Two of its readings are for the portal to correct: it reads OBR-16 as family and given name, so the XCN's leading NPI shows as a name, and it keeps OBX-6 with its coding system (`ng/mL^^UCUM`).
 
-A **LIMSiq Patient Portal** connection sends this profile. It posts each message over HTTPS to the portal's ingest API, with the delivery ID as the idempotency key. It reads the patient's current email and the practitioner's current phone at sending time, and holds the message while either is missing ([interfaces](../operations/interfaces.md#limsiq-patient-portal)). The portal's 202 means it took the message, not that it processed it. Processing errors show in the portal's own Exceptions page, and OpenBGA does not yet read them back.
+A **LIMSiq Patient Portal** connection sends this profile. It posts each message over HTTPS to the portal's ingest API, with the delivery ID as the idempotency key. It reads the patient's current email and the practitioner's current phone at sending time, and holds the message while either is missing, or while the patient has no given name, which the portal requires ([interfaces](../operations/interfaces.md#limsiq-patient-portal)). The portal's 202 means it took the message, not that it processed it. Processing errors show in the portal's own Exceptions page, and OpenBGA does not yet read them back.
 
 Edition status at the 2026-10-12 check:
 

@@ -25,7 +25,7 @@ import {
   sentText,
   socketText,
 } from "./mllpLabels";
-import { PORTAL_PROBLEMS } from "./portalLabels";
+import { PORTAL_PROBLEMS, PORTAL_WAITING } from "./portalLabels";
 
 export interface Labelled {
   label: string;
@@ -279,10 +279,7 @@ const WAITING: Record<WaitReason, string> = {
   impact_review: "Paused while the report's impact review is open",
   not_mapped: "Held: a test or analyte has no approved code mapping",
   no_patient_identifier: "Held: the patient has no identifier; add one on the patient's page",
-  no_portal_email:
-    "Held: the patient has no email for the patient portal (their consent); add it on the patient's page",
-  no_practitioner_phone:
-    "Held: the ordering practitioner has no phone; add it in Laboratory setup › Practitioners",
+  ...PORTAL_WAITING,
 };
 
 const RESOLUTIONS: Record<UnroutedResolution, string> = {

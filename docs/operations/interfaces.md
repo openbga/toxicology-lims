@@ -73,12 +73,12 @@ An HL7 Results connection can post each result to the LIMSiq Patient Portal's in
 - **The message.** HL7 Results in the [portal profile](../architecture/integrations.md):
   - PID-3 is the subject's identifier, with the laboratory's CLIA number as its authority.
   - PID-14 is the patient's current email.
-  - Every ORC and OBR carries the accession.
+  - Every ORC and OBR carries the accession; OBR-14 the specimen's receipt, which the portal reads there.
   - OBR-17 is the ordering practitioner's current phone.
   - NTE carries the laboratory's name, CLIA number and phone.
   - A last OBX of type ED carries the revision's PDF. A withdrawal carries no PDF.
   - The email and phone are read when the message is made, so one added after release counts.
-- **Held.** Without the patient's email, which is their consent, the message waits as **no_portal_email**. Without the practitioner's phone, it waits as **no_practitioner_phone**. Once the missing value is added, the message goes at the next pass. As for any change to a released patient, adding the email opens the report's impact review first.
+- **Held.** Without the patient's email, which is their consent, the message waits as **no_portal_email**. Without a given name, which the portal requires to match the patient and would otherwise refuse for good, it waits as **no_given_name**. Without the practitioner's phone, it waits as **no_practitioner_phone**. Once the missing value is added, the message goes at the next pass. As for any change to a released patient, adding the email opens the report's impact review first.
 - **Answers.**
   - 202 shows as **Accepted (AA)**, "Accepted by the portal."; 200 as **Accepted (AA)**, "Already received by the portal."
   - 422 shows as **Rejected (AR)**, with the portal's code, message and missing fields. 413 shows as **Rejected (AR)**, "too large". A rejected message is not posted again.

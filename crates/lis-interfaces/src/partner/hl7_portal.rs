@@ -2,7 +2,8 @@
 //! API reads beyond the standard message. PID-3 is the subject's identifier with the
 //! laboratory's CLIA number as its authority, so the portal keeps one patient for good;
 //! PID-14 the patient's email, which is their consent to the portal; every ORC and OBR
-//! carries the accession, so the portal makes one order; OBR-17 the ordering
+//! carries the accession, so the portal makes one order; OBR-14 the specimen's receipt;
+//! OBR-17 the ordering
 //! practitioner's phone; NTE the laboratory's name, CLIA number and phone; and a last
 //! OBX of type ED the revision's PDF. ORC-21 stays empty: the portal reads it as the
 //! laboratory's name, and it names the ordering client.
@@ -40,6 +41,13 @@ impl Oru {
 
     pub(super) fn portal_email(&self) -> Option<&str> {
         self.portal.as_ref().map(|fields| fields.email.as_str())
+    }
+
+    /// OBR-14: when the specimen was received; the portal reads it there, not in SPM-18.
+    pub(super) fn portal_received(&self) -> String {
+        self.portal
+            .as_ref()
+            .map_or_else(String::new, |_| esc(&self.specimen.received_at))
     }
 
     pub(super) fn portal_provider_phone(&self) -> String {

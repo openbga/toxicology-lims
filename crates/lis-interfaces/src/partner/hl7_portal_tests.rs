@@ -32,7 +32,7 @@ fn the_portal_profile_has_every_field_the_portal_reads() {
             "PID|1||0193a1b2-0000-7000-8000-000000000001^^^00D0000000^PI||Doe^Jane||19800101|F||||||jane.doe@example.com",
             "PV1|1|U|LOC-1^^^^^^^^Main office",
             "ORC|RE|ORD-000124|A26000005^VIBETOX LIS|||||||||1234567893^Test^Doctor^^^^^^^^^^NPI",
-            "OBR|1|ORD-000124|A26000005^VIBETOX LIS|CA-AMPH-CONF^Amphetamines Panel^L|||20261103083000-0500|||||||||1234567893^Test^Doctor^^^^^^^^^^NPI|(555) 555-0100|||||20261104101500-0600|||C",
+            "OBR|1|ORD-000124|A26000005^VIBETOX LIS|CA-AMPH-CONF^Amphetamines Panel^L|||20261103083000-0500|||||||20261103120000-0600||1234567893^Test^Doctor^^^^^^^^^^NPI|(555) 555-0100|||||20261104101500-0600|||C",
             "NTE|1||LAB NAME: Synthetic Tox Lab",
             "NTE|2||CLIA: 00D0000000",
             "NTE|3||LAB PHONE: (555) 555-0199",

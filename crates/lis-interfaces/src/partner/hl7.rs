@@ -244,6 +244,7 @@ impl Oru {
         fields[3] = coded(&group.service);
         fields[6] = esc(&self.order.collected_at);
         fields[15] = self.provider();
+        fields[13] = self.portal_received();
         fields[16] = self.portal_provider_phone();
         fields[21] = esc(&self.order.released_at);
         fields[24] = group.status.to_owned();
