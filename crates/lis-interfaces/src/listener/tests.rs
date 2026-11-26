@@ -675,12 +675,13 @@ fn unexpected_tcp_peer_is_rejected_before_receipt_and_security_audited() {
             .is_ok_and(|count| count == 1)
     });
     assert_eq!(fixture.receipt_count(), 0);
+    // The audit row and the status detail are written separately.
+    wait_until(|| {
+        supervisor.status_snapshot()[0].detail_code
+            == Some(ListenerDetailCode::UnexpectedPeerRejected)
+    });
     let status = supervisor.status_snapshot();
     assert_eq!(status[0].instrument_id, instrument.id);
-    assert_eq!(
-        status[0].detail_code,
-        Some(ListenerDetailCode::UnexpectedPeerRejected)
-    );
     supervisor.stop_all().expect("listener stops");
 }
 
