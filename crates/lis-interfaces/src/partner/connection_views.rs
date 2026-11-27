@@ -68,6 +68,8 @@ pub struct PartnerConnection {
     /// For incoming orders: where read files move to, local or on the server.
     pub processed_folder: Option<String>,
     pub failed_folder: Option<String>,
+    /// For the LIMSiq Patient Portal: the address each message is posted to.
+    pub ingest_url: Option<String>,
     /// For SFTP password sign-in: whether a password is kept. The password itself never
     /// leaves the engine.
     pub has_password: bool,

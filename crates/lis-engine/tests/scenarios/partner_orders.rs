@@ -218,6 +218,7 @@ pub(super) fn settings() -> PartnerConnectionSettings {
         }),
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 

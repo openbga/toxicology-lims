@@ -41,6 +41,7 @@ fn settings(sftp: SftpSettings) -> PartnerConnectionSettings {
         intake: None,
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 

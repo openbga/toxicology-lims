@@ -41,6 +41,7 @@ fn settings(rules: Vec<RoutingRule>) -> PartnerConnectionSettings {
         intake: None,
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 
@@ -73,13 +74,18 @@ impl Pdfs {
         } else {
             None
         };
+        // A portal connection signs in with its channel's API token.
+        let password = settings
+            .portal
+            .as_ref()
+            .map(|_| secret("synthetic-portal-token"));
         let created = engine
             .create_partner_connection(CreatePartnerConnectionInput {
                 settings,
                 folder_choice,
                 processed_folder_choice: None,
                 failed_folder_choice: None,
-                password: None,
+                password,
                 active: true,
             })
             .await

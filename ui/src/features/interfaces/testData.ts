@@ -7,6 +7,7 @@ import type { PartnerConnectionDetail } from "@/generated/PartnerConnectionDetai
 import type { PartnerContract } from "@/generated/PartnerContract";
 import type { PartnerMappings } from "@/generated/PartnerMappings";
 import type { PartnerMessageRow } from "@/generated/PartnerMessageRow";
+import type { PortalSettings } from "@/generated/PortalSettings";
 import type { SessionInfo } from "@/generated/SessionInfo";
 import type { SftpSettings } from "@/generated/SftpSettings";
 import type { UnroutedMessage } from "@/generated/UnroutedMessage";
@@ -49,10 +50,12 @@ export const CONNECTION: PartnerConnection = {
     intake: null,
     mllp: null,
     mllpListener: null,
+    portal: null,
   },
   folder: "/srv/billing/out",
   processedFolder: null,
   failedFolder: null,
+  ingestUrl: null,
   hasPassword: false,
   active: false,
   revision: 1,
@@ -106,6 +109,31 @@ export const HL7_MLLP: PartnerConnection = {
     protocol: "mllp_connect",
     fileNamePattern: "",
     mllp: MLLP,
+  },
+};
+
+/** A synthetic LIMSiq Patient Portal channel. */
+export const PORTAL: PortalSettings = {
+  baseUrl: "https://ingest.example.com",
+  labCode: "demo-lab",
+  apiUser: "lab-7-abcd1234",
+};
+
+/** An HL7 Results connection to the patient portal, with its token saved. */
+export const HL7_PORTAL: PartnerConnection = {
+  ...HL7,
+  ingestUrl: "https://ingest.example.com/api/labs/demo-lab/ingest",
+  hasPassword: true,
+  // The engine offers no test message to the portal.
+  allowedActions: HL7.allowedActions.filter((action) => action !== "send_partner_test_message"),
+  settings: {
+    ...HL7.settings,
+    name: "Patient portal",
+    partner: "LIMSiq",
+    protocol: "portal_https",
+    rules: [],
+    fileNamePattern: "",
+    portal: PORTAL,
   },
 };
 

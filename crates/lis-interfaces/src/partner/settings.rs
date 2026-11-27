@@ -11,6 +11,7 @@ use super::mllp_settings::valid_mllp;
 use super::model::{
     PartnerConnectionSettings, PartnerMessageType, RoutingRule, RuleCondition, Schedule,
 };
+use super::portal_settings::valid_portal;
 use super::sftp_settings::valid_sftp;
 use crate::validation::valid_text;
 
@@ -74,6 +75,7 @@ pub(crate) fn valid_settings(
         settings.mllp_listener,
     )?;
     let intake = valid_intake(settings.message_type, settings.protocol, settings.intake)?;
+    let portal = valid_portal(settings.message_type, settings.protocol, settings.portal)?;
     let Some(pattern) = pattern_rules(settings.message_type) else {
         return Ok(PartnerConnectionSettings {
             name,
@@ -85,12 +87,13 @@ pub(crate) fn valid_settings(
             intake,
             mllp,
             mllp_listener,
+            portal,
             ..settings
         });
     };
     let rules = valid_rules(settings.rules)?;
     valid_schedule(&settings.schedule)?;
-    let file_name_pattern = if mllp.is_some() {
+    let file_name_pattern = if mllp.is_some() || portal.is_some() {
         String::new()
     } else {
         let file_name_pattern = settings.file_name_pattern.trim().to_owned();
@@ -106,6 +109,7 @@ pub(crate) fn valid_settings(
         intake,
         mllp,
         mllp_listener,
+        portal,
         ..settings
     })
 }
@@ -314,6 +318,7 @@ mod tests {
             intake: None,
             mllp: None,
             mllp_listener: None,
+            portal: None,
         }
     }
 

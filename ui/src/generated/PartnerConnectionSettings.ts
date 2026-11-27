@@ -4,6 +4,7 @@ import type { MllpListener } from "./MllpListener";
 import type { MllpPartner } from "./MllpPartner";
 import type { PartnerMessageType } from "./PartnerMessageType";
 import type { PartnerProtocol } from "./PartnerProtocol";
+import type { PortalSettings } from "./PortalSettings";
 import type { RoutingRule } from "./RoutingRule";
 import type { Schedule } from "./Schedule";
 import type { SftpSettings } from "./SftpSettings";
@@ -36,4 +37,8 @@ mllp: MllpPartner | null,
 /**
  * Where the LIS listens, for MLLP – LIS listens; `None` otherwise.
  */
-mllpListener: MllpListener | null, };
+mllpListener: MllpListener | null, 
+/**
+ * The portal's ingest API, for the LIMSiq Patient Portal; `None` otherwise.
+ */
+portal: PortalSettings | null, };

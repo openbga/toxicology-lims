@@ -18,6 +18,7 @@ import { useFormatTime } from "@/lib/format";
 import { usePersonText } from "@/lib/person";
 import { GET_MESSAGE } from "../contract";
 import { applicationOf, MESSAGE_TYPES, problemText, recordText, transportOf } from "../labels";
+import { answers } from "../mllpLabels";
 import { connectionPath } from "../paths";
 import styles from "./MessagePanel.module.css";
 import { MessageDetails } from "./messageColumns";
@@ -96,10 +97,10 @@ export function MessagePanel({
   );
 }
 
-/** The partner's MSA code and text, or why there is none. */
+/** The MLLP partner's MSA code and text, or the portal's answer, or why there is none. */
 function Answer({ row }: { row: PartnerMessageRow }) {
   const answer = applicationOf(row);
-  if (row.connection?.protocol !== "mllp_connect") {
+  if (!answers(row)) {
     return <>None: a folder or SFTP server never answers.</>;
   }
   if (row.ackCode !== null && answer) {

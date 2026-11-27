@@ -162,11 +162,11 @@ Implemented on synthetic data: incoming OML^O21 (or ORM^O01) new orders read fro
 
 Implemented on synthetic data: outgoing ORU^R01 results written to a partner folder, uploaded to the partner's SFTP server (outbound only, pinned server fingerprint; [interfaces](../operations/interfaces.md#sftp)), or sent over MLLP to a partner's interface on the lab network, which answers each message with an application acknowledgement on the same connection (original mode; [interfaces](../operations/interfaces.md#mllp--lis-connects)), with per-connection code mappings a second person approves and held results for unmapped codes or units, or for a patient with no identifier for PID-3 ([interfaces](../operations/interfaces.md#hl7-results-messages)). Incoming OML^O21/ORM^O01 orders are read from a folder or SFTP server, or received over MLLP on a lab-network address of the host from allowed partner addresses only, each answered AA, AE or AR in original mode once it is saved ([interfaces](../operations/interfaces.md#mllp--lis-listens)). Each connection carries a versioned interface contract a second person approves and synthetic acceptance tests of the LIS's side, which must pass for the connection as it is now before patient data goes or comes ([interfaces](../operations/interfaces.md#interface-contracts-and-acceptance-tests); REQ-INT-001). Its segment choices are defaults, not an LRI conformance claim; the partner's acceptance, a conformance corpus and the per-partner readiness record remain open. The ADT and DFT candidates identify future contract scope; their full profiles have not been reviewed for this project. They must not be enabled based on this table alone. HL7's LOI product brief documents a US ambulatory ordering guide family; reviewing the brief is not reviewing or conforming to the complete guide. [DOM-009](https://dev3.hl7.org/implement/standards/product_brief.cfm?product_id=152)
 
-**LIMSiq Patient Portal profile (#4672, encoder only).** The `AGENTS.md` instruction of 2026-11-24 authorizes results delivery to the LIMSiq Patient Portal's ingest API. The ORU^R01 encoder has a portal profile (`Oru::for_portal`) that changes the standard message as follows:
+**LIMSiq Patient Portal profile (#4672).** The `AGENTS.md` instruction of 2026-11-24 authorizes results delivery to the LIMSiq Patient Portal's ingest API. The ORU^R01 encoder has a portal profile (`Oru::for_portal`) that changes the standard message as follows:
 
 - PID-3 carries the subject's identifier, with the laboratory's CLIA number as its assigning authority and type `PI`. The portal refuses the same identifier under another authority, so the authority never changes.
 - PID-14 carries the patient's email. A recorded email is the patient's consent to the portal.
-- The accession, not one number per test, goes in every ORC-3 and OBR-3, so the portal makes one order.
+- The accession, not one number per test, goes in every ORC-3 and OBR-3, so the portal makes one order. OBR-14 carries the specimen's receipt, which the portal reads there rather than in SPM-18.
 - OBR-17 carries the ordering practitioner's phone.
 - Three NTE segments after the first OBR carry `LAB NAME:`, `CLIA:` and `LAB PHONE:`.
 - A last OBX of type ED carries the revision's PDF as `^AP^PDF^Base64^…`. A withdrawal carries no PDF.
@@ -174,7 +174,7 @@ Implemented on synthetic data: outgoing ORU^R01 results written to a partner fol
 
 The portal's own parser reads all of these from a synthetic message. Two of its readings are for the portal to correct: it reads OBR-16 as family and given name, so the XCN's leading NPI shows as a name, and it keeps OBX-6 with its coding system (`ng/mL^^UCUM`).
 
-No connection sends this profile yet. The HTTPS connection to the portal is the next step. It reads the patient's current email and the practitioner's current phone at sending time, and holds the message while either is missing.
+A **LIMSiq Patient Portal** connection sends this profile. It posts each message over HTTPS to the portal's ingest API, with the delivery ID as the idempotency key. It reads the patient's current email and the practitioner's current phone at sending time, and holds the message while either is missing, or while the patient has no given name, which the portal requires ([interfaces](../operations/interfaces.md#limsiq-patient-portal)). The portal's 202 means it took the message, not that it processed it. Processing errors show in the portal's own Exceptions page, and OpenBGA does not yet read them back.
 
 Edition status at the 2026-10-12 check:
 

@@ -71,6 +71,7 @@ mod email;
 mod error;
 mod intake;
 mod model;
+mod portal_contacts;
 pub mod queries;
 mod repo;
 mod search;
@@ -108,6 +109,7 @@ pub use model::{
     LaboratoryProfileId, NPI_AUTHORITY, Npi, Practitioner, PractitionerId, Subject, SubjectId,
     SubjectIdentifier, SubjectIdentifierId,
 };
+pub use portal_contacts::{current_subject_email, practitioner_phone};
 pub use queries::{
     SubjectMatchQuery, audit_record_label, audit_record_search, current_laboratory_profile,
     find_subject_matches, get_client, get_laboratory_profile_by_id, get_practitioner, get_subject,

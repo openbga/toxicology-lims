@@ -235,6 +235,7 @@ fn settings(name: &str, rules: Vec<RoutingRule>) -> PartnerConnectionSettings {
         intake: None,
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 

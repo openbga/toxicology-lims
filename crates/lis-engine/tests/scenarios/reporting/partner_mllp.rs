@@ -79,6 +79,7 @@ pub(super) fn settings(port: u16) -> PartnerConnectionSettings {
             ack_timeout_seconds: 1,
         }),
         mllp_listener: None,
+        portal: None,
     }
 }
 

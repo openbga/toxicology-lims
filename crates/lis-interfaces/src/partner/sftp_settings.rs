@@ -112,6 +112,9 @@ pub(crate) fn destination_of(settings: &PartnerConnectionSettings, folder: &str)
     if let Some(listener) = &settings.mllp_listener {
         return listener_destination(listener);
     }
+    if let Some(portal) = &settings.portal {
+        return super::portal_settings::portal_destination(portal);
+    }
     match &settings.sftp {
         Some(sftp) => format!(
             "sftp://{}@{}:{}{} {}",

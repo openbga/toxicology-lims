@@ -17,6 +17,7 @@ fn settings(message_type: PartnerMessageType, pattern: &str) -> PartnerConnectio
         intake: None,
         mllp: None,
         mllp_listener: None,
+        portal: None,
     }
 }
 

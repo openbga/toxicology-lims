@@ -6,8 +6,8 @@ use lis_core::CommandError;
 use lis_interfaces::partner::{
     ApprovePartnerMappings, DiscardPartnerMappingDraft, DraftPartnerMapping, LisRecordId,
     ListPartnerMessages, MappingKind, MessageView, NewMappingDraft, PartnerConnectionId,
-    PartnerError, PartnerMappings, PartnerMessageRow, PartnerMessageType, TransportOutcome,
-    WaitReason,
+    PartnerError, PartnerMappings, PartnerMessageRow, PartnerMessageType, PartnerProtocol,
+    TransportOutcome, WaitReason,
 };
 use lis_reporting::ReportingError;
 use rusqlite::Connection;
@@ -20,6 +20,7 @@ use super::{
 use crate::engine::Engine;
 use crate::partner_delivery::hl7_message::Missing;
 use crate::partner_delivery::hl7_payload::{Target, make};
+use crate::partner_delivery::hl7_portal::{PortalGap, portal_gap};
 
 impl Engine {
     /// `list_partner_mappings`: an HL7 connection's approved mappings, drafts, and the LIS
@@ -161,11 +162,16 @@ pub(super) fn hold_reason(
     };
     Ok(match make(conn, &target)? {
         Err(missing) => (!missing.is_empty()).then_some(WaitReason::NotMapped),
-        Ok((oru, _)) => oru
-            .patient
-            .identifiers
-            .is_empty()
-            .then_some(WaitReason::NoPatientIdentifier),
+        Ok((oru, ..)) => match portal_gap(&oru) {
+            Some(PortalGap::Email) => Some(WaitReason::NoPortalEmail),
+            Some(PortalGap::GivenName) => Some(WaitReason::NoGivenName),
+            Some(PortalGap::PractitionerPhone) => Some(WaitReason::NoPractitionerPhone),
+            None => oru
+                .patient
+                .identifiers
+                .is_empty()
+                .then_some(WaitReason::NoPatientIdentifier),
+        },
     })
 }
 
@@ -189,6 +195,7 @@ fn waiting_target(row: &PartnerMessageRow) -> Option<Target> {
         source_id: row.source_id.clone(),
         // Only what the message misses is read here, not its bytes.
         acknowledged: false,
+        portal: connection.protocol == PartnerProtocol::PortalHttps,
     })
 }
 

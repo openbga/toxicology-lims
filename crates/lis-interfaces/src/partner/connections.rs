@@ -11,8 +11,7 @@ use super::error::{PartnerError, invalid};
 use super::intake_settings::moved_to;
 use super::model::{
     ConnectionChange, CreatePartnerConnection, PartnerConnectionId, PartnerConnectionSettings,
-    RecordPartnerDestinationCheck, SetPartnerConnectionActive, SftpAuth, SftpSettings,
-    UpdatePartnerConnection,
+    RecordPartnerDestinationCheck, SetPartnerConnectionActive, SftpAuth, UpdatePartnerConnection,
 };
 use super::repo::{self, ChangeRow, ConnectionRow, VerificationRow};
 use super::settings::{valid_folder, valid_settings};
@@ -32,8 +31,8 @@ pub fn create_partner_connection(
     let settings = valid_settings(input.settings)?;
     let folder = match &settings.sftp {
         Some(sftp) => sftp.remote_folder.clone(),
-        // An MLLP connection sends to, or listens for, an address: it has no folder.
-        None if settings.over_mllp() => String::new(),
+        // An MLLP or portal connection sends to, or listens for, an address: no folder.
+        None if settings.without_files() => String::new(),
         None => {
             valid_folder(&input.folder)?;
             input.folder
@@ -85,23 +84,20 @@ pub fn update_partner_connection(
     unique_name(ctx, &settings.name, Some(current.id))?;
     let folder = match (&settings.sftp, input.folder) {
         (Some(sftp), _) => sftp.remote_folder.clone(),
-        (None, _) if settings.over_mllp() => String::new(),
+        (None, _) if settings.without_files() => String::new(),
         (None, Some(folder)) => {
             valid_folder(&folder)?;
             folder
         }
         // The current folder is kept only while the connection writes to a folder.
-        (None, None) if current.settings.sftp.is_none() && !current.settings.over_mllp() => {
+        (None, None) if current.settings.sftp.is_none() && !current.settings.without_files() => {
             current.folder.clone()
         }
         (None, None) => return Err(invalid("folder", "required", "Choose the folder.")),
     };
-    // A kept password is never sent to another server or account: those need it again.
-    let account = |sftp: &Option<SftpSettings>| {
-        sftp.as_ref()
-            .map(|sftp| (sftp.host.clone(), sftp.port, sftp.username.clone()))
-    };
-    let previous = (account(&settings.sftp) == account(&current.settings.sftp))
+    // A kept password or token is never sent to another server or account: those need it
+    // again.
+    let previous = (account(&settings) == account(&current.settings))
         .then(|| current.sealed_password.clone())
         .flatten();
     let sealed_password = password_for(&settings, input.sealed_password, previous)?;
@@ -139,13 +135,35 @@ pub fn update_partner_connection(
     Ok(row.id)
 }
 
-/// The sealed password to keep: only for SFTP password sign-in, the new one or else the
-/// one already kept. The engine sealed it; the password itself never reaches this module.
+/// The account a kept secret belongs to: the SFTP server and user, or the portal address,
+/// laboratory code and API user.
+fn account(settings: &PartnerConnectionSettings) -> Option<String> {
+    if let Some(sftp) = &settings.sftp {
+        return Some(format!("{}:{} {}", sftp.host, sftp.port, sftp.username));
+    }
+    settings
+        .portal
+        .as_ref()
+        .map(super::portal_settings::portal_destination)
+}
+
+/// The sealed secret to keep: the SFTP password for password sign-in, or the portal's API
+/// token; the new one or else the one already kept. The engine sealed it; the secret itself
+/// never reaches this module.
 fn password_for(
     settings: &PartnerConnectionSettings,
     new: Option<Vec<u8>>,
     kept: Option<Vec<u8>>,
 ) -> Result<Option<Vec<u8>>, PartnerError> {
+    if settings.portal.is_some() {
+        return new.or(kept).map(Some).ok_or_else(|| {
+            invalid(
+                "settings.portal.token",
+                "required",
+                "Enter the API token LIMSiq gave you for this channel.",
+            )
+        });
+    }
     match settings.sftp.as_ref().map(|sftp| sftp.auth) {
         Some(SftpAuth::Password) => new.or(kept).map(Some).ok_or_else(|| {
             invalid(

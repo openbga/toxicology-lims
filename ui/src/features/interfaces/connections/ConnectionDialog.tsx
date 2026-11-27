@@ -18,12 +18,13 @@ import {
   FIELD_PATHS,
   toSettings,
   toValues,
-  typedPassword,
+  typedSecret,
 } from "./connectionForm";
 import { FolderFields } from "./FolderFields";
 import { AcceptSection, IntakeFolderFields } from "./IntakeSections";
 import { ListenerFields } from "./ListenerFields";
 import { MllpFields } from "./MllpFields";
+import { PortalFields } from "./PortalFields";
 import { ProtocolCards } from "./ProtocolCards";
 import { RuleFields } from "./RuleFields";
 import { SftpFields } from "./SftpFields";
@@ -64,8 +65,8 @@ export function ConnectionDialog({ connection, onClose, onSaved }: ConnectionDia
   const incoming = isIncoming(useWatch({ control: form.control, name: "messageType" }));
   const submit = form.handleSubmit((values) => {
     const settings = toSettings(values);
-    const password = values.protocol === "sftp" ? typedPassword(values.sftp) : undefined;
-    // Folders come only from the dialog's handles; an SFTP connection has none.
+    const password = typedSecret(values);
+    // Folders come only from the dialog's handles; an SFTP or portal connection has none.
     const local = values.protocol === "folder";
     const handle = (choice: string) => (local && choice !== "" ? choice : undefined);
     const destination = {
@@ -156,8 +157,8 @@ interface ProtocolSectionProps {
 }
 
 /**
- * Section 3, which changes with the protocol: the folder, the SFTP server, the MLLP partner or
- * the LIS's MLLP listener.
+ * Section 3, which changes with the protocol: the folder, the SFTP server, the MLLP partner,
+ * the LIS's MLLP listener or the patient portal's ingest API.
  */
 function ProtocolSection({ protocol, incoming, connection }: ProtocolSectionProps) {
   switch (protocol) {
@@ -177,6 +178,14 @@ function ProtocolSection({ protocol, incoming, connection }: ProtocolSectionProp
       return (
         <Box title="3. MLLP listener">
           <ListenerFields connectionId={connection?.id ?? null} />
+        </Box>
+      );
+    case "portal_https":
+      return (
+        <Box title="3. LIMSiq Patient Portal">
+          <PortalFields
+            hasToken={connection?.settings.protocol === "portal_https" && connection.hasPassword}
+          />
         </Box>
       );
     case "folder":
