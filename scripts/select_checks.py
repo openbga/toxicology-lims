@@ -15,7 +15,8 @@ TOOLING = {
     "scripts/release_version.py", "scripts/test_release_version.py",
     "scripts/update_feed.py", "scripts/test_update_feed.py",
     "scripts/changelog.py", "scripts/test_changelog.py", ".github/workflows/changelog.yml",
-    ".github/workflows/ci.yml", ".github/workflows/package.yml", ".gitignore",
+    ".github/workflows/ci.yml", ".github/workflows/package.yml", ".github/workflows/security.yml",
+    ".gitignore",
 }
 EMBEDDED = {
     "docs/architecture/backup-and-export-formats.md",

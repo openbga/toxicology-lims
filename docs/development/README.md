@@ -170,6 +170,22 @@ not itself change branch protection. CI does not deploy. The
 publishing nightly and versioned builds, and the separate
 [Pages workflow](public-website.md#publication) publishes only `website/`.
 
+### Advisory dependency checks
+
+The separate [`security` workflow](../../.github/workflows/security.yml) runs on pull requests
+and is advisory. Both jobs finish successfully even when they find something; a finding shows as
+a warning annotation on the run. They are not part of `quality-gate`, so they never block a merge.
+
+| Job | What it checks | Scope |
+| --- | --- | --- |
+| `dependency review` | GitHub's dependency review of the dependencies the pull request adds or changes, against known advisories (high or critical) | Only the pull request's own changes |
+| `npm audit (runtime dependencies)` | `npm audit --omit=dev --audit-level=high` on `package-lock.json`; nothing is installed | Runtime dependencies; development-only tools are excluded |
+
+Rust advisories, licenses and yanked crates stay with `cargo deny` in the `policy` job. The
+`security` workflow starts advisory so that a newly published advisory does not fail every open pull
+request; whether it should become blocking is a later decision. Open Dependabot alerts and the
+full `npm audit`, including development tools, are outside these jobs.
+
 The governing rules are the
 [coding](../governance/coding-standards.md), [UI](../governance/ui-standards.md),
 [library](../governance/library-policy.md), [security/audit/logging](../governance/security-audit-logging.md)
