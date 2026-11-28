@@ -25,6 +25,7 @@ Implementation skills for the scope authorized by [ADR 0013](../docs/architectur
 | [Changelog entry](skills/changelog-entry/SKILL.md) | Recording an observable change in `changelog.d/` for CHANGELOG.md and What's new |
 | [Quality gate](skills/quality-gate/SKILL.md) | Running and interpreting format, lint, type, test, duplication and unused-code checks |
 | [Batch code review](skills/batch-code-review/SKILL.md) | Independent read-only review of a batch of four or more tickets, or of engine, authorization, audit or migration changes, before the pull request |
+| [Weekly audit](skills/weekly-audit/SKILL.md) | Periodic read-only audit of the whole repository for duplication, dead code, dependency risk, authorization, secrets and sensitive data in logs |
 | [Release automation](skills/release-automation/SKILL.md) | Running the scheduled nightly and versioned GitHub releases through the package workflow |
 
 The research skills require only document access and, for current claims, a suitable research tool; the implementation skills also need the repository's build tools. Release automation publishes unsigned development builds through the package workflow under the project owner's 2026-10-20 instruction and needs an authenticated `gh`. No skill carries authority to contact third parties, upload other data, deploy services, or clinically authorize results. Future tools can wrap them while preserving this canonical location.
