@@ -1,0 +1,51 @@
+# Advisory dependency checks on pull requests. They report and annotate but never fail the
+# run, and they are not part of the ci workflow's quality-gate job, so they cannot block a
+# merge. See docs/development/README.md#advisory-dependency-checks.
+name: security
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    name: dependency review
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Compares the dependencies this pull request adds or changes with known advisories.
+      - id: review
+        continue-on-error: true
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: never
+      - name: Report the advisory result
+        if: steps.review.outcome == 'failure'
+        run: echo "::warning title=Dependency review::This pull request adds or changes a dependency with a known high or critical advisory. See the dependency review step. Advisory only; the run is not blocked."
+
+  npm-audit:
+    name: npm audit (runtime dependencies)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # Reads package-lock.json; nothing is installed. Development-only tools are excluded.
+      - id: audit
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
+      - name: Report the advisory result
+        if: steps.audit.outcome == 'failure'
+        run: echo "::warning title=npm audit::A runtime npm dependency has a known high or critical advisory. See the npm audit step. Advisory only; the run is not blocked."

@@ -37,6 +37,7 @@ class ClassificationTests(unittest.TestCase):
             ".github/workflows/changelog.yml": {"tooling"},
             ".github/workflows/ci.yml": {"tooling"},
             ".github/workflows/package.yml": {"tooling"},
+            ".github/workflows/security.yml": {"tooling"},
             "scripts/release_version.py": {"tooling"},
             ".github/ISSUE_TEMPLATE/bug-report.yml": {"docs"},
             "scripts/select_checks.py": {"tooling"},
